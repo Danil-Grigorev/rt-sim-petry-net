@@ -366,3 +366,6 @@ TSWLatexianTemp*
 
 # standalone packages
 *.sta
+
+*sablona2018*
+*.pdf
