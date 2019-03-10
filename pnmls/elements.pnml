@@ -1,0 +1,173 @@
+<pnml xmlns="RefNet">
+   <net id="netId1542970149297" type="RefNet">
+      <transition id="1">
+         <name>
+            <graphics>
+               <offset x="0" y="0"/>
+            </graphics>
+            <text>a</text>
+         </name>
+         <graphics>
+            <position x="204" y="133"/>
+            <dimension x="24" y="16"/>
+            <fill color="rgb(112,219,147)"/>
+            <line color="rgb(0,0,0)"/>
+         </graphics>
+      </transition>
+      <place id="2">
+         <name>
+            <graphics>
+               <offset x="0" y="0"/>
+            </graphics>
+            <text>p</text>
+         </name>
+         <graphics>
+            <position x="204" y="223"/>
+            <dimension x="20" y="20"/>
+            <fill color="rgb(112,219,147)"/>
+            <line color="rgb(0,0,0)"/>
+         </graphics>
+      </place>
+      <transition id="3">
+         <name>
+            <graphics>
+               <offset x="0" y="1"/>
+            </graphics>
+            <text>b</text>
+         </name>
+         <graphics>
+            <position x="119" y="178"/>
+            <dimension x="24" y="16"/>
+            <fill color="rgb(112,219,147)"/>
+            <line color="rgb(0,0,0)"/>
+         </graphics>
+      </transition>
+      <transition id="4">
+         <name>
+            <graphics>
+               <offset x="0" y="0"/>
+            </graphics>
+            <text>f</text>
+         </name>
+         <graphics>
+            <position x="286" y="178"/>
+            <dimension x="24" y="16"/>
+            <fill color="rgb(112,219,147)"/>
+            <line color="rgb(0,0,0)"/>
+         </graphics>
+      </transition>
+      <transition id="5">
+         <name>
+            <graphics>
+               <offset x="0" y="0"/>
+            </graphics>
+            <text>d</text>
+         </name>
+         <graphics>
+            <position x="204" y="316"/>
+            <dimension x="24" y="16"/>
+            <fill color="rgb(112,219,147)"/>
+            <line color="rgb(0,0,0)"/>
+         </graphics>
+      </transition>
+      <arc id="6" source="1" target="2">
+         <type>
+            <text>ordinary</text>
+         </type>
+         <graphics>
+            <line color="rgb(0,0,0)" style="solid"/>
+         </graphics>
+      </arc>
+      <arc id="7" source="2" target="5">
+         <type>
+            <text>ordinary</text>
+         </type>
+         <graphics>
+            <line color="rgb(0,0,0)" style="solid"/>
+         </graphics>
+      </arc>
+      <arc id="8" source="3" target="2">
+         <type>
+            <text>both</text>
+         </type>
+         <graphics>
+            <line color="rgb(0,0,0)" style="solid"/>
+         </graphics>
+      </arc>
+      <arc id="9" source="2" target="4">
+         <type>
+            <text>test</text>
+         </type>
+         <graphics>
+            <line color="rgb(0,0,0)" style="solid"/>
+         </graphics>
+      </arc>
+      <transition id="12">
+         <name>
+            <graphics>
+               <offset x="0" y="0"/>
+            </graphics>
+            <text>c</text>
+         </name>
+         <graphics>
+            <position x="119" y="265"/>
+            <dimension x="24" y="16"/>
+            <fill color="rgb(112,219,147)"/>
+            <line color="rgb(0,0,0)"/>
+         </graphics>
+      </transition>
+      <arc id="13" source="12" target="2">
+         <type>
+            <text>both</text>
+         </type>
+         <graphics>
+            <position x="159" y="233"/>
+            <line color="rgb(0,0,0)" style="solid"/>
+         </graphics>
+      </arc>
+      <arc id="14" source="12" target="2">
+         <type>
+            <text>both</text>
+         </type>
+         <graphics>
+            <position x="169" y="253"/>
+            <line color="rgb(0,0,0)" style="solid"/>
+         </graphics>
+      </arc>
+      <transition id="15">
+         <name>
+            <graphics>
+               <offset x="0" y="0"/>
+            </graphics>
+            <text>e</text>
+         </name>
+         <graphics>
+            <position x="286" y="265"/>
+            <dimension x="24" y="16"/>
+            <fill color="rgb(112,219,147)"/>
+            <line color="rgb(0,0,0)"/>
+         </graphics>
+      </transition>
+      <arc id="16" source="2" target="15">
+         <type>
+            <text>test</text>
+         </type>
+         <graphics>
+            <position x="238" y="250"/>
+            <line color="rgb(0,0,0)" style="solid"/>
+         </graphics>
+      </arc>
+      <arc id="17" source="2" target="15">
+         <type>
+            <text>test</text>
+         </type>
+         <graphics>
+            <position x="254" y="233"/>
+            <line color="rgb(0,0,0)" style="solid"/>
+         </graphics>
+      </arc>
+      <name>
+         <text>elements</text>
+      </name>
+   </net>
+</pnml>
