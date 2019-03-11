@@ -15,92 +15,45 @@ Vezmeme například
 \subsection*{Simulace v realnem case}
 \subsection*{Planovac udalosti}
 \subsection*{Petriho site}
-\chapter{Definice}
-Petrího síť (PN) je pětice, PN = (P, T, I, O, M0) kde:
-P = {p1, p2, ... , pn} je konečná množína míst, n > 0;
-T = {t1, t2, ... , tk} je konečná množína přechodů, k > 0;
-I = T -> P je vstupní funkce, propojující přechody s množínou vstupních míst;
-O = P -> T je výstupní funkce, propojující výstupní místa s množínou přechodů;
-M0 je množína počatečních znáček;
-P ∧ T = ∅, P ∨ T ≠ ∅
+\subsubsection*{Definice}
+
+Petrího síť ($PN$) se sestavuje ze ctrz prvku, $PN = \left(P, T, I, O\right)$ kde:
+  \begin{itemize}
+    \item $P = \left\{p_1, p_2, \cdots , p_n\right\}$ je konečná množína míst, $n >= 0$; \\
+    \item $T = \left\{t_1, t_2, \cdots , t_m\right\}$ je konečná množína přechodů, $m >= 0$; \\
+    \item $I = T \rightarrow P^\infty$ je vstupní funkce, propojující přechody s množínou vstupních míst; \\
+    \item $O = P \rightarrow T^\infty$ je výstupní funkce, propojující výstupní místa s množínou přechodů; \\
+  \end{itemize}
+P $\vee$ T = $\varnothing$, P $\wedge$ T != $\varnothing$. 
 
 Petrího síť může provest přechod 
 
-\chapter{Znackovane petriho site}
+\subsection*{Graf Petriho site}
 
-\chapter{Casovane petriho site}
-\chapter{Vysokourovnove petriho site}
-\chapter{Applikace Petrího siti}
+\subsubsection{Typy Petriho site}
+
+\paragraph*{Znackovane petriho site}
+Znackovane petriho seti (ZPS) zavadi takovy pojem jako "znacka". "Znacka" je zakladni prvek v ZPS, umoznujici jeji vykonovani. Vykonovani se provadi provedenim prehodu, behem ktereho se vymazou znacky ze mnoziny vstupnich mist, a prida se odpovidajici pocet do vystupnich mist. Tato operace se muze vykonovat dokud nezbyde zadny povoleny prechod.
+
+Prechod v PS je povolen, dokud kazde ze vstupnich mist propojenych s danym prechodem obsahuje alespon jednu znacku. Znacky, umoznujici provedeni prechodu se jmenuji "umoznujici znacky".
+
+Pri vykonovani seti Petri vznikaji dve posloupnosti - posloupnost znacek a posloupnost prechodu, ktere byly provedeny. Teto dve posloupnosti zcela popisuji vykonani Petriho seti.
+%[Petri net theory and model... par:2.4 p 18-19]
+
+Diky moznosti vykonovat Petriho sit, vznika prilezitost vytvorzit simulacni nastroj, ktery je zalozen na zminenych zasadech. 
+
+\paragraph*{Casovane petriho site}
+\paragraph*{Vysokourovnove petriho site}
+\subsection*{Applikace Petrího siti}
+Prikladem pouziti znackovane petriho siti muze slouzit implementace "problemu Vecericich philosofu", coz je problem poprve predstaveny professorem Dijkstrou v roce 1965.
+Je to obecne znamy problem paralelismu, ktery nazorne zobrazuje dva pripady chyb vznikajicich pri pararelnim vypoctu - vyhladoveni a uvaznuti.
+% https://en.wikipedia.org/wiki/Dining_philosophers_problem#cite_note-formalization-2
+% Petri nets theory and Modeling of Systems, p. 65-67, par 3.4.6
+% TODO: naimplementovat a zobrazit
 
 1. \url{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597?scroll=top&needAccess=true}
 Rozsah míst kdě se dá applikovat Petrího sítě je velmí široký. Jako modelovací prostředek můžou sloužit například pro „reprezentací vzorů interakce“ mezí člověkem a autopilotém letadla(odkáz 1), nebo .... V nášem případě vysokourovňová Petrího síť modeluje a nasledně simuluje chování distribovaného sýstemu (termostat <-> teploměr) 
 \chapter{Implementace}
 \chapter{Knihovna SNAKES}
-
-
-%===================================================================================
-\chapter{Úvod}
-
-Tento text slouží jako ukázkový obsah šablony a současně rekapituluje nejdůležitější informace z předpisů a poskytuje další užitečné informace, které budete potřebovat pro tvorbu technické zprávy ke svojí práci. Než se šablonou budete dále pracovat, je třeba vědět, jak ji správně použít. To je stručně uvedeno v~příloze \ref{jak}.
-
-\chapter{Abstrakt}
-\label{abstrakt}
-\bigskip
-
-\noindent Za prvé – na abstraktu záleží. Za druhé – není těžké ho napsat. Pojďme na to.
-
-\subsection*{K čemu je abstrakt}
-
-\subsection*{Kdy a jak psát Abstrakt}
-\subsection*{Doporučená struktura abstraktu}
-
-\paragraph{První část -- Jaký se řeší problém? Jaké je téma? Jaký je cíl textu?}
-\begin{itemize}
-  \item{Tato práce řeší.}
-  \item{Cílem této práce je.}
-  \item{Zaměřil jsem se na.}
-\end{itemize}
-
-\paragraph{Druhá část -- Jak je problém vyřešen? Cíl naplněn?}
-\begin{itemize}
-  \item{Zvolený problém jsem vyřešil pomocí toho a toho.}
-  \item{V řešení bylo použito metody té, postupu toho a analýzy oné.}
-  \item{Práce představuje algoritmus takový, který.}
-  \item{Data jsem zpracovával pomocí těch a těchto nástrojů a provedl vyhodnocení takové.}
-  \item{Podstatou našeho algoritmu je.}
-\end{itemize}
-
-\paragraph{Třetí část -- Jaké jsou konkrétní výsledky? Jak dobře je problém vyřešen?}
-\begin{itemize}
-  \item{Podařilo se dosáhnout úspěšnosti 87,3\,\%.}
-  \item{V práci jsme vytvořili systém, který.}
-  \item{Vytvořené řešení poskytuje ty a ty možnosti.}
-  \item{Provedeným výzkumem jsme zjistili, že.}
-\end{itemize}
-
-\paragraph{Čtvrtá část -- Takže co? Čím je to užitečné Vědě a čtenáři?}
-\begin{itemize}
-  \item{Přínosem této práce je.}
-  \item{Hlavním zjištěním je.}
-  \item{Hlavním výsledkem je.}
-  \item{Na základě zjištěných údajů je možné.}
-  \item{Výsledky této práce umožňují.}
-\end{itemize}
-
-
-\paragraph{Nultá část -- O co jde? Kde jsme?}
-\begin{itemize}
-  \item{Práce je řešena v kontextu tom a tom.}
-  \item{Nauka ta a ta se zabývá studiem toho a toho.}
-  \item{Stavíme na těchto a oněch nedávných pokrocích v naší oblasti.}
-\end{itemize}
-
-\chapter{Příprava základní struktury práce} 
-\label{struktura}
-
-
-\chapter{Odevzdání práce} 
-\label{odevzdani}
-
 \chapter{Závěr}
 \label{zaver}
