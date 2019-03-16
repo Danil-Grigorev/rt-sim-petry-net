@@ -19,7 +19,7 @@ class PNSim():
     NOW = -2
     INF = float('inf')
     barier = None
-    wake_event = [Event()]
+    wake_event = Event()
 
     def __init__(self, broker="127.0.0.1"):
         self._nets = {}
@@ -69,9 +69,9 @@ class PNSim():
                             tm - self.cur_time(), self.cur_time() - self.start_time))
                     logging.info('Waiting for {}'.format(tm - self.cur_time()))
                     if tm == PNSim.INF:
-                        event_set = PNSim.wake_event[0].wait()
+                        event_set = PNSim.wake_event.wait()
                     else:
-                        event_set = PNSim.wake_event[0].wait(tm - self.cur_time())
+                        event_set = PNSim.wake_event.wait(tm - self.cur_time())
                     if event_set:   # New event arrived
                         logging.info(
                             f"New event arrived at {self.cur_time() - self.start_time}")
@@ -95,9 +95,9 @@ class PNSim():
             if self._running_events:
                 logging.info('Waiting for threads {}'.format(self._running_events))
                 if self.end_time == PNSim.INF:
-                    PNSim.wake_event[0].wait()
+                    PNSim.wake_event.wait()
                 else:
-                    PNSim.wake_event[0].wait(self.end_time - self.cur_time())
+                    PNSim.wake_event.wait(self.end_time - self.cur_time())
                 
     def execute_net(self, net):
         if not isinstance(net, snakes.nets.PetriNet):
@@ -154,20 +154,16 @@ class PNSim():
             self.wake()
 
     def wake(self):
-        PNSim.wake_event[0].set()
-        PNSim.wake_event[0].clear()
+        PNSim.wake_event.set()
+        PNSim.wake_event.clear()
 
     def __wait_net_ports(self):
-        PNSim.barier = Barrier(parties=len(self._nets), timeout=2)
-        for net in self._nets.values():
+        nets = self._nets.values()
+        parties = len([net for net in nets if net.ports])
+        PNSim.barier = Barrier(parties=parties, timeout=2)
+        for net in nets:
             net.prepare()
-        while not all([net.ready for net in self._nets.values()]):
-            got_ready = PNSim.wake_event[0].wait(10)
-            print(
-                f'Update {" ".join(["-".join((net.name, str(net.ready))) for net in self._nets.values()])}')
-            if not got_ready:
-                raise RuntimeError('Brocker request timedout {}'.format(
-                    [(net, net.ready) for net in self._nets.values()]))
+        PNSim.barier.wait()
 
 class Scheduler:
 

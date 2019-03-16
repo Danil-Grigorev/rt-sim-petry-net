@@ -15,13 +15,12 @@ class Mqtt_client():
 
     def on_message(self, client, userdata, message):
         # print('***', self.net.name, message.topic, message.payload.decode('utf-8'))
-        if message.topic == 'control':
-            self.__serve_control(message)
+        data = self.__parse_msg(message)
+        if data['topic'] == 'control':
+            self.__serve_control(data)
         else:
-            net, place = message.topic.split('/')
-            if net == self.net.name:
-                self.__serve_port(self._input_ports[place], message)
-
+            self.__serve_port(data)
+            
     def close(self):
         if self._client:
             self._client.loop_stop()
@@ -87,11 +86,10 @@ class Mqtt_client():
         self._client.loop_start()
         self._client.subscribe('control', 2)
 
-
-    def __serve_control(self, message):
+    def __parse_msg(self, message):
         '''
-        Provides backend API for port setup
-
+        Parses message and returns a dictionary of it's values
+            
         Control message syntax looks like:
             "TYPE ACTION PAYLOAD"
             TYPE -- message type, [RSFA]
@@ -100,53 +98,75 @@ class Mqtt_client():
             ACTION -- actions with selected place gathered from topic
             PAYLOAD --  actual message payload, source place name, etc.
         '''
-        payload = message.payload.decode('utf-8')
-        place = message.topic.split('/')[-1]
+        msg = {}
+        p = message.payload.decode('utf-8')
+        msg['payload'] = p
+        msg['topic'] = message.topic
+        if msg['topic'] == 'control':
+            # msg['target_place'] = msg['topic'].split('/'[-1])
+            msg['type'], msg['content'] = p.split(', ', 1)
+            # print(self.net.name, 'received', p)
+            if msg['type'] == 'R':
+                msg['action'], target_topic, msg['source_topic'] = msg['content'].split(', ')
+                msg['target_net'], msg['target_place'] = target_topic.split('/')
+            elif msg['type'] not in ('A', 'F', 'S'):
+                raise Exception('Unknown message type')
+        return msg
+            
 
-        tp, p = payload.split(', ', 1)
-        # print(self.net.name, 'received', payload)
-        if tp == 'R':
-            act, target_topic, source_topic = p.split(', ')
-            net_name, place = target_topic.split('/')
-            if net_name != self.net.name:
+    def __serve_control(self, message):
+        '''
+        Provides backend API processing for port setup
+        '''
+        if message['type'] == 'R':
+            if message['target_net'] != self.net.name:
                 return
             net_places = {p.name: p for p in self.net.place()}
-            if place not in net_places.keys():
-                self.__control_publish('F, {}'.format(payload))
+            if message['target_place'] not in net_places.keys():
+                self.__control_publish('F, {}'.format(message['payload']))
                 return
-            self.__control_publish('A, {}'.format(payload))
-            if act == 'set_input':
+            self.__control_publish('A, {}'.format(message['payload']))
+            if message['action'] == 'set_input':
                 try:
-                    self.__configure_internal_input_port(net_places[place])
+                    self.__configure_internal_input_port(
+                        net_places[message['target_place']])
                 except:
-                    self.__control_publish('F, {}'.format(payload))
+                    self.__control_publish(f"F, {message['payload']}")
                     return
-            elif act == 'set_output':
+            elif message['action'] == 'set_output':
                 try:
-                    self.__configure_internal_output_port(net_places[place], source_topic)
+                    self.__configure_internal_output_port(
+                        net_places[message['target_place']],
+                        source_topic)
                 except:
-                    self.__control_publish('F, {}'.format(payload))
+                    self.__control_publish(f"F, {message['payload']}")
                     return
-            self.__control_publish('S, {}'.format(payload))
-        elif tp == 'A':
+            else:
+                raise Exception(f'Unknown message action {message}')
+            self.__control_publish(f"S, {message['payload']}")
+        elif message['type'] == 'A':
             # print('Received A', payload)
-            if p in self._pending_requests:
+            if message['content'] in self._pending_requests:
                 self._pending_req_cnt -= 1
-        elif tp == 'F':
-            raise Exception("Failed to setup {}".format(payload))
-        elif tp == 'S':
-            if p in self._pending_requests:
-                self._pending_req_cnt -= 1
-                self._pending_requests.remove(p)
-                if self._pending_req_cnt == 0:
-                    self.net.ready = True
-                    self.net.simul.wake()
-            print(f'{self._pending_req_cnt}')
+        elif message['type'] == 'F':
+            raise Exception("Failed to setup {}".format(message['payload']))
+        elif message['type'] == 'S':
+            if message['content'] not in self._pending_requests:
+                return
+            self._pending_req_cnt -= 1
+            self._pending_requests.remove(message['content'])
+            if self._pending_req_cnt == 0:
+                self.net.ready = True
+                self.net.simul.barier.wait()
 
-    def __serve_port(self, place, message):
-        payload = message.payload.decode('utf-8')
-        print(f'Serving port {place.name} - {payload}')
-        payload = payload.split('&')
+    def __serve_port(self, message):
+        net, place = message['topic'].split('/')
+        if net != self.net.name:
+            return
+        place = self._input_ports[place]
+
+        print(f"Serving port {place.name} - {message['payload']}")
+        payload = message['payload'].split('&')
         tokens = []
         for tp, val in map(lambda x: x.split(':'), payload):
             tp = eval(tp)   # Type casting
@@ -164,11 +184,11 @@ class Mqtt_client():
         if message[0] == 'R':
             self._pending_requests.append(message)
             self._pending_req_cnt += 2  # Waiting for ack and success message
-        self._client.publish('control', message)
+        self._client.publish('control', message, 2)
     
     def __topic_publish(self, topic, tokens):
         print(f'publishing {topic} - {"&".join(tokens)}')
-        self._client.publish(topic, '&'.join(tokens))
+        self._client.publish(topic, '&'.join(tokens), 2)
         net = topic.split('/')[0]
         net = self.net.simul._nets[net]
         net.plan_execute()
