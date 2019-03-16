@@ -152,7 +152,7 @@ def execute(net_t=1):
 
         sim.run()
         for name, net in sim._nets.items():
-            net.draw('{}.png'.format(name))
+            net.draw(f'nets_png/{name}.png')
 
         
 

@@ -1,7 +1,7 @@
 #!/bin/python2.7
 import time
 import logging
-from threading import Event, Thread
+from threading import Event, Thread, Barrier
 
 from heapq import *
 from mqtt_client import Mqtt_client
@@ -18,6 +18,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(threadName)s - %
 class PNSim():
     NOW = -2
     INF = float('inf')
+    barier = None
+    wake_event = [Event()]
 
     def __init__(self, broker="127.0.0.1"):
         self._nets = {}
@@ -27,7 +29,18 @@ class PNSim():
         self.cur_time = PNSim.INF
         self.start_time = PNSim.INF
         self._running_events = []
-        self._wake_event = Event()
+
+    def __setup(self, end_time):
+        self.__wait_net_ports()
+        self.start_time = time.time()
+        if end_time == PNSim.INF:
+            pass
+        elif end_time <= 0:
+            raise ValueError("Not positive running time value.")
+        else:
+            self.end_time = self.start_time + end_time
+        self.cur_time = time.time
+        self.scheduler.start(self.start_time)
 
     def run(self, end_time=INF):
         ''' Next-event algorithm with real time extention '''
@@ -37,7 +50,7 @@ class PNSim():
         running_sim = Thread(target=(self._run))
         running_sim.start()
         running_sim.join()
-        logging.info('Simulation ended at {}'.format(self.cur_time() - self.start_time))
+        logging.info(f'Simulation ended at {self.cur_time() - self.start_time}')
             
     def _run(self):
         logging.info('Simulation thread started')
@@ -56,16 +69,18 @@ class PNSim():
                             tm - self.cur_time(), self.cur_time() - self.start_time))
                     logging.info('Waiting for {}'.format(tm - self.cur_time()))
                     if tm == PNSim.INF:
-                        event_set = self._wake_event.wait()
+                        event_set = PNSim.wake_event[0].wait()
                     else:
-                        event_set = self._wake_event.wait(tm - self.cur_time())
+                        event_set = PNSim.wake_event[0].wait(tm - self.cur_time())
                     if event_set:   # New event arrived
-                        logging.info("New event arrived at {}".format(self.cur_time() - self.start_time))
+                        logging.info(
+                            f"New event arrived at {self.cur_time() - self.start_time}")
                         continue
                 tm, action = self.scheduler.pop_planned()
-                logging.info('Extracting event {} - {}'.format(
-                    (tm - self.start_time) if tm != PNSim.NOW else 'NOW',
-                    action))
+                logging.info(
+                    f'Extracting event '
+                    f'{(tm - self.start_time) if tm != PNSim.NOW else "NOW"} '
+                    f'- {action}')
                 # Execute the action
                 if action:
                     function, args = action[0], action[1:]
@@ -80,16 +95,16 @@ class PNSim():
             if self._running_events:
                 logging.info('Waiting for threads {}'.format(self._running_events))
                 if self.end_time == PNSim.INF:
-                    self._wake_event.wait()
+                    PNSim.wake_event[0].wait()
                 else:
-                    self._wake_event.wait(self.end_time - self.cur_time())
+                    PNSim.wake_event[0].wait(self.end_time - self.cur_time())
                 
-
     def execute_net(self, net):
         if not isinstance(net, snakes.nets.PetriNet):
             net = self._nets[str(net)]
-        net.draw(net.name + '-start.png')
-        logging.info('Started execution "{}" at {}'.format(net, self.cur_time() - self.start_time))
+        net.draw(f'nets_png/{net.name}-start.png')
+        logging.info(
+            f'Started execution "{net}" at {self.cur_time() - self.start_time}')
         while not all([len(t.modes()) == 0 for t in net.transition()]):
             if self.end_time != PNSim.INF and self.cur_time() > self.end_time:
                 break   # Simulation time ended
@@ -98,7 +113,7 @@ class PNSim():
                 if len(modes) > 0:
                     t.fire(modes[0])
         else:
-            net.draw(net.name + '-end.png')
+            net.draw(f'nets_png{net.name}-end.png')
             net.send_tokens()
         self.wake()
 
@@ -109,18 +124,6 @@ class PNSim():
             self._nets[net.name] = net
         else:
             raise NameError("Net {} already exists".format(net.name))
-
-    def __setup(self, end_time):
-        self.__wait_net_ports()
-        self.start_time = time.time()
-        if end_time == PNSim.INF:
-            pass
-        elif end_time <= 0:
-            raise ValueError("Not positive running time value.")
-        else:
-            self.end_time = self.start_time + end_time
-        self.cur_time = time.time
-        self.scheduler.start(self.start_time)
 
     def schedule(self, event, tm=NOW, prior=0):
         if self.start_time == PNSim.INF:
@@ -151,15 +154,17 @@ class PNSim():
             self.wake()
 
     def wake(self):
-        self._wake_event.set()
-        self._wake_event.clear()
+        PNSim.wake_event[0].set()
+        PNSim.wake_event[0].clear()
 
     def __wait_net_ports(self):
+        PNSim.barier = Barrier(parties=len(self._nets), timeout=2)
         for net in self._nets.values():
             net.prepare()
         while not all([net.ready for net in self._nets.values()]):
-            got_ready = self._wake_event.wait(10)
-            print('Update', [(net, net.ready) for net in self._nets.values()])
+            got_ready = PNSim.wake_event[0].wait(10)
+            print(
+                f'Update {" ".join(["-".join((net.name, str(net.ready))) for net in self._nets.values()])}')
             if not got_ready:
                 raise RuntimeError('Brocker request timedout {}'.format(
                     [(net, net.ready) for net in self._nets.values()]))

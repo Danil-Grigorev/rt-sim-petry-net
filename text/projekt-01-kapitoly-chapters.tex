@@ -3,18 +3,15 @@
 \chapter{Úvod}
 \chapter{Prehled teorie}
 \label{prehled}
-V teto kapitole jsou popsany teoretické zaklady Petriho sítí. Taky tato kapitola se soustředí na popís několíka podtříd petrího site, zejmena na „vysokourovňové Petrího Sítě“ a „Časované Petrího Sítě“ a  včetně přehledu míst, kdě se Petrího sítě použivají, nebo hrají významnou roli.
 
-           Petriho site
-               V současné době se Petrího site často použivají jako modelovací prostředek pro modelovaní chovaní systemu, za účelem pochopení jeho slabších stránek. Použití Petrího síti pro tento učel je velice vhodne, malo modelovacích prostředku dokáže popsat ne jenom system jako celek, ale i zjistit slabší stránky jeho implementace.
-
-Vezmeme například 
+V teto kapitole jsou popsany teoretické zaklady Petriho sítí. Taky tato kapitola se soustředí na popís několíka podtříd petrího site, zejmena na „vysokourovňové Petrího Sítě“ a „Časované Petrího Sítě“ a  včetně přehledu míst, kdě se Petrího sítě použivají, nebo hrají významnou roli. Taky bude zmineno o simulacni teorii, zamerene na simulaci Petriho siti v realnem case. Taky se popise pojem distribovanych systemu a ukaze se jejich vztah z Petriho siti.
 
 \subsection*{Simulace}
 \subsection*{Diskretni simulace}
 \subsection*{Simulace v realnem case}
 \subsection*{Planovac udalosti}
 \subsection*{Petriho site}
+V současné době se Petrího site často použivají jako modelovací prostředek pro modelovaní chovaní systemu, za účelem pochopení jeho slabších stránek. Použití Petrího síti pro tento učel je velice vhodne, malo modelovacích prostředku dokáže popsat ne jenom system jako celek, ale i zjistit slabší stránky jeho implementace.
 \subsubsection*{Definice}
 
 Petrího síť ($PN$) se sestavuje ze ctrz prvku, $PN = \left(P, T, I, O\right)$ kde:
@@ -42,18 +39,34 @@ Pri vykonovani seti Petri vznikaji dve posloupnosti - posloupnost znacek a poslo
 
 Diky moznosti vykonovat Petriho sit, vznika prilezitost vytvorzit simulacni nastroj, ktery je zalozen na zminenych zasadech. 
 
-\paragraph*{Casovane petriho site}
+%\paragraph*{Casovane petriho site}
 \paragraph*{Vysokourovnove petriho site}
-\subsection*{Applikace Petrího siti}
+\subsection*{Distribovany system}
+Definice distribovaneho systemu zni:
+Distribovany system je kolekce na sobe nezavislych pocitatcu, ktery konecny uzivatel vnima jako celek. 
+% http://barbie.uta.edu/~jli/Resources/MapReduce&Hadoop/Distributed%20Systems%20Principles%20and%20Paradigms.pdf
+
+Distribovane systemy museji pouzivat decentralizovane algoritmy, ktere pozaduji nasledujici: 1. Zadny prvek nesmi vedet informaci o celkovem stavu systemu. 2. Prvek uvazuje jenom na zaklade jeho stavu. 3. Chyba v zadnem z prvku ne ovlivni chovani algoritmu. 4. Neprovadi se synchronizace podle globalnich hodin. 
+
+Z definice taky vypliva, ze distribovany system se obecne sestavuje s vice se opakujicich prvku, ktere funguji nezavisle na sobe a nemaji pristup ke sdilene pameti, neboli kazdy prvek ma svoi vlastni. Sdileni stavu ve pripade distribovaneho systemu se provadi pomoci zasilani zprav.
+
+Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho sitmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a prechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol MQTT(odkaz), ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace (Boiler net) nazorne ukazuje pouziti dane myslenky na praktice.
+\subsection*{Applikace}
+\paragraph*{Obsah}
+
+1. \url{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597?scroll=top&needAccess=true}
+Rozsah míst kdě se dá applikovat Petrího sítě je velmí široký. Jako modelovací prostředek můžou sloužit například pro „reprezentací vzorů interakce“ mezí člověkem a autopilotém letadla(odkáz 1), nebo .... V nášem případě vysokourovňová Petrího síť modeluje a nasledně simuluje chování distribovaného sýstemu (termostat <-> teploměr) 
+
+\subsection*{Znackovaná Petrího sít}
 Prikladem pouziti znackovane petriho siti muze slouzit implementace "problemu Vecericich philosofu", coz je problem poprve predstaveny professorem Dijkstrou v roce 1965.
 Je to obecne znamy problem paralelismu, ktery nazorne zobrazuje dva pripady chyb vznikajicich pri pararelnim vypoctu - vyhladoveni a uvaznuti.
 % https://en.wikipedia.org/wiki/Dining_philosophers_problem#cite_note-formalization-2
 % Petri nets theory and Modeling of Systems, p. 65-67, par 3.4.6
 % TODO: naimplementovat a zobrazit
-
-1. \url{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597?scroll=top&needAccess=true}
-Rozsah míst kdě se dá applikovat Petrího sítě je velmí široký. Jako modelovací prostředek můžou sloužit například pro „reprezentací vzorů interakce“ mezí člověkem a autopilotém letadla(odkáz 1), nebo .... V nášem případě vysokourovňová Petrího síť modeluje a nasledně simuluje chování distribovaného sýstemu (termostat <-> teploměr) 
+\subsection*{Vysokourovnova Petriho sit}
+% TODO
 \chapter{Implementace}
 \chapter{Knihovna SNAKES}
+\subsection*{Vyuziti MQTT}
 \chapter{Závěr}
 \label{zaver}

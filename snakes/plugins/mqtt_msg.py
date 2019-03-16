@@ -6,7 +6,6 @@ import snakes.plugins
 def extend(module):
     class PetriNet(module.PetriNet):
         def __init__(self, name, simul=None):
-            print("CREATED NET!!!!!!!!!!!")
             self.mqtt_cl = None
             self.simul = simul
             self.ready = False
@@ -41,13 +40,13 @@ def extend(module):
         def plan_execute(self):
             if self.simul is None:
                 raise RuntimeError('Not a simulation entity')
-            print('Planning execution for ', self.simul.execute_net, self.name)
+            print(f'Planning execution for {self.name}')
             self.simul.schedule([self.simul.execute_net, self.name], self.simul.INF)
 
         def execute(self):
             if self.simul is None:
                 raise RuntimeError('Not a simulation entity')
-            print('updating execution time for ', self.simul.execute_net, self.name)
+            print(f'updating execution time for {self.name}')
             self.simul.update_time([self.simul.execute_net, self.name], self.simul.NOW)
 
     class Place(module.Place):

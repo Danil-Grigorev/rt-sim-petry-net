@@ -14,7 +14,7 @@ class Mqtt_client():
         self._pending_req_cnt = 0
 
     def on_message(self, client, userdata, message):
-        print('***', self.net.name, message.topic, message.payload.decode('utf-8'))
+        # print('***', self.net.name, message.topic, message.payload.decode('utf-8'))
         if message.topic == 'control':
             self.__serve_control(message)
         else:
@@ -37,7 +37,7 @@ class Mqtt_client():
         else:
             topic_str = topic
         # print(self.net.name, "is subscribed to", topic_str)
-        self._client.subscribe(topic_str)
+        self._client.subscribe(topic_str, 2)
 
     def __input_port_setup(self, trg_place, from_topic):
         if not isinstance(from_topic, str):
@@ -54,7 +54,7 @@ class Mqtt_client():
         self._input_ports[place.name] = place
         input_port_topic = '{}/{}'.format(self.net.name, place.name)
         self.add_subscription(input_port_topic)
-        print('{}/{} is an input'.format(self.net.name, place.name))
+        print(f'{self.net.name}/{place.name} is an input')
 
     def __output_port_setup(self, trg_place, to_topic):
         if not isinstance(to_topic, str):
@@ -68,7 +68,7 @@ class Mqtt_client():
     def __configure_internal_output_port(self, trg_place, to_topic):
         self.__set_place_type(trg_place, trg_place.OUTPUT)
         self._output_ports[trg_place] = to_topic
-        print('{}/{} is an output to {}'.format(self.net.name, trg_place.name, to_topic))
+        print(f'{self.net.name}/{trg_place.name} is an output to {to_topic}')
 
     def __set_place_type(self, place, p_type):
         if place.state == place.SEPARATED:
@@ -80,12 +80,12 @@ class Mqtt_client():
         self.__setup_client()
 
     def __setup_client(self):
-        self._client = mqtt.Client()
+        self._client = mqtt.Client(self.net.name)
         self._client.on_message = self.on_message
         self._client.connect(self._brocker)
         self._client.user_data_set(self.net.name)
         self._client.loop_start()
-        self._client.subscribe('control')
+        self._client.subscribe('control', 2)
 
 
     def __serve_control(self, message):
@@ -96,7 +96,7 @@ class Mqtt_client():
             "TYPE ACTION PAYLOAD"
             TYPE -- message type, [RSFA]
                     R means request, S means success, F means failure,
-                    A is ack for last request
+                    A is ack for the last request
             ACTION -- actions with selected place gathered from topic
             PAYLOAD --  actual message payload, source place name, etc.
         '''
@@ -141,10 +141,11 @@ class Mqtt_client():
                 if self._pending_req_cnt == 0:
                     self.net.ready = True
                     self.net.simul.wake()
+            print(f'{self._pending_req_cnt}')
 
     def __serve_port(self, place, message):
         payload = message.payload.decode('utf-8')
-        print('Serving port', place.name, payload)
+        print(f'Serving port {place.name} - {payload}')
         payload = payload.split('&')
         tokens = []
         for tp, val in map(lambda x: x.split(':'), payload):
@@ -166,7 +167,7 @@ class Mqtt_client():
         self._client.publish('control', message)
     
     def __topic_publish(self, topic, tokens):
-        print('publishing', topic, '&'.join(tokens))
+        print(f'publishing {topic} - {"&".join(tokens)}')
         self._client.publish(topic, '&'.join(tokens))
         net = topic.split('/')[0]
         net = self.net.simul._nets[net]
