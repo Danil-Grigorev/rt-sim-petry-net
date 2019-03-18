@@ -53,7 +53,7 @@ class Mqtt_client():
         self._input_ports[place.name] = place
         input_port_topic = '{}/{}'.format(self.net.name, place.name)
         self.add_subscription(input_port_topic)
-        print(f'{self.net.name}/{place.name} is an input')
+        # print(f'{self.net.name}/{place.name} is an input')
 
     def __output_port_setup(self, trg_place, to_topic):
         if not isinstance(to_topic, str):
@@ -67,7 +67,7 @@ class Mqtt_client():
     def __configure_internal_output_port(self, trg_place, to_topic):
         self.__set_place_type(trg_place, trg_place.OUTPUT)
         self._output_ports[trg_place] = to_topic
-        print(f'{self.net.name}/{trg_place.name} is an output to {to_topic}')
+        # print(f'{self.net.name}/{trg_place.name} is an output to {to_topic}')
 
     def __set_place_type(self, place, p_type):
         if place.state == place.SEPARATED:
@@ -165,7 +165,7 @@ class Mqtt_client():
             return
         place = self._input_ports[place]
 
-        print(f"Serving port {place.name} - {message['payload']}")
+        # print(f"Serving port {place.name} - {message['payload']}")
         payload = message['payload'].split('&')
         tokens = []
         for tp, val in map(lambda x: x.split(':'), payload):
@@ -187,7 +187,7 @@ class Mqtt_client():
         self._client.publish('control', message, 2)
     
     def __topic_publish(self, topic, tokens):
-        print(f'publishing {topic} - {"&".join(tokens)}')
+        # print(f'publishing {topic} - {"&".join(tokens)}')
         self._client.publish(topic, '&'.join(tokens), 2)
         net = topic.split('/')[0]
         net = self.net.simul._nets[net]
@@ -210,8 +210,9 @@ class Mqtt_client():
             for token in place.tokens:
                 tokens.append('{}:{}'.format(
                     token.__class__.__name__, str(token)))
-            self.__topic_publish(topic, tokens)
-            place.empty()
+            if tokens:
+                self.__topic_publish(topic, tokens)
+                place.empty()
 
 
                 

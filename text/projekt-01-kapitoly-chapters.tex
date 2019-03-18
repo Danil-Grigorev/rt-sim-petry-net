@@ -6,10 +6,6 @@
 
 V teto kapitole jsou popsany teoretické zaklady Petriho sítí. Taky tato kapitola se soustředí na popís několíka podtříd petrího site, zejmena na „vysokourovňové Petrího Sítě“ a „Časované Petrího Sítě“ a  včetně přehledu míst, kdě se Petrího sítě použivají, nebo hrají významnou roli. Taky bude zmineno o simulacni teorii, zamerene na simulaci Petriho siti v realnem case. Taky se popise pojem distribovanych systemu a ukaze se jejich vztah z Petriho siti.
 
-\subsection*{Simulace}
-\subsection*{Diskretni simulace}
-\subsection*{Simulace v realnem case}
-\subsection*{Planovac udalosti}
 \subsection*{Petriho site}
 V současné době se Petrího site často použivají jako modelovací prostředek pro modelovaní chovaní systemu, za účelem pochopení jeho slabších stránek. Použití Petrího síti pro tento učel je velice vhodne, malo modelovacích prostředku dokáže popsat ne jenom system jako celek, ale i zjistit slabší stránky jeho implementace.
 \subsubsection*{Definice}
@@ -51,6 +47,32 @@ Distribovane systemy museji pouzivat decentralizovane algoritmy, ktere pozaduji 
 Z definice taky vypliva, ze distribovany system se obecne sestavuje s vice se opakujicich prvku, ktere funguji nezavisle na sobe a nemaji pristup ke sdilene pameti, neboli kazdy prvek ma svoi vlastni. Sdileni stavu ve pripade distribovaneho systemu se provadi pomoci zasilani zprav.
 
 Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho sitmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a prechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol MQTT(odkaz), ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace (Boiler net) nazorne ukazuje pouziti dane myslenky na praktice.
+\subsection*{Simulace}
+\subsection*{Diskretni simulace}
+Diskretni simulace je zalozena ve svem zakladu na algoritmu znamem pod nazvem "NextEvent". Tento algoritmus se ridi nasledujicim pseudokodem:
+nainicializuj simulaci, cas a planovac udalosti
+dokud je naplanovana dalsi udalost
+  vyjmi prvni udalost ze seznamu
+  $if cas_udalosti >= T_END:$
+    konec simulace
+  nastav cas na cas udalosti
+  proved popis chovani udalosti
+\subsection*{Simulace v realnem case}
+Simulace v realnem case se lisi of diskretni simulace v jedne vlastnosti. Beh takove simulace musi byt synchronizovan s relanim casem. Obecne posuv v casove rovine se provadi kvazidistantnim krokem, pricemz ten krok musi byt dostatecne maly, na to aby simulace stacila cist vstupni parametry. ??? % Real-Time Simulation of Electric Vehicles for Distribution System Operation Assessment, Characteristics of Real-Time Simulation
+
+Simulace v realnem case upravena pro ucely tohoto projektu je zalozena na vyse zminenem algoritmu "Next Event" s jedinou zmenou, ktera pridava cekani na synchronizaci simulacniho casu s realnim nebo na prichod nove udalosti. Algoritmus v tom pripade vypada nasledujim zpusobem:
+nainicializuj simulaci, cas a planovac udalosti
+dokud je naplanovana udalost
+  podivej se na cas dalsi udalosti 
+  $if cas_udalosti >= T_END:$
+    konec simulace
+  pockej na cas udalosti nebo na prichod nove udalosti
+  if nova udalost:
+    continue
+  proved popis chovani udalosti
+
+Tento algoritmus nachazi svoje pouziti ve mnoha simulacnich pripadech. Bezny priklad pouziti - pocitacove hry, kde uzivatele zaujme herni prostredi, ktere simuluje realni svet, vcetne casove roviny. Simulace v realnim case se taky pouziva, kdy obycejne diskretni simulace nestaci a cas neni zanedbatelny. Uzivatel muze chtit sledovat system v prubehu simulace, za ucelem zjisteni anomalii v chovani jeho prvku nebo zvyseni kvality systemu pred jeho nasazenim do provozu. Takovy pristup se pouziva v simulace "Hardware-in-the-loop"(odkaz).
+\subsection*{Hardware-in-the-loop(HWIL)}
 \subsection*{Applikace}
 \paragraph*{Obsah}
 
@@ -66,7 +88,14 @@ Je to obecne znamy problem paralelismu, ktery nazorne zobrazuje dva pripady chyb
 \subsection*{Vysokourovnova Petriho sit}
 % TODO
 \chapter{Implementace}
-\chapter{Knihovna SNAKES}
+\subsection*{Knihovna SNAKES}
+% https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/
+SNAKES je knihovna v jazyce Python ktera nabizi vsechno potrebne pro definici a spousteni spousty typu Petriho siti. Cili knhovny SNAKES je nabidnout badatelum moznost rychle namodelovat novy napad. Zvlastni vlastnosti knihovny SNAKES je moznost vytvarzet Barevne Petriho site s pouzitim vyrazu v jazyce Python pro annotaci prechodu ci vstupnich nebo vystupnich sipek.
+
+Zvlastni vlastnosti SNAKES je moznost implementace vlastnich rozsireni pro jednotlive casti Petriho siti, nebo pridani novych vlastnosti pro modelovani jinych podtypu Petriho siti. Tato vlastnost byla zvlast pouzita pro pridani rozsireni, podporujici vytvareni Petriho siti urcenych pro modelovani distribovanych systemu.
+\subsection*{Implementace pluginu $mqtt_msg$}
+Tento plugin ve svem zaklade umoznuje pouziti MQTT clientu pro provazani portu Petriho siti mezi sebou.
 \subsection*{Vyuziti MQTT}
+\subsection*{Planovac udalosti}
 \chapter{Závěr}
 \label{zaver}

@@ -56,50 +56,70 @@ class PNSim():
         logging.info('Simulation thread started')
         while self.scheduler.next_planned() or self._running_events:
             while self.scheduler.next_planned():
-                tm = self.scheduler.next_planned()
-                logging.info('Checking event at {}'.format(
-                    ((tm - self.start_time) if tm != PNSim.NOW else 'NOW')))
-                if tm != PNSim.NOW:
-                    if self.end_time != PNSim.INF \
-                            and tm >= self.end_time:
-                        return
-                    if tm != PNSim.NOW and tm < self.cur_time():
-                        sys.stderr.write(
-                            "Fall back on schedule for {}s at time {}s\n".format(
-                            tm - self.cur_time(), self.cur_time() - self.start_time))
-                    logging.info('Waiting for {}'.format(tm - self.cur_time()))
-                    if tm == PNSim.INF:
-                        event_set = PNSim.wake_event.wait()
-                    else:
-                        event_set = PNSim.wake_event.wait(tm - self.cur_time())
-                    if event_set:   # New event arrived
-                        logging.info(
-                            f"New event arrived at {self.cur_time() - self.start_time}")
-                        continue
-                tm, action = self.scheduler.pop_planned()
-                logging.info(
-                    f'Extracting event '
-                    f'{(tm - self.start_time) if tm != PNSim.NOW else "NOW"} '
-                    f'- {action}')
-                # Execute the action
-                if action:
-                    function, args = action[0], action[1:]
-                    logging.info('Executing {} - {}'.format(
-                        (tm - self.start_time) if tm != PNSim.NOW else 'NOW',
-                        action))
-                    net_runner = Thread(target=function, args=args)
-                    net_runner.start()
-                    self._running_events.append(net_runner)
-            self._running_events = list(
-                filter(lambda x: x.is_alive(), self._running_events))
-            if self._running_events:
-                logging.info('Waiting for threads {}'.format(self._running_events))
-                if self.end_time == PNSim.INF:
-                    PNSim.wake_event.wait()
-                else:
-                    PNSim.wake_event.wait(self.end_time - self.cur_time())
+                interrupted = self._wait_to_event_begin()
+                if interrupted:   # New event arrived
+                    logging.info(
+                        f"New event arrived at {self.cur_time() - self.start_time}")
+                    continue
+                # print(
+                #     f'_extract_and_execute\n\tEvents: {self._running_events}\n\tQueue: {self.scheduler.queue}')
+                self._extract_and_execute()
+            # print(
+            #     f'_wait_to_finish_or_new_event\n\tEvents: {self._running_events}\n\tQueue: {self.scheduler.queue}')
+            self._wait_to_finish_or_new_event()
                 
+    def _wait_to_event_begin(self):
+        tm = self.scheduler.next_planned()
+        logging.info('Checking event at {}'.format(
+            ((tm - self.start_time) if tm != PNSim.NOW else 'NOW')))
+        interrupted = False
+        if tm == PNSim.NOW:
+            return interrupted
+        if self.end_time != PNSim.INF \
+                and tm >= self.end_time:
+            return
+        if tm != PNSim.NOW and tm < self.cur_time():
+            sys.stderr.write(
+                "Fall back on schedule for {}s at time {}s\n".format(
+                    tm - self.cur_time(), self.cur_time() - self.start_time))
+        logging.info('Waiting for {}'.format(tm - self.cur_time()))
+        # print(
+        #     f'Next is: {self.scheduler.queue[0]}\nAfter: {self.scheduler.queue[-1]}\n Next < After: {self.scheduler.queue[0] < self.scheduler.queue[-1]}')
+        if tm == PNSim.INF:
+            interrupted = PNSim.wake_event.wait()
+        else:
+            interrupted = PNSim.wake_event.wait(tm - self.cur_time())
+        return interrupted
+
+    def _extract_and_execute(self):
+        tm, action = self.scheduler.pop_planned()
+        logging.info(
+            f'Extracting event '
+            f'{(tm - self.start_time) if tm != PNSim.NOW else "NOW"} '
+            f'- {action}')
+        # Execute the action
+        if action:
+            function, args = action[0], action[1:]
+            logging.info('Executing {} - {}'.format(
+                (tm - self.start_time) if tm != PNSim.NOW else 'NOW',
+                action))
+            net_runner = Thread(target=function, args=args)
+            net_runner.start()
+            self._running_events.append(net_runner)
+    
+    def _wait_to_finish_or_new_event(self):
+        self._running_events = list(
+            filter(lambda x: x.is_alive(), self._running_events))
+        if self._running_events:
+            logging.info('Waiting for threads {}'.format(
+                self._running_events))
+            if self.end_time == PNSim.INF:
+                PNSim.wake_event.wait()
+            else:
+                PNSim.wake_event.wait(self.end_time - self.cur_time())
+
     def execute_net(self, net):
+        print(f'Executing net {net.name}')
         if not isinstance(net, snakes.nets.PetriNet):
             net = self._nets[str(net)]
         net.draw(f'nets_png/{net.name}-start.png')
@@ -113,7 +133,7 @@ class PNSim():
                 if len(modes) > 0:
                     t.fire(modes[0])
         else:
-            net.draw(f'nets_png{net.name}-end.png')
+            net.draw(f'nets_png/{net.name}-end.png')
             net.send_tokens()
         self.wake()
 

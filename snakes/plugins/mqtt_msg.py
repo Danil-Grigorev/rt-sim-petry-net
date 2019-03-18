@@ -27,9 +27,12 @@ def extend(module):
 
         def prepare(self):
             if self.ready:
-                return True
+                return
             self.mqtt_cl.configure(self.ports)
-            return False
+            for tr in self.transition():
+                tr.add_parent_net(self)
+                tr.add_simulator(self.simul)
+            self.ready = True
 
         def add_remote_output(self, place, target):
             self.ports.add(('output', place, target))
@@ -40,14 +43,14 @@ def extend(module):
         def plan_execute(self):
             if self.simul is None:
                 raise RuntimeError('Not a simulation entity')
-            print(f'Planning execution for {self.name}')
-            self.simul.schedule([self.simul.execute_net, self.name], self.simul.INF)
+            # print(f'Planning execution for {self.name}')
+            self.simul.schedule([self.simul.execute_net, self], self.simul.INF)
 
         def execute(self):
             if self.simul is None:
                 raise RuntimeError('Not a simulation entity')
-            print(f'updating execution time for {self.name}')
-            self.simul.update_time([self.simul.execute_net, self.name], self.simul.NOW)
+            # print(f'updating execution time for {self.name}')
+            self.simul.update_time([self.simul.execute_net, self], self.simul.NOW)
 
     class Place(module.Place):
         SEPARATED = 1
@@ -58,40 +61,59 @@ def extend(module):
             module.Place.__init__(self, name, tokens, check)
 
     class Transition(module.Transition):
-        def __init__(self, name, guard=None, timeout=None, simul=None):
+        def __init__(self, name, guard=None, timeout=None):
             self.timeout = timeout
             self.simul = None
             self.scheduled = False
             self.ready = False
+            self.bindings = []
+            self.net = None
             module.Transition.__init__(self, name, guard)
         
         def add_simulator(self, sim):
             self.simul = sim
 
-        def plan(self, net):
-            if self.timeout and self.scheduled:
-                self.simul.schedule([self.unblock, net], self.timeout)
+        def add_parent_net(self, net):
+            self.net = net
+
+        def plan(self):
+            timeout = self.simul.cur_time() - self.simul.start_time + self.timeout
+            # print(f'{self.simul.cur_time()} - {self.simul.start_time} + {self.timeout}')
+            # print(f"Planning execution at {timeout}")
+            self.simul.schedule([self.unblock], timeout)
 
         def block(self):
-            if self.timeout and not self.scheduled:
-                self.scheduled = True
-                self.ready = False
+            self.scheduled = True
+            self.ready = False
                 
-        def unblock(self, net):
-            if self.timeout and self.scheduled:
-                self.scheduled = False
-                self.ready = True
+        def unblock(self):
+            self.scheduled = False
+            self.ready = True
+            for binding in self.bindings:
+                self.add_bindings(binding)
+            if self.bindings:
+                self.bindings = []
                 self.simul.schedule(
-                    [self.simul.execute_net, net], self.simul.NOW)
+                    [self.simul.execute_net, self.net], self.simul.NOW)
+                # print(f'\tAdded net execution of {self.net.name} to {self.simul.scheduler.queue}')
 
-        def execute(self, net):
-            result = module.Transition.modes(self)
-            if not self.timeout or self.ready:
-                self.fire(result[0])
-            elif not self.scheduled:
-                self.block()
-                self.plan(net)
+        def add_bindings(self, binding):
+            for place, label in self.output() :
+                place.add(label.flow(binding))
+        
+        def fire (self, binding) :
+            if self.enabled(binding) :
+                for place, label in self.input() :
+                    place.remove(label.flow(binding))
+                if not self.timeout or self.ready:
+                    self.add_bindings(binding)
+                elif not self.scheduled:
+                    self.block()
+                    self.plan()
+                    self.bindings.append(binding)
+            else :
+                raise ValueError("transition not enabled for %s" % binding)
 
-    return PetriNet, Place
+    return PetriNet, Place, Transition
 
 

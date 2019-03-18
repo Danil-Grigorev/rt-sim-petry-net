@@ -46,7 +46,7 @@ def transport_proto(name):
     n.add_place(Place("NextSend", [1], check=tInteger))
     n.add_place(Place("A", check=tPair))
 
-    snd_pack = Transition("Send Packet", Expression('update_success()'))
+    snd_pack = Transition("Send Packet", guard=Expression('update_success()'))
     n.add_transition(snd_pack)
     
     n.add_input("Packets to send", "Send Packet", Tuple([Variable("n"), Variable("d")]))
@@ -113,7 +113,7 @@ def transmit_net(name):
     n = PetriNet(name)
     i = Place('Data Input', check=tString)
     o = Place('Data Output', check=tString)
-    t = Transition('t')
+    t = Transition('t', timeout=15)
     n.add_transition(t)
     n.add_place(o)
     n.add_place(i)
