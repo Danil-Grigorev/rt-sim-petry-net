@@ -49,6 +49,7 @@ False
 
 import os, os.path, subprocess, collections, codecs
 import snakes.plugins
+from time import sleep as sleep
 from snakes.plugins.clusters import Cluster
 from snakes.compat import *
 
@@ -77,6 +78,10 @@ class Graph (Cluster) :
             tag = ""
         else :
             tag = "%s " % tag
+        # print(["%s[" % tag,
+        #          ["%s=%s" % (key, self.escape(str(val)))
+        #           for key, val in attr.items()],
+        #          "];"])
         return (["%s[" % tag,
                  ["%s=%s" % (key, self.escape(str(val)))
                   for key, val in attr.items()],
@@ -139,6 +144,8 @@ class Graph (Cluster) :
                                    stderr=subprocess.STDOUT)
         stdout, stderr = dot.communicate()
         if not debug :
+            while not os.path.exists(outfile.name):
+                sleep(0.1)
             os.unlink(outfile.name)
         if dot.returncode != 0 :
             if (stdout or "").strip() + (stderr or "").strip() :
