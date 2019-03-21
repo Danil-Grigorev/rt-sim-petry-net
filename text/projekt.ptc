@@ -1,9 +1,29 @@
 \babel@toc {czech}{}
 \contentsline {chapter}{\numberline {1}\IeC {\'U}vod}{2}{chapter.1}
 \contentsline {chapter}{\numberline {2}Prehled teorie}{3}{chapter.2}
-\contentsline {subsubsection}{Typy Petriho site}{3}{section*.5}
+\contentsline {subsection}{\numberline {2.0.1}Petriho site}{3}{subsection.2.0.1}
+\contentsline {subsubsection}{Definice}{3}{section*.2}
+\contentsline {subsection}{\numberline {2.0.2}Graf Petriho site}{3}{subsection.2.0.2}
+\contentsline {subsubsection}{Typy Petriho site}{3}{section*.3}
+\contentsline {paragraph}{Znackovane petriho site}{3}{section*.4}
+\contentsline {paragraph}{Casovane petriho site}{4}{section*.5}
+\contentsline {paragraph}{Vysokourovnove petriho site}{4}{section*.6}
+\contentsline {subsection}{\numberline {2.0.3}HLPN Graf}{5}{subsection.2.0.3}
+\contentsline {subsection}{\numberline {2.0.4}Distribovany system}{5}{subsection.2.0.4}
+\contentsline {subsection}{\numberline {2.0.5}Simulace}{6}{subsection.2.0.5}
+\contentsline {subsection}{\numberline {2.0.6}Diskretni simulace}{6}{subsection.2.0.6}
+\contentsline {subsection}{\numberline {2.0.7}Simulace v realnem case}{6}{subsection.2.0.7}
+\contentsline {subsection}{\numberline {2.0.8}Hardware-in-the-loop(HWIL)}{7}{subsection.2.0.8}
+\contentsline {subsection}{\numberline {2.0.9}Applikace}{7}{subsection.2.0.9}
+\contentsline {paragraph}{Obsah}{7}{section*.8}
+\contentsline {subsection}{\numberline {2.0.10}Znackovan\IeC {\'a} Petr\IeC {\'\i }ho s\IeC {\'\i }t}{7}{subsection.2.0.10}
+\contentsline {subsection}{\numberline {2.0.11}Vysokourovnova Petriho sit}{7}{subsection.2.0.11}
 \contentsline {chapter}{\numberline {3}Implementace}{8}{chapter.3}
+\contentsline {subsection}{\numberline {3.0.1}Knihovna SNAKES}{8}{subsection.3.0.1}
+\contentsline {subsection}{\numberline {3.0.2}MQTT}{8}{subsection.3.0.2}
+\contentsline {subsection}{\numberline {3.0.3}Implementace pluginu $prob_timed_pl$}{9}{subsection.3.0.3}
+\contentsline {subsection}{\numberline {3.0.4}Planovac udalosti}{9}{subsection.3.0.4}
 \contentsline {chapter}{\numberline {4}Z\IeC {\'a}v\IeC {\v e}r}{10}{chapter.4}
-\contentsline {chapter}{Literatura}{11}{chapter*.22}
+\contentsline {chapter}{Literatura}{11}{chapter*.9}
 \ttl@starttoc {chapters@1}
 \contentsfinish 

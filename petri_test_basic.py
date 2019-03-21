@@ -3,7 +3,7 @@
 import snakes
 import snakes.plugins
 from simul import PNSim
-snakes.plugins.load(["gv", "mqtt_msg"], "snakes.nets", "plugins")
+snakes.plugins.load(["gv", "prob_timed_pl"], "snakes.nets", "plugins")
 from snakes.nets import *
 from plugins import *
 

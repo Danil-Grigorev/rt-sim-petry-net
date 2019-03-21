@@ -6,9 +6,9 @@
 
 V teto kapitole jsou popsany teoretické zaklady Petriho sítí. Taky tato kapitola se soustředí na popís několíka podtříd petrího site, zejmena na „vysokourovňové Petrího Sítě“ a „Časované Petrího Sítě“ a  včetně přehledu míst, kdě se Petrího sítě použivají, nebo hrají významnou roli. Taky bude zmineno o simulacni teorii, zamerene na simulaci Petriho siti v realnem case. Taky se popise pojem distribovanych systemu a ukaze se jejich vztah z Petriho siti.
 
-\subsection*{Petriho site}
+\subsection{Petriho site}
 V současné době se Petrího site často použivají jako modelovací prostředek pro modelovaní chovaní systemu, za účelem pochopení jeho slabších stránek. Použití Petrího síti pro tento učel je velice vhodne, malo modelovacích prostředku dokáže popsat ne jenom system jako celek, ale i zjistit slabší stránky jeho implementace.
-\subsubsection*{Definice}
+\subsubsection{Definice}
 
 Petrího síť ($PN$) se sestavuje ze ctrz prvku, $PN = \left(P, T, I, O\right)$ kde:
   \begin{itemize}
@@ -19,11 +19,11 @@ Petrího síť ($PN$) se sestavuje ze ctrz prvku, $PN = \left(P, T, I, O\right)$
   \end{itemize}
 P $\vee$ T = $\varnothing$, P $\wedge$ T != $\varnothing$. 
 
-\subsection*{Graf Petriho site}
+\subsection{Graf Petriho site}
 
 \subsubsection{Typy Petriho site}
 
-\paragraph*{Znackovane petriho site}
+\paragraph{Znackovane petriho site}
 Znackovane petriho seti (ZPS) zavadi takovy pojem jako "znacka". "Znacka" je zakladni prvek v ZPS, umoznujici jeji vykonovani. Vykonovani se provadi provedenim prehodu, behem ktereho se vymazou znacky ze mnoziny vstupnich mist, a prida se odpovidajici pocet do vystupnich mist. Tato operace se muze vykonovat dokud nezbyde zadny povoleny prechod. Na tento myslence je zalozena simulace Petriho site. Prechod v PS je povolen, dokud kazde ze vstupnich mist propojenych s danym prechodem obsahuje alespon jednu znacku. 
 
 Pri vykonovani seti Petri vznikaji dve posloupnosti - posloupnost znacek a posloupnost prechodu, ktere byly provedeny. Teto dve posloupnosti zcela popisuji vykonani Petriho seti.
@@ -45,32 +45,45 @@ P $\vee$ T = $\varnothing$, P $\wedge$ T != $\varnothing$. TODO citace
 
 Diky moznosti vykonovat Petriho sit, vznika prilezitost vytvorzit simulacni nastroj, ktery je zalozen na zminenych zasadech. Podrobny popis simulace viz implementace(odkaz).
 
-\paragraph*{Casovane petriho site}
+\paragraph{Casovane petriho site}
 Podtrida Casovanych petriho seti rozsiruje pojem petriho seti o jednu dulezitou zasadu. 
-\paragraph*{Vysokourovnove petriho site}
-Vysokourovnove petriho site jsou dalsim rozsirenim Petriho siti, ktere umoznuje jednodussi reprezentaci vypoctu, diky tomu ze sit ziskava nekolik dalsich vlastnosti. 
+\paragraph{Vysokourovnove petriho site}
+Vysokourovnove petriho site (High Level Petri Nets) jsou dalsim rozsirenim Petriho siti, ktere umoznuje jednodussi reprezentaci vypoctu, diky tomu ze sit ziskava nekolik dalsich vlastnosti. 
 
-An HLPN is a structure:
+High Level Petri Net (HLPN) is a structure $HLPN = = \left( P; T; D; T_ype; P_re; P_{ost}; M_0\right) $ kde: 
 
-N = (NG, Sig,V,H, Type,AN,M0):
-
-Here:
 \begin{itemize}
-  \item NG = (P,T;F) is a net graph, with: \\
-  \item P a finite set of nodes, called places; \\
-  \item Ta finite set of nodes, called transitions, disjoint fromP(P\\T = 1); \\
-  \item $F C= (PxT)[(TxP)$  a  set  of  directed  edges  calledarcs, known as the flow relation. \\
-  \item .Sig = (S, O)  is  a  Boolean  signature,  whereSis  a  set  ofsorts  and  whereOis  a  set  of  operators \\
-  \item Vis anS-indexed set of variables, disjoint fromO \\
-  \item H = (SH,OH) is a many-sorted algebra for the signatureSig, defined in this list: \\
-  \item Type:P!SHis a function that assigns types to places. \\
-  \item AN = (A, TC) is a pair of net annotations. \\
-  \item A:F!TERM(O[V)  such  that  for  all  (p, t),  (t, p)2Fand  all  bindingsa,Vala(A(p,t)),Vala(A(t0,p))2mType(p) \\
-  \item TC:T!TERM(O[V)Boolis  a  function  that  anno-tates transitions with Boolean expressions \\
-  \item M0:P![p2PmType(p)  such  that8p2P,M0(p)2mType  (p)  is  the  initial  marking  function  that  associatesa  multiset  of  tokens  (of  the  correct  type)  with  eachplace. `'
+  \item $P$ je konecna mnozina mist. \\
+  \item $T$ je konecna mnozina prechodu, pro kterou plati $\left(P \cup T = \varnothing\right)$. \\
+  \item $D$ je konecna neprazna mnozina domen, kde kazdy element domeny je typ. \\ % is a non-empty finite set of non-empty domains where each element of D is called type.
+  \item $T_{ype}$ : $P \cap T \rightarrow D$ je funkce pro pridani typu do mist a urceni typu prechodu.
+  \item $P_{re}$, $P_{ost}$ : $TRANS$ $\rightarrow$ $\mu PLACE$ jsou pre a post kondicii pro ktere plati: \\
+  \begin{center}
+    \item $TRANS$ = $\left\{\left(t, m\right) | t \in T, m \in T_{ype} \left( t \right)\right\}$ \\
+    \item $PLACE$ = $\left\{\left(p, g\right) | p \in P, g \in T_{ype} \left( p \right)\right\}$ \\
+  \end{center}
+  
+  \item $M_0$ je $\mu PLACE$ je multimnozina pocatecnych znacek.
 \end{itemize}  
-Citace \url{http://users.cis.fiu.edu/~hex/CEN6075-11/PetriNets/He-Murata.pdf}
-\subsection*{Distribovany system}
+Citace pnstd-4.7.1.pdf
+\paragraph*{Pravidlo pro provedeni prechodu}
+Pokud je dane ze konecna multimnozina $T_\mu$ je zapnuta pro znacku $M$, tedy prechod v HLPN muze byt uskutecnen pro znacku $M'$ nasledujicim zpusobem:
+\begin{center}
+  $M' = M - Pre(T_\mu) + Post(T_\mu)$
+\end{center}
+TODO: citace pnstd p5.4
+\subsection{HLPN Graf}
+Graf HLPN ma nasledujici vlastnosti:
+\begin{itemize}
+  \item $Graf\:site$ je sestaveny s dvou prvku - $mist$ a $tansici$, ktere jsou propojeny mezi sebou sipkami($ark$).
+  \item $Typy\:mist$ Kazde misto musi mit prirazeny jeden typ. Mnozina typu nesmi byt prazdna.
+  \item $Znackovani\:mist$: je kolekce prvku, ktere museji odpovidat typu mista, ve kterem se nachazeji. Prvky se jmenuji $tokeny$ a muzou se opakovat.
+  \item $Sipkove\:annotaci$: kazda sipka je annotovana vyrazem se sestavujicim z konstant, promenych ($x, y$) nebo funkci($f(x)$). Kazda promena je typovana, a vyrazy se provadeji prirazenim hodnot ke kazde ze promenych. Vyhodnoceni vyrazu produkuje colekci prvku prevzatych z vstupniho mista, ktera se muze opakovat.
+  \item $Podminky\:pro\:prechod$: jsou booleove vyrazy ve tvaru $x < y$, ktere jsou v annotaci tranzice.
+  \item $Deklaraci$: Vytvareji definici typu mist, funkci a promenych.
+\end{itemize}
+
+\subsection{Distribovany system}
 Definice distribovaneho systemu zni:
 Distribovany system je kolekce na sobe nezavislych pocitatcu, ktery konecny uzivatel vnima jako celek. 
 % http://barbie.uta.edu/~jli/Resources/MapReduce&Hadoop/Distributed%20Systems%20Principles%20and%20Paradigms.pdf
@@ -80,8 +93,8 @@ Distribovane systemy museji pouzivat decentralizovane algoritmy, ktere pozaduji 
 Z definice taky vypliva, ze distribovany system se obecne sestavuje s vice se opakujicich prvku, ktere funguji nezavisle na sobe a nemaji pristup ke sdilene pameti, neboli kazdy prvek ma svoi vlastni. Sdileni stavu ve pripade distribovaneho systemu se provadi pomoci zasilani zprav.
 
 Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho sitmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a prechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol MQTT(odkaz), ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace (Boiler net) nazorne ukazuje pouziti dane myslenky na praktice.
-\subsection*{Simulace}
-\subsection*{Diskretni simulace}
+\subsection{Simulace}
+\subsection{Diskretni simulace}
 Diskretni simulace je zalozena ve svem zakladu na algoritmu znamem pod nazvem "NextEvent". Tento algoritmus se ridi nasledujicim pseudokodem:
 \begin{algorithm}
   \caption{Diskretni simulace}\label{euclid}
@@ -97,7 +110,7 @@ Diskretni simulace je zalozena ve svem zakladu na algoritmu znamem pod nazvem "N
   \EndWhile
   \end{algorithmic}
   \end{algorithm}
-\subsection*{Simulace v realnem case}
+\subsection{Simulace v realnem case}
 Simulace v realnem case se lisi of diskretni simulace v jedne vlastnosti. Beh takove simulace musi byt synchronizovan s relanim casem. Obecne posuv v casove rovine se provadi kvazidistantnim krokem, pricemz ten krok musi byt dostatecne maly, na to aby simulace stacila cist vstupni parametry. ??? % Real-Time Simulation of Electric Vehicles for Distribution System Operation Assessment, Characteristics of Real-Time Simulation
 
 Simulace v realnem case upravena pro ucely tohoto projektu je zalozena na vyse zminenem algoritmu "Next Event" s jedinou zmenou, ktera pridava cekani na synchronizaci simulacniho casu s realnim nebo na prichod nove udalosti. Algoritmus v tom pripade vypada nasledujim zpusobem:
@@ -121,44 +134,49 @@ Simulace v realnem case upravena pro ucely tohoto projektu je zalozena na vyse z
 \end{algorithm}
 
 Tento algoritmus nachazi svoje pouziti ve mnoha simulacnich pripadech. Bezny priklad pouziti - pocitacove hry, kde uzivatele zaujme herni prostredi, ktere simuluje realni svet, vcetne casove roviny. Simulace v realnim case se taky pouziva, kdy obycejne diskretni simulace nestaci a cas neni zanedbatelny. Uzivatel muze chtit sledovat system v prubehu simulace, za ucelem zjisteni anomalii v chovani jeho prvku nebo zvyseni kvality systemu pred jeho nasazenim do provozu. Takovy pristup se pouziva v simulace "Hardware-in-the-loop"(odkaz).
-\subsection*{Hardware-in-the-loop(HWIL)}
-\subsection*{Applikace}
-\paragraph*{Obsah}
+\subsection{Hardware-in-the-loop(HWIL)}
+\subsection{Applikace}
+\paragraph{Obsah}
 
 1. \url{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597?scroll=top&needAccess=true}
-Rozsah míst kdě se dá applikovat Petrího sítě je velmí široký. Jako modelovací prostředek můžou sloužit například pro „reprezentací vzorů interakce“ mezí člověkem a autopilotém letadla(odkáz 1), nebo .... V nášem případě vysokourovňová Petrího síť modeluje a nasledně simuluje chování distribovaného sýstemu (termostat <-> teploměr) 
+Rozsah míst kdě se dá applikovat Petrího sítě je velmí široký. Jako modelovací prostředek můžou sloužit například pro „reprezentací vzorů interakce“ mezí člověkem a autopilotém letadla(odkáz 1), nebo .... V nášem případě vysokourovňová Petrího síť modeluje a nasledně simuluje chování distribovaného sýstemu (termostat <-> teploměr) TODO
 
-\subsection*{Znackovaná Petrího sít}
+\subsection{Znackovaná Petrího sít}
 Prikladem pouziti znackovane petriho siti muze slouzit implementace "problemu Vecericich philosofu", coz je problem poprve predstaveny professorem Dijkstrou v roce 1965.
 Je to obecne znamy problem paralelismu, ktery nazorne zobrazuje dva pripady chyb vznikajicich pri pararelnim vypoctu - vyhladoveni a uvaznuti.
-\url{https://en.wikipedia.org/wiki/Dining_philosophers_problem#cite_note-formalization-2}
-% Petri nets theory and Modeling of Systems, p. 65-67, par 3.4.6
-% TODO: naimplementovat a zobrazit
-\subsection*{Vysokourovnova Petriho sit}
+\url{https://en.wikipedia.org/wiki/Dining_philosophers_problem#cite_note-formalization-2} Petri nets theory and Modeling of Systems, p. 65-67, par 3.4.6
+TODO: naimplementovat a zobrazit
+\subsection{Vysokourovnova Petriho sit}
 % TODO
 \chapter{Implementace}
-\subsection*{Knihovna SNAKES}
-% https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/
+\subsection{Knihovna SNAKES}
+\url{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/}
 SNAKES je knihovna v jazyce Python ktera nabizi vsechno potrebne pro definici a spousteni spousty typu Petriho siti. Cili knhovny SNAKES je nabidnout badatelum moznost rychle namodelovat novy napad. Zvlastni vlastnosti knihovny SNAKES je moznost vytvarzet Barevne Petriho site s pouzitim vyrazu v jazyce Python pro annotaci prechodu ci vstupnich nebo vystupnich sipek.
 
 Zvlastni vlastnosti SNAKES je moznost implementace vlastnich rozsireni pro jednotlive casti Petriho siti, nebo pridani novych vlastnosti pro modelovani jinych podtypu Petriho siti. Tato vlastnost byla zvlast pouzita pro pridani rozsireni, podporujici vytvareni Petriho siti urcenych pro modelovani distribovanych systemu.
 Tento plugin ve svem zaklade umoznuje pouziti MQTT clientu pro provazani portu Petriho siti mezi sebou.
-\subsection*{MQTT}
+\subsection{MQTT}
 MQTT je protokol urceny pro komunikaci ve pripadech nizke propustnosti siti nebo jeji vysoke nespolehlivosti. V soucasne dobe svoje vyuziti nachazi v IoT (odkaz). MQTT zavadi takove pojmy jako klient a broker. Klient je tenka aplikace, schopna navazani spojeni s brokerem. Muze byt pouzite pro zarizeni, jejichz vykon je bod srazu. Broker je server, obsluhujici klienty, navazuje spojeni s klientem a provadi posilani zprav typu PUBLISH klientum, ktere sleduji tema odpovidajici teto zprave.
 
 Kazda zprava posilana klientem se nepredava primo dalsimu klientovi, ale obsluhuje se brokerem. Zprava musi mit specifikovane tema, podle ktere broker urci, kterym klientum tu zpravu preposlat.
 
 Zpravy museji navic mit specifikovany obsah, a QoS. QoS muze byt 3 typu:
 \begin{itemize}
-  \item $Qos_0$ Nanejvys jedno dodani \\
+  \item $QoS_0$ Nanejvys jedno dodani \\
   \item $QoS_1$ Alespon jedno dodani \\
   \item $QoS_2$ Presne jedno dodani 
 \end{itemize}
 
 Pro navazani spojeni s brokerem po nastaveni sitoveho pripojeni klient musi nejdrive poslat zparavu $CONNECT$, po ktere server musi odpovedet zpravou typu $CONNACK$ podtvrzujici navazani spojeni. Potom klient je volen poslat zpravy typu $SUBSCRIBE$ s tematem na ktere chce dostavat zpravy. Server odpovida zpravou $SUBACK$. Potom uz zprava typu $PUBLISH$ z urcitym obsahem od klienta ktery provedl vsechny minule kroky bude zpracovana brokerem.
-\subsection*{Implementace pluginu $mqtt_msg$}
+\subsection{Implementace pluginu $prob_timed_pl$}
+Tento plugin je urcen pro knihovny SNAKES a pridava podporu implementaci takovych rozsireni Petriho siti, jako Casovany prechod a Pravdepodobnostni prechod.
 
+Prvni rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tranzice do budoucna. Toto rozsireni pouziva jednoduchou logiku pro provedeni prechodu - ve chvili kdy prechod bude spustitelny, tak se zapne casovac a zkonzumuji odpovidajici tokeny ze vstupnich mist. Cekani se neresetuje pridanim dalsich tokenu do vstupnich mist. Ve pripade teto implementace prechod vezme vsechny tokeny ktere se objevi ve vstupnich mistech a tudiz zapnou tranzici. Po ukonceni cekani, tokeny budou preneseny do vystupnich mist, s nasledujcimi upravami, ktere muzou nastat podle definice HLPN(odkaz).
 
-\subsection*{Planovac udalosti}
+Druhe rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudiz rovnomerne rozdelit pravdepodobnost spousteni kazde z nich. Uzivatel muze ve pripade potreby uvest explicitnou hodnotu pravdepodobnosti pro kazdou tranzici, ale neni to nutne. Pro spojene prechody plati, ze museji mit stejnou sadu vstupnich mist. 
+
+\subsection{Planovac udalosti}
+\url{https://docs.python.org/3/library/heapq.html}
+Planovac udalosti je naimplementovan jako prioritni fronta za vyuziti vestavene knihovny heapq v Pythonu. Api naznacuje ze pro pridani a vyberu prvku se pouzivaji metody $heappush$ a $heappop$. \url{https://docs.python.org/3/library/heapq.html#theory} Priorita v takove fronte se urcuje ciselnou hodnotou, ktera se vklada do fronty. Tato hodnota muze byt prvnim prvkem v seznamu elementu. Druhym parametrem pro urceni priority je poradi, ve kterem prvek byl vlozen. Tato sada pravidel umoznuje vkladat zaznamy, obsahujici cas spusteni jako prvni prvek, a podle toho se zaradi na prisluhujici misto ve fronte. Metoda $heappop$ vybere prvek ze seznamu s nejvyssi prioritou, coz bude element s nejnizsi hodnotou casu.
 \chapter{Závěr}
 \label{zaver}
