@@ -42,7 +42,13 @@
 % Základní balíčky jsou dole v souboru šablony fitthesis.cls
 % Basic packages are at the bottom of template file fitthesis.cls
 % zde můžeme vložit vlastní balíčky / you can place own packages here
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 
+\newcommand{\sfunction}[1]{\textsf{\textsc{#1}}}
+\algrenewcommand\algorithmicforall{\textbf{foreach}}
+\algrenewcommand\algorithmicindent{.8em}
 % Kompilace po částech (rychlejší, ale v náhledu nemusí být vše aktuální)
 % Compilation piecewise (faster, but not all parts in preview will be up-to-date)
 % \usepackage{subfiles}
