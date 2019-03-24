@@ -126,28 +126,18 @@ class Timed():
                 - self.simul.start_time + self.timeout
         self.simul.schedule([self.unblock], timeout)
 
-    def block(self):
-        self.scheduled = True
-        self.ready = False
-            
     def unblock(self):
         self.scheduled = False
         self.ready = True
-        for binding in self.bindings:
-            self.transition.add_bindings(binding)
-        if self.bindings:
-            self.bindings = []
-            self.simul.schedule(
-                [self.simul.execute_net, self.transition.net], self.simul.NOW)
-            # print(f'\tAdded net execution of {self.net.name} to {self.simul.scheduler.queue}')
+        self.transition.add_bindings(self.bindings[0])
+        self.bindings = self.bindings[1:]
+        self.simul.schedule(
+            [self.simul.execute_net, self.transition.net], self.simul.NOW)
+        # print(f'\tAdded net execution of {self.net.name} to {self.simul.scheduler.queue}')
 
     def check_and_fire(self, binding):
-        if self.ready:
-            self.transition.add_bindings(binding)
-        elif not self.scheduled:
-            self.block()
-            self.plan()
-            self.bindings.append(binding)
+        self.plan()
+        self.bindings.append(binding)
         
 
 
@@ -185,9 +175,13 @@ def extend(module):
             self.ready = True
 
         def add_remote_output(self, place, target):
+            if isinstance(place, str):
+                place = self.place(place)
             self.ports.add(('output', place, target))
 
         def add_remote_input(self, place, target):
+            if isinstance(place, str):
+                place = self.place(place)
             self.ports.add(('input', place, target))
 
         def plan_execute(self):
@@ -220,11 +214,19 @@ def extend(module):
             self.state = Place.SEPARATED
             module.Place.__init__(self, name, tokens, check)
         
+        def set_place_type(self, p_type):
+            if self.state == self.SEPARATED:
+                self.state = p_type
+            elif self.state != p_type:
+                raise ValueError("Place type is already set")
+
         @staticmethod
         def draw_place (place, attr) :
-            pass
             # attr['label'] = place.name.upper()
-            # attr['color'] = '#FF0000'
+            if place.state == Place.INPUT:
+                attr['color'] = '#00FF00'
+            elif place.state == Place.OUTPUT:
+                attr['color'] = '#FF0000'
 
     class Transition(module.Transition):
 

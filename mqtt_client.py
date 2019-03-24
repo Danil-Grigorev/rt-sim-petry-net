@@ -49,7 +49,7 @@ class Mqtt_client():
         self.__serve_output(from_topic, src_topic)
 
     def __configure_internal_input_port(self, place): # DONE
-        self.__set_place_type(place, place.INPUT)
+        place.set_place_type(place.INPUT)
         self._input_ports[place.name] = place
         input_port_topic = '{}/{}'.format(self.net.name, place.name)
         self.add_subscription(input_port_topic)
@@ -65,16 +65,10 @@ class Mqtt_client():
         self.__serve_input(target_port_topic)
 
     def __configure_internal_output_port(self, trg_place, to_topic):
-        self.__set_place_type(trg_place, trg_place.OUTPUT)
+        trg_place.set_place_type(trg_place.OUTPUT)
         self._output_ports[trg_place] = to_topic
         # print(f'{self.net.name}/{trg_place.name} is an output to {to_topic}')
 
-    def __set_place_type(self, place, p_type):
-        if place.state == place.SEPARATED:
-            place.state == p_type
-        elif place.state != p_type:
-            raise Exception("Place type is already set")
-        
     def setup(self):
         self.__setup_client()
 
@@ -197,8 +191,6 @@ class Mqtt_client():
         if not planned:
             self.net.ready = True
         for as_port, place, topic in planned:
-            if isinstance(place, str):
-                place = self.net.place(place)
             if as_port == 'input':
                 self.__input_port_setup(place, topic)
             else:   # configure as output
