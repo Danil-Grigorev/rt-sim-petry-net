@@ -1,7 +1,9 @@
-#!/bin/python2.7
+#!/bin/python3.7
 import time
 import logging
-from threading import Event, Thread, Barrier
+import signal
+import sys
+from threading import Condition, Thread, RLock
 
 from heapq import *
 from mqtt_client import Mqtt_client
@@ -15,23 +17,27 @@ h = logging.FileHandler('out.log', 'w')
 h.setLevel(logging.DEBUG)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(threadName)s - %(message)s', handlers=[h])
 
-class PNSim():
+
+class PNSim(Thread):
     NOW = -2
     INF = float('inf')
     barier = None
-    wake_event = Event()
+    wake_event = Condition()
 
     def __init__(self, broker="127.0.0.1"):
         self._nets = {}
-        self._broker = broker
         self.end_time = PNSim.INF
         self.scheduler = Scheduler()
-        self.cur_time = PNSim.INF
+        self.cur_time = time.time
         self.start_time = PNSim.INF
         self._running_events = []
+        self.mqtt = Mqtt_client(self, broker)
+        self.kill = False
+        Thread.__init__(self)
 
-    def __setup(self, end_time):
-        self.__wait_net_ports()
+    def setup(self, end_time=INF):
+        assert isinstance(end_time, (int, float))
+        self.mqtt.configure()
         self.start_time = time.time()
         if end_time == PNSim.INF:
             pass
@@ -39,36 +45,33 @@ class PNSim():
             raise ValueError("Not positive running time value.")
         else:
             self.end_time = self.start_time + end_time
-        self.cur_time = time.time
         self.scheduler.start(self.start_time)
 
-    def run(self, end_time=INF):
+    def run(self):
         ''' Next-event algorithm with real time extention '''
-        assert isinstance(end_time, (int, float))
-        self.__setup(end_time)
-        logging.info('Starting simulation')
-        running_sim = Thread(target=(self._run))
-        running_sim.start()
-        running_sim.join()
-        logging.info(f'Simulation ended at {self.cur_time() - self.start_time}')
-            
-    def _run(self):
-        logging.info('Simulation thread started')
-        while self.scheduler.next_planned() or self._running_events:
+        if self.start_time == PNSim.INF:
+            raise Exception('Simulation was not setup')
+        logging.info('Starting simulation node')
+        while not self.kill:
             while self.scheduler.next_planned():
                 interrupted = self._wait_to_event_begin()
                 if interrupted:   # New event arrived
                     logging.info(
                         f"New event arrived at {self.cur_time() - self.start_time}")
                     continue
-                # print(
-                #     f'_extract_and_execute\n\tEvents: {self._running_events}\n\tQueue: {self.scheduler.queue}')
                 self._extract_and_execute()
-            # print(
-            #     f'_wait_to_finish_or_new_event\n\tEvents: {self._running_events}\n\tQueue: {self.scheduler.queue}')
             self._wait_to_finish_or_new_event()
+        self.end_run()
+
+    def end_run(self):
+        logging.info(
+            f'Simulation ended at {self.cur_time() - self.start_time}')
+        print('Simulation interrupted')
+        sys.exit()
                 
     def _wait_to_event_begin(self):
+        if self.kill:
+            self.end_run()
         tm = self.scheduler.next_planned()
         logging.info('Checking event at {}'.format(
             ((tm - self.start_time) if tm != PNSim.NOW else 'NOW')))
@@ -85,13 +88,16 @@ class PNSim():
         logging.info('Waiting for {}'.format(tm - self.cur_time()))
         # print(
         #     f'Next is: {self.scheduler.queue[0]}\nAfter: {self.scheduler.queue[-1]}\n Next < After: {self.scheduler.queue[0] < self.scheduler.queue[-1]}')
-        if tm == PNSim.INF:
-            interrupted = PNSim.wake_event.wait()
-        else:
-            interrupted = PNSim.wake_event.wait(tm - self.cur_time())
+        with PNSim.wake_event:
+            if tm == PNSim.INF:
+                interrupted = PNSim.wake_event.wait()
+            else:
+                interrupted = PNSim.wake_event.wait(tm - self.cur_time())
         return interrupted
 
     def _extract_and_execute(self):
+        if self.kill:
+            self.end_run()
         tm, action = self.scheduler.pop_planned()
         logging.info(
             f'Extracting event '
@@ -105,6 +111,7 @@ class PNSim():
                 action))
             net_runner = Thread(target=function, args=args)
             net_runner.start()
+            # print(args, 'started execution on ', net_runner)
             self._running_events.append(net_runner)
     
     def _wait_to_finish_or_new_event(self):
@@ -113,35 +120,42 @@ class PNSim():
         if self._running_events:
             logging.info('Waiting for threads {}'.format(
                 self._running_events))
-            if self.end_time == PNSim.INF:
-                PNSim.wake_event.wait()
-            else:
-                PNSim.wake_event.wait(self.end_time - self.cur_time())
+            with PNSim.wake_event:
+                if self.end_time == PNSim.INF:
+                    PNSim.wake_event.wait()
+                else:
+                    PNSim.wake_event.wait(self.end_time - self.cur_time())
 
     def execute_net(self, net):
-        print(f'Executing net {net.name}')
         if not isinstance(net, snakes.nets.PetriNet):
             net = self._nets[str(net)]
+        print(f'Executing net {net.name}, {self.mqtt.remote_nets}, {self}')
         net.draw(f'nets_png/{net.name}-start.png')
         logging.info(
             f'Started execution "{net}" at {self.cur_time() - self.start_time}')
-        while not all([len(t.modes()) == 0 for t in net.transition()]):
+        while any([len(t.modes()) != 0 for t in net.transition()]):
+            if self.kill:
+                sys.exit()
             if self.end_time != PNSim.INF and self.cur_time() > self.end_time:
                 break   # Simulation time ended
-            for t in net.transition():
+            t_list = net.transition()
+            t_list.sort(key=lambda x: x.__hash__())
+            for t in t_list:
                 modes = t.modes()
                 if len(modes) > 0:
+                    modes.sort(key=lambda x: x.__hash__())
                     t.fire(modes[0])
-        else:
-            net.draw(f'nets_png/{net.name}-end.png')
-            net.send_tokens()
+            # print('Modes: ', [t.modes()
+            #                   for t in net.transition() if t.modes()])
+            # print('Marks: ', [p for p in net.place()])
+        net.draw(f'nets_png/{net.name}-end.png')
+        net.send_tokens()
         self.wake()
 
     def add_petri_net(self, net):
-        mqtt = Mqtt_client(net, self._broker)
-        net.add_mqtt_client(mqtt)
         if net.name not in self._nets:
             self._nets[net.name] = net
+            self.mqtt.nets[net.name] = net
         else:
             raise NameError("Net {} already exists".format(net.name))
 
@@ -174,16 +188,10 @@ class PNSim():
             self.wake()
 
     def wake(self):
-        PNSim.wake_event.set()
-        PNSim.wake_event.clear()
-
-    def __wait_net_ports(self):
-        nets = self._nets.values()
-        parties = len([net for net in nets if net.ports])
-        PNSim.barier = Barrier(parties=parties, timeout=2)
-        for net in nets:
-            net.prepare()
-        PNSim.barier.wait()
+        with self.wake_event:
+            self.wake_event.notify_all()
+        if self.kill:
+            self.end_run()
 
 class Scheduler:
 
@@ -191,6 +199,7 @@ class Scheduler:
         self.queue = []
         self.preplanned = []
         self.running = False
+        self.lock = RLock()
 
     def start(self, timeval):
         self.running = True
@@ -210,34 +219,38 @@ class Scheduler:
         Priority should be converted to negative value to preserve queue's
         sorting direction.
         """
-        if self.running:
-            heappush(self.queue, (timeval, -prior, executable))
-        else:
-            self.preplanned.append((timeval, executable, prior))
+        with self.lock:
+            if self.running:
+                heappush(self.queue, (timeval, -prior, executable))
+            else:
+                self.preplanned.append((timeval, executable, prior))
 
     def pop_planned(self):
         """ 
         Returns and pops next planned executable form scheduler.
         Returns None when heap is empty
         """
-        if self.queue:
-            timeval, _, executable = heappop(self.queue)
-            return timeval, executable
-        else:
-            return None, None
+        with self.lock:
+            if self.queue:
+                timeval, _, executable = heappop(self.queue)
+                return timeval, executable
+            else:
+                return None, None
 
 
     def next_planned(self):
         """
         Returns next planned executable in scheduler or None when executable heap is empty
         """
-        if self.queue:
-            return self.queue[0][0]
-        else:
-            return None
+        with self.lock:
+            if self.queue:
+                return self.queue[0][0]
+            else:
+                return None
 
     def remove_planned(self, timeval, executable, prior=0):
-        self.queue.remove((timeval, prior, executable))
+        with self.lock:
+            self.queue.remove((timeval, prior, executable))
 
         
 

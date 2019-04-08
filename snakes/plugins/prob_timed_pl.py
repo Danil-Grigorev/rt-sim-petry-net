@@ -96,7 +96,6 @@ class Prob():
     def check_and_fire(self, binding):
         prob = 0.0
         transitions = list(self.neighbours)
-        print(transitions)
         for nb in transitions[:-1]:
             prob += nb.extension.prob
             if random() <= prob:
@@ -151,23 +150,27 @@ def extend(module):
             self.ports = set()
             module.PetriNet.__init__(self, name)
 
-        def add_mqtt_client(self, mqtt):
-            if self.mqtt_cl is not None:
-                return
-            self.mqtt_cl = mqtt
-            self.mqtt_cl.setup()
-
         def add_simulator(self, simul):
             self.simul = simul
             self.simul.add_petri_net(self)
+            self.mqtt_cl = self.simul.mqtt
 
         def send_tokens(self):
-            self.mqtt_cl.send_tokens()
+            output_ports = [port[1:] for port in self.ports if port[0] is 'output']
+            for place, topic in output_ports:
+                tokens = []
+                if not place.tokens:
+                    continue
+                for token in place.tokens:
+                    tokens.append('{}:{}'.format(
+                        token.__class__.__name__, str(token)))
+
+                self.mqtt_cl.topic_publish(topic, tokens)
+                place.empty()
 
         def prepare(self):
             if self.ready:
                 return
-            self.mqtt_cl.configure(self.ports)
             for tr in self.transition():
                 tr._add_parent_net(self)
                 tr._add_simulator(self.simul)
@@ -183,18 +186,6 @@ def extend(module):
             if isinstance(place, str):
                 place = self.place(place)
             self.ports.add(('input', place, target))
-
-        def plan_execute(self):
-            if self.simul is None:
-                raise RuntimeError('Not a simulation entity')
-            # print(f'Planning execution for {self.name}')
-            self.simul.schedule([self.simul.execute_net, self], self.simul.INF)
-
-        def execute(self):
-            if self.simul is None:
-                raise RuntimeError('Not a simulation entity')
-            # print(f'updating execution time for {self.name}')
-            self.simul.update_time([self.simul.execute_net, self], self.simul.NOW)
 
         def draw(self, filename, engine="dot", debug=False,
                   graph_attr=None, cluster_attr=None,
@@ -222,7 +213,6 @@ def extend(module):
 
         @staticmethod
         def draw_place (place, attr) :
-            # attr['label'] = place.name.upper()
             if place.state == Place.INPUT:
                 attr['color'] = '#00FF00'
             elif place.state == Place.OUTPUT:

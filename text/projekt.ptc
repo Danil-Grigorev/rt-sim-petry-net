@@ -23,7 +23,9 @@
 \contentsline {subsection}{\numberline {3.0.2}MQTT}{8}{subsection.3.0.2}
 \contentsline {subsection}{\numberline {3.0.3}Implementace pluginu $prob_timed_pl$}{9}{subsection.3.0.3}
 \contentsline {subsection}{\numberline {3.0.4}Planovac udalosti}{9}{subsection.3.0.4}
-\contentsline {chapter}{\numberline {4}Z\IeC {\'a}v\IeC {\v e}r}{10}{chapter.4}
-\contentsline {chapter}{Literatura}{11}{chapter*.9}
+\contentsline {chapter}{\numberline {4}Aplikace}{10}{chapter.4}
+\contentsline {section}{\numberline {4.1}Tepelne rizeni}{10}{section.4.1}
+\contentsline {chapter}{\numberline {5}Z\IeC {\'a}v\IeC {\v e}r}{12}{chapter.5}
+\contentsline {chapter}{Literatura}{13}{chapter*.9}
 \ttl@starttoc {chapters@1}
 \contentsfinish 

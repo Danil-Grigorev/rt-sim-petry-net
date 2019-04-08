@@ -92,7 +92,7 @@ Distribovane systemy museji pouzivat decentralizovane algoritmy, ktere pozaduji 
 
 Z definice taky vypliva, ze distribovany system se obecne sestavuje s vice se opakujicich prvku, ktere funguji nezavisle na sobe a nemaji pristup ke sdilene pameti, neboli kazdy prvek ma svoi vlastni. Sdileni stavu ve pripade distribovaneho systemu se provadi pomoci zasilani zprav.
 
-Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho sitmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a prechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol MQTT(odkaz), ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace (Boiler net) nazorne ukazuje pouziti dane myslenky na praktice.
+Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho sitmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a prechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol MQTT(odkaz), ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace tepelneho rizeni(odkaz) nazorne ukazuje pouziti dane myslenky na praktice.
 \subsection{Simulace}
 \subsection{Diskretni simulace}
 Diskretni simulace je zalozena ve svem zakladu na algoritmu znamem pod nazvem "NextEvent". Tento algoritmus se ridi nasledujicim pseudokodem:
@@ -178,5 +178,25 @@ Druhe rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudi
 \subsection{Planovac udalosti}
 \url{https://docs.python.org/3/library/heapq.html}
 Planovac udalosti je naimplementovan jako prioritni fronta za vyuziti vestavene knihovny heapq v Pythonu. Api naznacuje ze pro pridani a vyberu prvku se pouzivaji metody $heappush$ a $heappop$. \url{https://docs.python.org/3/library/heapq.html#theory} Priorita v takove fronte se urcuje ciselnou hodnotou, ktera se vklada do fronty. Tato hodnota muze byt prvnim prvkem v seznamu elementu. Druhym parametrem pro urceni priority je poradi, ve kterem prvek byl vlozen. Tato sada pravidel umoznuje vkladat zaznamy, obsahujici cas spusteni jako prvni prvek, a podle toho se zaradi na prisluhujici misto ve fronte. Metoda $heappop$ vybere prvek ze seznamu s nejvyssi prioritou, coz bude element s nejnizsi hodnotou casu.
+\chapter{Aplikace}
+\section{Tepelne rizeni}
+Pro demonstraci praci simulatoru bylo rozhodnuto namodelovat dystribovany system modelujici chovani topeni, ktey nekteri z vas pravdepodobne pouzivaji u sebe doma. Takovy system se sestavuje z nekolika casti. Zakladnim prvkem je plynovy spotrebic, nebo karma. Ta ohriva vodu a uvadi ji do pohybu po potrubich. Pak kazdy z pokoju ma na starosti ?teplene cidlo? a rizeni, ktere udrzuje v pokoji nastavenou teplotu podle calendare. Kazdou hodinu se z tabulky teplot vezme aktualni teplota pro soucasnou hodiny a tento pokoj, pak rizeni rozhodne jestli ma zapnout topeni nebo ne. Pokud zadny z pokoju v soucasne dobe nema zapnute topeni, tak karma se musi vypnout za ucelem setreni plynu. Toto rizeni provadi vestaveny system, nebo je zcela mechanicky. Kazdy z tech prvku bude dale namodelovan Petriho sitmi.
+
+Aby tento navrh co nejpresneji odpovidal realite, bylo rozhodnuto namodelovat chovani teploty v pokoji.
+Celkovy Nejdrive musime vedet jak vykonne je topeni v pokoji. Dale nas zajimaji tepelne ztraty. Zakladni parametrem rozhodujicim o tepelnych ztratach pokoje je plocha vnitrniho povrchu pokoje [V], respektive celkova plocha povrchu stopu, podlahy a sten. Pro ne je dulezte vedet koefficent ztrat tepla [K]. Zvlast se pocitaji okna a dvere, vzhledem k jejich vetshi teplovodivosti. Pak zbyva jenom zjistit rozdil teploty uvnitr pokoje a venku [delta T]. To vsechno dosadime do vzorecku Q[kW/h] = V*delta T*K/860 a zjistime celkove tepelne ztraty pokoje. % https://www.komplektacya.ru/spravochnik/teplovoe-oborudovanie1/raschet-teplovoj-moschnosti
+
+Pak je potreba vedet celkovy objem vzduchu a vyplne sten a podlahy pro vypocet mnozstvi energii potrebne pro jejich ohrati. 
+
+Cele chovani systemu odpovida zákonu zachovaní energii, a tak muzeme odvodit rovnici pro vypocet potrebneho jeji mnozstvi.
+
+Pro zjednoduseni vypoctu zanedbame parametry koefficentu ztrat tepla pro vsechny elementy, a vezmeme stredni hodnoty pro nekolik typickych druhu pokoju - kuchin, sklep a obyvaci pokoj. Kazdy z techto pokoju bude mit odlisny koefficent K a V. Pokoj bude mit 2 steny celici venku, kuchin bude mit 1. Pro sklep navic plati konstantni teplota vnejsiho prostredi, napriklad 5 stupnu. Taky se budeme pocitat s prijemnymi (skoro tropickymi) podminkami Ceske republiki - teplota venku je v prumeru v rozmezi 5 az 10 stupnu. % https://cs.wikipedia.org/wiki/Podneb%C3%AD_%C4%8Ceska
+Pak koefficenty vypadaji nasledně:
+
+kuchin - K: 0.5, V: 4x3x2.5 Dop. vykon topeni: 1200 W
+pokoj - K: 0.6, V: 6x4x2.5 Dop. vykon topeni: 2300 W
+sklep - K: 0.8, V: 3x3x2.2 Dop. vykon topeni: 300 W
+
+Modelovani chovani teploty venku je stochasticky process, ktery neni mozne spocitat presne. Proto byla navyrzena Petriho sit, vyuzivajici pravdepodobnostni prechody. Ma na vstupu rozsah teplot den - noc, a podle vybrane doby dne pravdivostnimi prechody modeluje zmenu aktualni teploty.
+
 \chapter{Závěr}
 \label{zaver}

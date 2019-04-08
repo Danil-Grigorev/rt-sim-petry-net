@@ -49,7 +49,6 @@ False
 
 import os, os.path, subprocess, collections, codecs
 import snakes.plugins
-from time import sleep as sleep
 from snakes.plugins.clusters import Cluster
 from snakes.compat import *
 
@@ -144,12 +143,8 @@ class Graph (Cluster) :
                                    stderr=subprocess.STDOUT)
         stdout, stderr = dot.communicate()
         if not debug :
-            while not os.path.exists(outfile.name):
-                sleep(0.1)
             os.unlink(outfile.name)
         if dot.returncode != 0 :
-            if (stdout or "").strip() + (stderr or "").strip() :
-                stdout = "\n*** Original error message follows ***\n " + stdout
             raise IOError("%s exited with status %s%s"
                           % (engine, dot.returncode, stdout))
     def layout (self, engine="dot", debug=False) :

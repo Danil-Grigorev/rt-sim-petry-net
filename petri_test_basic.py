@@ -1,11 +1,27 @@
 #!/usr/bin/python3.7
 
+import signal
 import snakes
 import snakes.plugins
 from simul import PNSim
 snakes.plugins.load(["gv", "prob_timed_pl"], "snakes.nets", "plugins")
 from snakes.nets import *
 from plugins import *
+
+import time
+
+nodes = []
+
+class Terminate(Exception):
+    '''
+    Simulation end event, raised when SIGINT or SIGTERM
+    was captured.
+    '''
+    pass
+
+
+def terminate(*args):
+    raise Terminate
 
 def factory(cons, prod, init=[1, 2, 3]):
     n = PetriNet("N")
@@ -22,17 +38,6 @@ def transport_proto(name):
 
     n = PetriNet(name)
 
-    n.declare("import random")
-    n.declare("succ_th=0.7")
-    n.declare("success=True")
-
-    n.declare("def success_tr(val):\n\
-\tif success: return val\n\
-\telse: return None")
-
-    n.declare("def update_success(thres=succ_th): global success; success = (random.uniform(0,1) > thres); return True")
-
-    n.declare("def copy(val): return val")
 
     packets = [
         (1, "COL"),
@@ -46,7 +51,7 @@ def transport_proto(name):
     n.add_place(Place("NextSend", [1], check=tInteger))
     n.add_place(Place("A", check=tPair))
 
-    snd_pack = Transition("Send Packet", guard=Expression('update_success()'))
+    snd_pack = Transition("Send Packet")
     n.add_transition(snd_pack)
     
     n.add_input("Packets to send", "Send Packet", Tuple([Variable("n"), Variable("d")]))
@@ -55,17 +60,12 @@ def transport_proto(name):
     n.add_output("NextSend", "Send Packet", Variable("n"))
 
     n.add_place(Place("B", check=tPair))
-    n.add_place(Place("Loss", check=tPair))
 
     # trans_pack = Transition("Transmit Packet", Expression("update_success()"))
-    trans_pack = Transition("Transmit Packet", Expression("success == True"))
-    trans_loss = Transition("Packet Loss", Expression("success == False"))
+    trans_pack = Transition("Transmit Packet")
     n.add_transition(trans_pack)
-    n.add_transition(trans_loss)
     n.add_output("A", "Send Packet", Tuple([Variable("n"), Variable("d")]))
     n.add_input("A", "Transmit Packet", Tuple([Variable("n"), Variable("d")]))
-    n.add_input("A", "Packet Loss", Tuple([Variable("n"), Variable("d")]))
-    n.add_output("Loss", "Packet Loss", Tuple([Variable("n"), Variable("d")]))
     # n.add_output("B", "Transmit Packet", Expression("success_tr(" + str(Tuple([Variable("n"), Variable("d")])) + ")"))
     n.add_output("B", "Transmit Packet", Tuple([Variable("n"), Variable("d")]))
 
@@ -98,7 +98,7 @@ def transport_proto(name):
     n.add_output("NextSend", "Receive Ack", Variable("n"))
     n.add_input("NextSend", "Receive Ack", Variable("k"))
 
-    n.add_remote_output('Transmit port', 'transm/Data Input')
+    # n.add_remote_output('Transmit port', 'transm/Data Input')
 
     return n
 
@@ -118,7 +118,7 @@ def transmit_net(name):
     t = Transition('t', prob=0.6)
     l = Transition('l', prob=0.2)
     l2 = Transition('l2')
-    tr = Transition('Transmit', timeout=10)
+    tr = Transition('Transmit')
     t.add_neighbour_transition(l)
     l2.add_neighbour_transition(l)
     n.add_transition(l)
@@ -138,7 +138,7 @@ def transmit_net(name):
     n.add_input('Data Input', l.name, Variable('data'))
     n.add_input('Data Input', l2.name, Variable("data"))
     n.add_remote_input(i, 'net/Transmit port')
-    n.add_remote_output(o, 'res/Data Received')
+    # n.add_remote_output(o, 'res/Data Received')
 
     return n
 
@@ -150,6 +150,7 @@ def execute(net_t=1):
         # nets.draw('out.png')
     elif net_t == 2:
         sim = PNSim()
+        sim2 = PNSim()
         net = transport_proto('net')
         net1 = transport_proto('net1')
         transm = transmit_net('transm')
@@ -157,23 +158,47 @@ def execute(net_t=1):
         # res.add_remote_input('Data Received', 'net/Transmit port')
         res.add_simulator(sim)
         net.add_simulator(sim)
-        net1.add_simulator(sim)
+
+        transm.add_simulator(sim2)
+        net1.add_simulator(sim2)
+
         # net.add_remote_output('Transmit port', 'res/Data Received')
-        transm.add_simulator(sim)
         # n1.place("Transmit port").set_output(n1, 'res/Data Received')
         # place = n.place()[0]
         sim.schedule_at([sim.execute_net, net], PNSim.NOW)
-        sim.schedule_at([sim.execute_net, net1], 4)
+        
         # sim.schedule_at([sim.execute_net, transm], 3)
         # sim.schedule_at(6, [sim.execute_net, res])
         # sim.schedule_at([sim.execute_net, net], 9)
 
-        sim.run()
+        sim.setup()
+        nodes.append(sim)
+        nodes.append(sim2)
+        try:
+            sim2.schedule_at([sim2.execute_net, net1], 4)
+            sim2.setup()
+            sim2.start()
+            time.sleep(5)
+            sim.start()
+            for node in nodes:
+                node.join()
+        except Terminate:
+            for node in nodes:
+                node.kill = True
+                print(node.mqtt.remote_requests)
+            for node in nodes:
+                if node.is_alive():
+                    node.wake()
+            print('done')
+        print(sim._running_events)
+        print(sim2._running_events)
         for name, net in sim._nets.items():
             net.draw(f'nets_png/{name}.png')
 
         
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGTERM, terminate)
+    signal.signal(signal.SIGINT, terminate)
     execute(2)
 
