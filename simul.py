@@ -66,9 +66,15 @@ class PNSim(Thread):
     def end_run(self):
         logging.info(
             f'Simulation ended at {self.cur_time() - self.start_time}')
-        print('Simulation interrupted')
+        if self.kill:
+            logging.info(f'Simulation interrupted')
+            logging.info(
+                f'Remote requests left unserved: {self.mqtt.remote_requests}')
+            print('Simulation interrupted')
+            if self.mqtt.remote_requests:
+                print('Unserved remote requests:', self.mqtt.remote_requests)
         sys.exit()
-                
+
     def _wait_to_event_begin(self):
         if self.kill:
             self.end_run()
@@ -113,7 +119,7 @@ class PNSim(Thread):
             net_runner.start()
             # print(args, 'started execution on ', net_runner)
             self._running_events.append(net_runner)
-    
+
     def _wait_to_finish_or_new_event(self):
         self._running_events = list(
             filter(lambda x: x.is_alive(), self._running_events))
@@ -133,24 +139,43 @@ class PNSim(Thread):
         net.draw(f'nets_png/{net.name}-start.png')
         logging.info(
             f'Started execution "{net}" at {self.cur_time() - self.start_time}')
+        presorted_tr = self.presort_transitions(net)
         while any([len(t.modes()) != 0 for t in net.transition()]):
             if self.kill:
                 sys.exit()
-            if self.end_time != PNSim.INF and self.cur_time() > self.end_time:
-                break   # Simulation time ended
-            t_list = net.transition()
-            t_list.sort(key=lambda x: x.__hash__())
-            for t in t_list:
-                modes = t.modes()
-                if len(modes) > 0:
-                    modes.sort(key=lambda x: x.__hash__())
-                    t.fire(modes[0])
+            for group in presorted_tr:
+                self.execute_group(group)
             # print('Modes: ', [t.modes()
             #                   for t in net.transition() if t.modes()])
             # print('Marks: ', [p for p in net.place()])
         net.draw(f'nets_png/{net.name}-end.png')
         net.send_tokens()
         self.wake()
+
+    def execute_group(self, group):
+        for t in group:
+            print(f'Executing t: {t.name}')
+            modes = t.modes()
+            modes.sort(key=lambda x: x.items())
+            if modes and t.enabled(modes[0]):
+                t.fire(modes[0])
+
+    def presort_transitions(self, net):
+        tgroups = []
+        t_list = net.transition()
+        t_list.sort(key=lambda x: x.__hash__())
+
+        prior_tr_sort = {}
+        for t in t_list:
+            pr = t.priority()
+            if pr in prior_tr_sort.keys():
+                prior_tr_sort[pr].append(t)
+            else:
+                prior_tr_sort[pr] = [t]
+
+        for k in sorted(prior_tr_sort.keys()):
+            tgroups.insert(0, prior_tr_sort[k])
+        return tgroups
 
     def add_petri_net(self, net):
         if net.name not in self._nets:
@@ -251,6 +276,3 @@ class Scheduler:
     def remove_planned(self, timeval, executable, prior=0):
         with self.lock:
             self.queue.remove((timeval, prior, executable))
-
-        
-

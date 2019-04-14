@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 from threading import RLock
 
 class Mqtt_client():
-    
+
     def __init__(self, simul, brock_addr='127.0.0.1'):
         self.input_ports = {} 
         self.output_ports = {}
@@ -28,11 +28,11 @@ class Mqtt_client():
             self.serve_private(data)
         else:
             self.serve_port(data)
-            
+
     def close(self):
         if self.client:
             self.client.loop_stop()
-    
+
     def add_subscription(self, topic):
         if not self.client:
             raise Exception("Client was not configured")
@@ -85,7 +85,7 @@ class Mqtt_client():
                 if not net in self.remote_requests.keys():
                     continue
                 self.remote_requests_pop(net)
-                    
+
         elif message['type'] == 'F':
             raise Exception("Failed to setup {}".format(message['payload']))
         elif message['type'] == 'S':
@@ -146,7 +146,7 @@ class Mqtt_client():
             to_topic = '/'.join(to_topic)
         self.configure_internal_output_port(trg_place, to_topic)
         self.configure_external_input_port(to_topic)
-        
+
     def configure_external_input_port(self, target_port_topic):
         net, place = target_port_topic.split('/')
         if net not in self.nets.keys():
@@ -155,7 +155,7 @@ class Mqtt_client():
         net = self.nets[net]
         place = net.place(place)
         self.configure_internal_input_port(net, place)
-        
+
     def configure_internal_output_port(self, trg_place, to_topic):
         trg_place.set_place_type(trg_place.OUTPUT)
         self.output_ports[trg_place] = to_topic
@@ -170,7 +170,7 @@ class Mqtt_client():
     def parse_msg(self, message):
         '''
         Parses message and returns a dictionary of it's values
-            
+
         Control message syntax looks like:
             "TYPE ACTION PAYLOAD"
             TYPE -- message type, [RSFA]
@@ -205,14 +205,14 @@ class Mqtt_client():
             else:
                 raise RuntimeError('Unknown message type for private message')
         return msg
-            
+
     def serve_input(self, target_port_topic, net):
         message = 'R, set_input, {}, /'.format(target_port_topic)
         if net in self.remote_nets:
             self.control_publish(message)
         else:
             self.update_remote_requests(net, message, 'control')
-        
+
     def serve_output(self, target_port_topic, src_topic, net):
         message = 'R, set_output, {}, {}'.format(target_port_topic, src_topic)
         if net in self.remote_nets:
@@ -258,7 +258,7 @@ class Mqtt_client():
         else: # Net is not yet registered
             self.update_remote_requests(net, '&'.join(tokens), topic)
         # self.simul.schedule([self.topic_publish, topic], self.simul.INF)
-        
+
     def configure(self):
         self.client.user_data_set(self.nets.keys())
         self.client._client_id = hash(str(self.nets.keys()))

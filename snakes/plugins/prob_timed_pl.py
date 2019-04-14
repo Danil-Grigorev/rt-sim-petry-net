@@ -6,9 +6,9 @@ from random import random
 from math import isclose
 
 class Prob():
-    
+
     def __init__(self, transition, prob=None):
-        
+
         self.type = 'probabilistic'
         self.transition = transition
         self.neighbours = {self.transition,}
@@ -22,7 +22,7 @@ class Prob():
         if self.prob is None:
             raise ValueError(f'Probability was not set for {self.transition.name}')
         return f'P: {self.prob * 100}%'
-    
+
     def add_neighbour(self, neighbour):
         if isinstance(neighbour, list):
             for n in neighbour:
@@ -56,12 +56,12 @@ class Prob():
         if not self.neighbours:
             raise ValueError(
                 f'Expected at least one neighbour for transition {self.transition.name}')
-        
+
     def __copy_neighbours(self, neighbour):
         self.neighbours.add(neighbour)
         neighbour.extension.neighbours.update(self.neighbours)
         self.neighbours.update(neighbour.extension.neighbours)
-        
+
     def __check_places(self, neighbour):
         if neighbour.input() != self.input_places:
             raise ValueError(
@@ -92,7 +92,7 @@ class Prob():
         distributed_prob = (1.0 - calc_prob) / len(unset_neighbours)
         for nb in unset_neighbours:
             nb.extension.set_probability(distributed_prob)
-        
+
     def check_and_fire(self, binding):
         prob = 0.0
         transitions = list(self.neighbours)
@@ -102,6 +102,7 @@ class Prob():
                 nb.add_bindings(binding)
                 return
         transitions[-1].add_bindings(binding)
+
 
 class Timed():
 
@@ -113,10 +114,10 @@ class Timed():
         self.timeout = timeout
         self.bindings = []
         self.ready = False
-    
+
     def prepare(self):
         self.simul = self.transition.simul
-    
+
     def text_repr(self):
         return f'T: {self.timeout}s'
 
@@ -128,8 +129,7 @@ class Timed():
     def unblock(self):
         self.scheduled = False
         self.ready = True
-        self.transition.add_bindings(self.bindings[0])
-        self.bindings = self.bindings[1:]
+        self.transition.add_bindings(self.bindings.pop(0))
         self.simul.schedule(
             [self.simul.execute_net, self.transition.net], self.simul.NOW)
         # print(f'\tAdded net execution of {self.net.name} to {self.simul.scheduler.queue}')
@@ -137,7 +137,6 @@ class Timed():
     def check_and_fire(self, binding):
         self.plan()
         self.bindings.append(binding)
-        
 
 
 @snakes.plugins.plugin("snakes.nets")
@@ -192,7 +191,7 @@ def extend(module):
                   place_attr=None, trans_attr=None, arc_attr=None):
             # ',net-with-colors.png',
             #    place_attr=draw_place, trans_attr=draw_transition
-            
+
             module.PetriNet.draw(self, filename, engine="dot", debug=False,
                   graph_attr=None, cluster_attr=None,
                   place_attr=Place.draw_place, trans_attr=Transition.draw_transition, arc_attr=None)
@@ -204,7 +203,7 @@ def extend(module):
         def __init__(self, name, tokens=[], check=None):
             self.state = Place.SEPARATED
             module.Place.__init__(self, name, tokens, check)
-        
+
         def set_place_type(self, p_type):
             if self.state == self.SEPARATED:
                 self.state = p_type
@@ -220,29 +219,35 @@ def extend(module):
 
     class Transition(module.Transition):
 
-        
-        def __init__(self, name, guard=None, timeout=None, prob=None):
+
+        def __init__(self, name, guard=None, **args):
+            timeout = args.pop('timeout', None)
+            prob = args.pop('prob', None)
+            module.Transition.__init__(self, name, guard, **args)
             if timeout and prob:
                 raise AttributeError('Transition can be eather timed or probabilistic, not both')
             self.extension = None
             self.net = None
             self.simul = None
-            module.Transition.__init__(self, name, guard)
             if timeout:
                 self.extension = Timed(self, timeout)
             if prob:
                 self.extension = Prob(self, prob)
-        
+
         def _add_simulator(self, sim):
             self.simul = sim
 
         def _add_parent_net(self, net):
             self.net = net
-        
+
         def prepare(self):
+            in_out_places = self.input() + self.output()
+            for _, label in in_out_places:
+                if hasattr(label, "globals"):
+                    label.globals.attach(self.net.globals)
             if self.extension is not None:
                 self.extension.prepare()
-            
+
         def set_probability(self, prob):
             if not self.extension:
                 self.extension = Prob(self)
@@ -258,7 +263,7 @@ def extend(module):
                 raise AttributeError(
                     f'Transition "{self.name}" already has a type')
             self.extension.add_neighbour(neighbour)
-        
+
         def set_timeout(self, timeout):
             if not isinstance(timeout, (int, float)):
                 raise TypeError(f'Timeout should be int or float, got {timeout}')

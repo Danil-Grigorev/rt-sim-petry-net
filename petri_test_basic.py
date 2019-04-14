@@ -4,7 +4,7 @@ import signal
 import snakes
 import snakes.plugins
 from simul import PNSim
-snakes.plugins.load(["gv", "prob_timed_pl"], "snakes.nets", "plugins")
+snakes.plugins.load(["gv", "prob_timed_pl", "prior_pl"], "snakes.nets", "plugins")
 from snakes.nets import *
 from plugins import *
 
@@ -53,7 +53,7 @@ def transport_proto(name):
 
     snd_pack = Transition("Send Packet")
     n.add_transition(snd_pack)
-    
+
     n.add_input("Packets to send", "Send Packet", Tuple([Variable("n"), Variable("d")]))
     n.add_output("Packets to send", "Send Packet", Tuple([Variable("n"), Variable("d")]))
     n.add_input("NextSend", "Send Packet", Variable("n"))
@@ -165,8 +165,8 @@ def execute(net_t=1):
         # net.add_remote_output('Transmit port', 'res/Data Received')
         # n1.place("Transmit port").set_output(n1, 'res/Data Received')
         # place = n.place()[0]
-        sim.schedule_at([sim.execute_net, net], PNSim.NOW)
-        
+        sim.schedule_at([sim.execute_net, net.name], PNSim.NOW)
+
         # sim.schedule_at([sim.execute_net, transm], 3)
         # sim.schedule_at(6, [sim.execute_net, res])
         # sim.schedule_at([sim.execute_net, net], 9)
@@ -175,7 +175,7 @@ def execute(net_t=1):
         nodes.append(sim)
         nodes.append(sim2)
         try:
-            sim2.schedule_at([sim2.execute_net, net1], 4)
+            sim2.schedule_at([sim2.execute_net, net1.name], 4)
             sim2.setup()
             sim2.start()
             time.sleep(5)
@@ -195,7 +195,6 @@ def execute(net_t=1):
         for name, net in sim._nets.items():
             net.draw(f'nets_png/{name}.png')
 
-        
 
 if __name__ == "__main__":
     signal.signal(signal.SIGTERM, terminate)
