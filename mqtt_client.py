@@ -100,7 +100,6 @@ class Mqtt_client():
         net, place = message['topic'].split('/')
         if net not in self.nets.keys():
             return
-
         # print(f"Serving port {place.name} - {message['payload']}")
         place = self.input_ports[place]
         tokens = message['payload'].split('&')
@@ -108,11 +107,24 @@ class Mqtt_client():
         self.simul.execute_net(net) # TODO: move to planned
 
     def parse_tokens(self, place, tokens):
-        parsed_tokens = []
-        for tp, val in map(lambda x: x.split(':'), tokens):
-            tp = eval(tp)   # Type casting
-            parsed_tokens.append(tp(val))
-        place.add(parsed_tokens)
+        for tp, val in map(lambda x: x.split(':', 1), tokens):
+            tk = self.parse_subtokens(tp, val)
+            print('Adding: ', tk)
+            place.add(tk)
+
+    def parse_subtokens(self, tp, value):
+        tp = eval(tp) # Type casting
+        if tp == tuple:
+            parsed_tokens = []
+            value = eval(value) # Converting string list to list
+            for tp_v, val in map(lambda x: x.split(':'), value):
+                tk = self.parse_subtokens(tp_v, val)
+                parsed_tokens.append(tk)
+            return tuple([tp(parsed_tokens)])
+        elif tp == bool:
+            return value == 'True'
+        else:
+            return tp(value)
 
     def serve_private(self, message):
         if message['type'] == 'U':
@@ -135,10 +147,10 @@ class Mqtt_client():
         place = net.place(place)
         self.configure_internal_output_port(place, trg_topic)
 
-    def configure_internal_input_port(self, net, place): # DONE
-        place.set_place_type(place.INPUT)
+    def configure_internal_input_port(self, net, place):
         self.input_ports[place.name] = place
         input_port_topic = '{}/{}'.format(net.name, place.name)
+        place.set_place_type(place.INPUT, input_port_topic)
         self.add_subscription(input_port_topic)
 
     def output_port_setup(self, trg_place, to_topic):
@@ -157,7 +169,7 @@ class Mqtt_client():
         self.configure_internal_input_port(net, place)
 
     def configure_internal_output_port(self, trg_place, to_topic):
-        trg_place.set_place_type(trg_place.OUTPUT)
+        trg_place.set_place_type(trg_place.OUTPUT, to_topic)
         self.output_ports[trg_place] = to_topic
 
     def setup_client(self):
@@ -226,7 +238,7 @@ class Mqtt_client():
             self.remote_requests[net].append(message)
         else:
             self.remote_requests[net] = [message]
-    
+
     def remote_requests_pop(self, net):
         remote_requests = self.remote_requests.pop(net)
         for msg in remote_requests:
@@ -242,7 +254,7 @@ class Mqtt_client():
             self.pending_requests.append(message)
             self.pending_req_cnt += 1  # Waiting for ack and success message
         self.client.publish('control', message, 2)
-    
+
     def private_publish(self, target, message):
         self.client.publish(f'private/{target}', message, 2)
 
@@ -254,6 +266,7 @@ class Mqtt_client():
             self.parse_tokens(place, tokens)
             self.simul.schedule([self.simul.execute_net, net], self.simul.NOW)
         elif net in self.remote_nets: # Net is in other simulator
+            print(tokens)
             self.client.publish(topic, '&'.join(tokens), 2)
         else: # Net is not yet registered
             self.update_remote_requests(net, '&'.join(tokens), topic)
@@ -271,7 +284,7 @@ class Mqtt_client():
                     self.output_port_setup(place, topic)
         self.wait_net_ports()
         self.notify_others()
-    
+
     def notify_others(self):
         net_list = '&'.join(self.nets.keys())
         net_list = f'U, update_nets, {self.client._client_id}, {net_list}'

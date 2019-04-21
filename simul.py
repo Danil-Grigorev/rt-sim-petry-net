@@ -126,39 +126,51 @@ class PNSim(Thread):
         if self._running_events:
             logging.info('Waiting for threads {}'.format(
                 self._running_events))
-            with PNSim.wake_event:
-                if self.end_time == PNSim.INF:
-                    PNSim.wake_event.wait()
-                else:
-                    PNSim.wake_event.wait(self.end_time - self.cur_time())
+        with PNSim.wake_event:
+            if self.end_time == PNSim.INF:
+                PNSim.wake_event.wait()
+            else:
+                PNSim.wake_event.wait(self.end_time - self.cur_time())
 
     def execute_net(self, net):
         if not isinstance(net, snakes.nets.PetriNet):
             net = self._nets[str(net)]
         print(f'Executing net {net.name}, {self.mqtt.remote_nets}, {self}')
-        net.draw(f'nets_png/{net.name}-start.png')
+        try:
+            net.draw(f'nets_png/{net.name}-start.png')
+        except:
+            pass
         logging.info(
             f'Started execution "{net}" at {self.cur_time() - self.start_time}')
         presorted_tr = self.presort_transitions(net)
-        while any([len(t.modes()) != 0 for t in net.transition()]):
+        finished_execution = False
+        while not finished_execution:
             if self.kill:
                 sys.exit()
-            for group in presorted_tr:
-                self.execute_group(group)
-            # print('Modes: ', [t.modes()
-            #                   for t in net.transition() if t.modes()])
-            # print('Marks: ', [p for p in net.place()])
-        net.draw(f'nets_png/{net.name}-end.png')
+            finished_execution = self.execute_groups(presorted_tr)
+        try:
+            net.draw(f'nets_png/{net.name}-end.png')
+        except:
+            pass
         net.send_tokens()
         self.wake()
 
-    def execute_group(self, group):
-        for t in group:
-            print(f'Executing t: {t.name}')
-            modes = t.modes()
-            modes.sort(key=lambda x: x.items())
-            if modes and t.enabled(modes[0]):
-                t.fire(modes[0])
+    def execute_groups(self, groups):
+        finished_execution = True
+        for group in groups:
+            for t in group:
+                modes = t.modes()
+                if not modes:
+                    continue
+                finished_execution = False
+                modes.sort(key=lambda x: x.items())
+                for m in modes:
+                    if not t.enabled(m):
+                        continue
+                    print(f'Executing t: {t.name} with {m}')
+                    t.fire(m)
+                    return finished_execution
+        return finished_execution
 
     def presort_transitions(self, net):
         tgroups = []

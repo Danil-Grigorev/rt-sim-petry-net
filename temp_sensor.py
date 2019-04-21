@@ -26,7 +26,8 @@ def temp_sensor(name, expected):
 
     n = PetriNet(name)
 
-    n.declare(f'global name; name = "{name}"')
+    n.declare('import random')
+    n.declare(f'global name; name = "{name}" + str(random.randint(0, 1000))')
 
     temp_new = 12.
     temp_act = 0.
@@ -37,7 +38,7 @@ def temp_sensor(name, expected):
     it = Place('Input temp', [temp_new], check=tFloat)
     ta = Place('Current temp', [temp_act], check=tFloat)
     texp = Place('Temperature expected', [expected], check=tFloat)
-    hen = Place('Enable heater', [], check=tTuple)
+    hen = Place('Enable_heater', [], check=tTuple)
     n.add_place(w)
     n.add_place(u)
     n.add_place(it)
@@ -65,7 +66,7 @@ def temp_sensor(name, expected):
     n.add_transition(hswitch)
 
     n.add_remote_input(it, 'temp_gen/Measurement')
-    n.add_remote_output(hen, 'boil_control/sensory_input')
+    n.add_remote_output(hen, 'boiler_logic/Sensory_input')
 
     n.draw(f'nets_png/{name}.png')
 
