@@ -1,5 +1,3 @@
-%===============================================================================
-% Autoři: Michal Bidlo, Bohuslav Křena, Jaroslav Dytrych, Petr Veigend a Adam Herout 2018
 \chapter{Úvod}
 \chapter{Prehled teorie}
 \label{prehled}
@@ -62,9 +60,9 @@ High Level Petri Net (HLPN) is a structure $HLPN = = \left( P; T; D; T_ype; P_re
     \item $TRANS$ = $\left\{\left(t, m\right) | t \in T, m \in T_{ype} \left( t \right)\right\}$ \\
     \item $PLACE$ = $\left\{\left(p, g\right) | p \in P, g \in T_{ype} \left( p \right)\right\}$ \\
   \end{center}
-  
+
   \item $M_0$ je $\mu PLACE$ je multimnozina pocatecnych znacek.
-\end{itemize}  
+\end{itemize}
 Citace pnstd-4.7.1.pdf
 \paragraph*{Pravidlo pro provedeni prechodu}
 Pokud je dane ze konecna multimnozina $T_\mu$ je zapnuta pro znacku $M$, tedy prechod v HLPN muze byt uskutecnen pro znacku $M'$ nasledujicim zpusobem:
@@ -168,12 +166,20 @@ Zpravy museji navic mit specifikovany obsah, a QoS. QoS muze byt 3 typu:
 \end{itemize}
 
 Pro navazani spojeni s brokerem po nastaveni sitoveho pripojeni klient musi nejdrive poslat zparavu $CONNECT$, po ktere server musi odpovedet zpravou typu $CONNACK$ podtvrzujici navazani spojeni. Potom klient je volen poslat zpravy typu $SUBSCRIBE$ s tematem na ktere chce dostavat zpravy. Server odpovida zpravou $SUBACK$. Potom uz zprava typu $PUBLISH$ z urcitym obsahem od klienta ktery provedl vsechny minule kroky bude zpracovana brokerem.
-\subsection{Implementace pluginu $prob_timed_pl$}
-Tento plugin je urcen pro knihovny SNAKES a pridava podporu implementaci takovych rozsireni Petriho siti, jako Casovany prechod a Pravdepodobnostni prechod.
 
-Prvni rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tranzice do budoucna. Toto rozsireni pouziva jednoduchou logiku pro provedeni prechodu - ve chvili kdy prechod bude spustitelny, tak se zapne casovac a zkonzumuji odpovidajici tokeny ze vstupnich mist. Cekani se neresetuje pridanim dalsich tokenu do vstupnich mist. Ve pripade teto implementace prechod vezme vsechny tokeny ktere se objevi ve vstupnich mistech a tudiz zapnou tranzici. Po ukonceni cekani, tokeny budou preneseny do vystupnich mist, s nasledujcimi upravami, ktere muzou nastat podle definice HLPN(odkaz).
+\subsection{Implementace pluginu}
+Tento pododdil popisuje implementaci pluginu pro knihovny SNAKES, ktere zesnadnili nasledujici modelovani.
 
-Druhe rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudiz rovnomerne rozdelit pravdepodobnost spousteni kazde z nich. Uzivatel muze ve pripade potreby uvest explicitnou hodnotu pravdepodobnosti pro kazdou tranzici, ale neni to nutne. Pro spojene prechody plati, ze museji mit stejnou sadu vstupnich mist. 
+je urcen pro knihovny SNAKES a pridava podporu implementaci takovych rozsireni Petriho siti, jako Casovany prechod a Pravdepodobnostni prechod.
+
+\subsubsection{Plugin $timed_pl$}
+Toto rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tranzice do budoucna. Toto rozsireni pouziva jednoduchou logiku pro provedeni prechodu - ve chvili kdy prechod bude spustitelny, tak se zapne casovac a zkonzumuji odpovidajici tokeny ze vstupnich mist. Cekani se neresetuje pridanim dalsich tokenu do vstupnich mist. Ve pripade teto implementace prechod vezme noveprichozi tokeny ktere se objevi ve vstupnich mistech a tudiz zapnou tranzici. Po ukonceni cekani, tokeny budou preneseny do vystupnich mist, s nasledujcimi upravami, ktere muzou nastat podle definice HLPN(odkaz).
+
+\subsubsection{Plugin $prob_pl$}
+Toto rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudiz rovnomerne rozdelit pravdepodobnost spousteni kazde z nich. Pro spojene prechody plati, ze museji mit stejnou sadu vstupnich mist. Pak se pri provedeni jedneho z nich se rozhodne na zaklade hodnoty jeho pravdepodobnosti jestli se tento prechod musi provest, nebo se provede nektery z jeho sousedu. Soucet pravdepodobnosti pro takovou skupinu prechodu musi byt vzdycky 1.
+
+\subsubsection{Plugin $prior_pl$}
+Tento plugin je urceny pro pridani priorit k pechodum v siti. Podle nastavene priority se behem simulace bude rozhodovat, ktere tranzice se vyhodnoti a provedou jako prvni. Priority muzou byt v rozsahu 0-100, a radi se sestupne. Pro nastaveni priority `Transition` ma argument `prior`.
 
 \subsection{Planovac udalosti}
 \url{https://docs.python.org/3/library/heapq.html}
@@ -183,20 +189,53 @@ Planovac udalosti je naimplementovan jako prioritni fronta za vyuziti vestavene 
 Pro demonstraci praci simulatoru bylo rozhodnuto namodelovat dystribovany system modelujici chovani topeni, ktey nekteri z vas pravdepodobne pouzivaji u sebe doma. Takovy system se sestavuje z nekolika casti. Zakladnim prvkem je plynovy spotrebic, nebo karma. Ta ohriva vodu a uvadi ji do pohybu po potrubich. Pak kazdy z pokoju ma na starosti ?teplene cidlo? a rizeni, ktere udrzuje v pokoji nastavenou teplotu podle calendare. Kazdou hodinu se z tabulky teplot vezme aktualni teplota pro soucasnou hodiny a tento pokoj, pak rizeni rozhodne jestli ma zapnout topeni nebo ne. Pokud zadny z pokoju v soucasne dobe nema zapnute topeni, tak karma se musi vypnout za ucelem setreni plynu. Toto rizeni provadi vestaveny system, nebo je zcela mechanicky. Kazdy z tech prvku bude dale namodelovan Petriho sitmi.
 
 Aby tento navrh co nejpresneji odpovidal realite, bylo rozhodnuto namodelovat chovani teploty v pokoji.
-Celkovy Nejdrive musime vedet jak vykonne je topeni v pokoji. Dale nas zajimaji tepelne ztraty. Zakladni parametrem rozhodujicim o tepelnych ztratach pokoje je plocha vnitrniho povrchu pokoje [V], respektive celkova plocha povrchu stopu, podlahy a sten. Pro ne je dulezte vedet koefficent ztrat tepla [K]. Zvlast se pocitaji okna a dvere, vzhledem k jejich vetshi teplovodivosti. Pak zbyva jenom zjistit rozdil teploty uvnitr pokoje a venku [delta T]. To vsechno dosadime do vzorecku Q[kW/h] = V*delta T*K/860 a zjistime celkove tepelne ztraty pokoje. % https://www.komplektacya.ru/spravochnik/teplovoe-oborudovanie1/raschet-teplovoj-moschnosti
+Nejdrive musime vedet jak vykonne je topeni v pokoji. Dale nas zajimaji tepelne ztraty a taky mnozstvi energii potrebne pro ohrati pokoje. Pro vypocet tohoto parametru pouzijeme nasledujici vzorecek. Zakladni parametrem rozhodujicim o tepelnych kapacite pokoje je plocha vnitrniho povrchu pokoje [V], respektive celkova plocha povrchu stopu, podlahy a sten. Pro ne je dulezte vedet koefficent ztrat tepla [K]. Zvlast se pocitaji okna a dvere, vzhledem k jejich vetshi teplovodivosti. Pak zbyva jenom zjistit rozdil teploty uvnitr pokoje a venku [delta T]. To vsechno dosadime do vzorecku Q[kW/h] = V*delta T*K/860 a zjistime celkove mnozstvi energii potrebne pro jeho ohrati. \cite{tep_calc}
 
-Pak je potreba vedet celkovy objem vzduchu a vyplne sten a podlahy pro vypocet mnozstvi energii potrebne pro jejich ohrati. 
+Pro zjednoduseni vypoctu zanedbame parametry koefficentu ztrat tepla pro vsechny elementy, a vezmeme stredni hodnoty pro nekolik typickych druhu pokoju - kuchin, sklep a obyvaci pokoj. Kazdy z techto pokoju bude mit odlisny koefficent K a V. Pokoj bude mit 2 steny celici venku, kuchin bude mit 1. Pro sklep navic plati konstantni teplota vnejsiho prostredi, napriklad 5 stupnu. Taky se budeme pocitat s prijemnymi (skoro tropickymi) podminkami Ceske republiki - teplota venku je v prumeru v rozmezi 5 az 10 stupnu. \cite{cesko}
+Pak koefficenty vypadaji nasledně:
+
+\begin{table}[H]
+	\vskip6pt
+	\caption{Tabulka parametrů pokojů}
+    \vskip6pt
+	\centering
+	\begin{tabular}{lllr}
+		\toprule
+		Typ pokoje & Koefficent tepelných ztrat & Objem $[m^3]$ & Očekavaný výkon topení $[W]$ \\
+    \midrule
+    Kuchin & 0.5 & $4*3*2.5$ & $1200$ \\
+    Pokoj & 0.6 & $6*4*2.5$ & $2300$ \\
+    Sklep & 0.8 & $3*3*2.2$ & $300$ \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:TepelneZtraty}
+\end{table}
+
+Na vypocet tepelnych ztrat pokoje jsem pouzil tento nastroj. \url{https://wpcalc.com/kalkulyator-teplopoter/}
+Pro kuchin to vychazi zhruba nasledne:
+
+\begin{table}[H]
+	\vskip6pt
+	\caption{Tabulka tepelných ztrát pokojů} 
+    \vskip6pt
+	\centering
+	\begin{tabular}{llr}
+		\toprule
+		Typ pokoje & Ztráty $[kW/h]$ \\
+		\midrule
+		Kuchin & $0.7$ \\
+    Pokoj & $1$ \\
+    Sklep & $0.4$ \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:TepelneZtraty}
+\end{table}
 
 Cele chovani systemu odpovida zákonu zachovaní energii, a tak muzeme odvodit rovnici pro vypocet potrebneho jeji mnozstvi.
 
-Pro zjednoduseni vypoctu zanedbame parametry koefficentu ztrat tepla pro vsechny elementy, a vezmeme stredni hodnoty pro nekolik typickych druhu pokoju - kuchin, sklep a obyvaci pokoj. Kazdy z techto pokoju bude mit odlisny koefficent K a V. Pokoj bude mit 2 steny celici venku, kuchin bude mit 1. Pro sklep navic plati konstantni teplota vnejsiho prostredi, napriklad 5 stupnu. Taky se budeme pocitat s prijemnymi (skoro tropickymi) podminkami Ceske republiki - teplota venku je v prumeru v rozmezi 5 az 10 stupnu. % https://cs.wikipedia.org/wiki/Podneb%C3%AD_%C4%8Ceska
-Pak koefficenty vypadaji nasledně:
+Modelovani chovani teploty venku je stochasticky process, ktery neni mozne spocitat presne. Proto byla navyrzena Petriho sit, vyuzivajici pravdepodobnostni prechody. Ma na vstupu rozsah teplot den - noc, a podle vybrane doby dne, za pouziti funkcii $cos$ modeluje zmenu aktualni teploty. Rozhodnuti pouziti funkce $cos$ vychazi z jednoducheho pozorovani prubehu teplot behem dne, a pereodicita zmeny teplot ji trochu odpovida, za predpokladu ze prubeh funkce zacina v nejteplejsi hodinu. %https://forecast.weather.gov/MapClick.php?lat=42.3758&lon=-71.1187&lg=english&FcstType=graphical
+Pravdepodobnostni prechody modeluji nahodne jevy jako vyskit slunce nebo deste.
 
-kuchin - K: 0.5, V: 4x3x2.5 Dop. vykon topeni: 1200 W
-pokoj - K: 0.6, V: 6x4x2.5 Dop. vykon topeni: 2300 W
-sklep - K: 0.8, V: 3x3x2.2 Dop. vykon topeni: 300 W
-
-Modelovani chovani teploty venku je stochasticky process, ktery neni mozne spocitat presne. Proto byla navyrzena Petriho sit, vyuzivajici pravdepodobnostni prechody. Ma na vstupu rozsah teplot den - noc, a podle vybrane doby dne pravdivostnimi prechody modeluje zmenu aktualni teploty.
 
 \chapter{Závěr}
 \label{zaver}
