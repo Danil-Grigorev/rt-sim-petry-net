@@ -94,7 +94,7 @@ def temp_generator(name, low, high, timeout):
 
 def execute():
     sim = PNSim()
-    temp_gen = temp_generator('temp_gen', 5, 18, 4)
+    temp_gen = temp_generator('temp_gen', 5, 18, 30)
 
     temp_gen.add_simulator(sim)
     sim.schedule_at([sim.execute_net, temp_gen.name], PNSim.NOW)

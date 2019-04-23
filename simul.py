@@ -2,6 +2,8 @@
 import time
 import logging
 import signal
+import random
+import os
 import sys
 from threading import Condition, Thread, RLock
 
@@ -33,7 +35,20 @@ class PNSim(Thread):
         self._running_events = []
         self.mqtt = Mqtt_client(self, broker)
         self.kill = False
+        self.id = self.setup_id()
         Thread.__init__(self)
+
+    def setup_id(self):
+        rand_id = random.randint(0, 10000)
+        png_dir = os.path.dirname(__file__)
+        png_dir = os.path.join(png_dir, 'nets_png')
+        if not os.path.exists(png_dir):
+            os.mkdir(png_dir)
+        run_id = f'sim_run_{rand_id}'
+        png_dir = os.path.join(png_dir, run_id)
+        if not os.path.exists(png_dir):
+            os.mkdir(png_dir)
+        return run_id
 
     def setup(self, end_time=INF):
         assert isinstance(end_time, (int, float))

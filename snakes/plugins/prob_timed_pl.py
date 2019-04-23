@@ -119,7 +119,10 @@ class Timed():
         self.simul = self.transition.simul
 
     def text_repr(self):
-        return f'T: {self.timeout}s'
+        desc = f'Wait: {self.timeout}s'
+        if self.bindings:
+            desc += f'\n{self.bindings}'
+        return desc
 
     def plan(self):
         timeout = self.simul.cur_time() \
