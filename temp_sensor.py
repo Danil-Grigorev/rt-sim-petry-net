@@ -5,7 +5,7 @@ import signal
 import snakes
 import snakes.plugins
 from simul import PNSim
-snakes.plugins.load(["gv", "prob_timed_pl", "prior_pl"], "snakes.nets", "plugins")
+snakes.plugins.load(["gv", "sim_pl", "timed_pl", "prior_pl"], "snakes.nets", "plugins")
 from snakes.nets import *
 from plugins import *
 

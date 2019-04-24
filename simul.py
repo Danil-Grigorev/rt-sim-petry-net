@@ -150,11 +150,7 @@ class PNSim(Thread):
     def execute_net(self, net):
         if not isinstance(net, snakes.nets.PetriNet):
             net = self._nets[str(net)]
-        print(f'Executing net {net.name}, {self.mqtt.remote_nets}, {self}')
-        try:
-            net.draw(f'nets_png/{net.name}-start.png')
-        except:
-            pass
+        print(f'{self.id}: Executing net {net.name}')
         logging.info(
             f'Started execution "{net}" at {self.cur_time() - self.start_time}')
         presorted_tr = self.presort_transitions(net)
@@ -164,7 +160,7 @@ class PNSim(Thread):
                 sys.exit()
             finished_execution = self.execute_groups(presorted_tr)
         try:
-            net.draw(f'nets_png/{net.name}-end.png')
+            net.draw(f'nets_png/{self.id}/{net.name}.png')
         except:
             pass
         net.send_tokens()

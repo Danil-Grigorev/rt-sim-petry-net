@@ -4,7 +4,7 @@ import signal
 import snakes
 import snakes.plugins
 from simul import PNSim
-snakes.plugins.load(["gv", "prob_timed_pl", "prior_pl"], "snakes.nets", "plugins")
+snakes.plugins.load(["gv", "timed_pl", "sim_pl", "prob_pl", "prior_pl"], "snakes.nets", "plugins")
 from snakes.nets import *
 from plugins import *
 
@@ -30,6 +30,8 @@ def temp_generator(name, low, high, timeout):
     k = 0
 
     n.declare('import math')
+    n.declare('import random, time')
+    n.declare('random.seed(time.time)')
     n.declare(f'f = {f}')
     n.declare('def temp_placement(Tmin, Tmax, k):'
               '\n\tif k == 0:'
@@ -72,12 +74,12 @@ def temp_generator(name, low, high, timeout):
 
     # trainy.add_input(meas, Variable('Told'))
     trainy.add_input(traw, Variable('Tnew'))
-    trainy.add_output(meas, Expression('Tnew-2'))
+    trainy.add_output(meas, Expression('Tnew-random.random()*2'))
     n.add_transition(trainy)
 
     # tsunny.add_input(meas, Variable('Told'))
     tsunny.add_input(traw, Variable('Tnew'))
-    tsunny.add_output(meas, Expression('Tnew+2'))
+    tsunny.add_output(meas, Expression('Tnew+random.random()*2'))
     n.add_transition(tsunny)
 
     # texpec.add_input(meas, Variable('Told'))
