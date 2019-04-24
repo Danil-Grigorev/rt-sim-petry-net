@@ -171,7 +171,7 @@ def temp_sensor(run_id, name, expected):
     return n
 
 def execute():
-    sim = PNSim()
+    sim = PNSim(detached=True)
     sens = temp_sensor(sim.id, 'temp_sens', 21.0)
 
     sens.add_simulator(sim)

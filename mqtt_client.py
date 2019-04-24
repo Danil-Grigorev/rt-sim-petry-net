@@ -233,6 +233,8 @@ class Mqtt_client():
             self.update_remote_requests(net, message, 'control')
 
     def update_remote_requests(self, net, message, topic):
+        if topic != 'control' and self.simul.detached:
+            return  # Skip the storage part
         message = [topic, message]
         if net in self.remote_requests.keys():
             self.remote_requests[net].append(message)

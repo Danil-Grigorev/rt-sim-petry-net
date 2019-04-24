@@ -26,7 +26,7 @@ class PNSim(Thread):
     barier = None
     wake_event = Condition()
 
-    def __init__(self, broker="127.0.0.1"):
+    def __init__(self, broker="127.0.0.1", detached=False):
         self._nets = {}
         self.end_time = PNSim.INF
         self.scheduler = Scheduler()
@@ -35,6 +35,7 @@ class PNSim(Thread):
         self._running_events = []
         self.mqtt = Mqtt_client(self, broker)
         self.kill = False
+        self.detached = detached    # If is True, topic messages will not be stored
         self.id = self.setup_id()
         Thread.__init__(self)
 
