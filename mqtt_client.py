@@ -6,7 +6,7 @@ from threading import RLock
 class Mqtt_client():
 
     def __init__(self, simul, brock_addr='127.0.0.1'):
-        self.input_ports = {} 
+        self.input_ports = {}
         self.output_ports = {}
         self.brocker = brock_addr
         self.simul = simul
@@ -266,7 +266,6 @@ class Mqtt_client():
             self.parse_tokens(place, tokens)
             self.simul.schedule([self.simul.execute_net, net], self.simul.NOW)
         elif net in self.remote_nets: # Net is in other simulator
-            print(tokens)
             self.client.publish(topic, '&'.join(tokens), 2)
         else: # Net is not yet registered
             self.update_remote_requests(net, '&'.join(tokens), topic)

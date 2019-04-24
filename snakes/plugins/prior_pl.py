@@ -36,9 +36,13 @@ def extend(module):
 
         def __init__(self, name, guard=None, **args):
             prior = args.pop('prior', None)
+            self.extension = None
             module.Transition.__init__(self, name, guard, **args)
 
             if prior != None:
+                if self.extension is not None:
+                    raise AttributeError(
+                        f'Transition "{name}" type is already set to {self.extension}')
                 self.extension = Priority(self, prior)
 
         def priority(self):

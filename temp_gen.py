@@ -72,17 +72,14 @@ def temp_generator(name, low, high, timeout):
     trainy.add_neighbour_transition(texpec)
     trainy.add_neighbour_transition(tsunny)
 
-    # trainy.add_input(meas, Variable('Told'))
     trainy.add_input(traw, Variable('Tnew'))
     trainy.add_output(meas, Expression('Tnew-random.random()*2'))
     n.add_transition(trainy)
 
-    # tsunny.add_input(meas, Variable('Told'))
     tsunny.add_input(traw, Variable('Tnew'))
     tsunny.add_output(meas, Expression('Tnew+random.random()*2'))
     n.add_transition(tsunny)
 
-    # texpec.add_input(meas, Variable('Told'))
     texpec.add_input(traw, Variable('Tnew'))
     texpec.add_output(meas, Variable('Tnew'))
     n.add_transition(texpec)

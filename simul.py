@@ -107,8 +107,6 @@ class PNSim(Thread):
                 "Fall back on schedule for {}s at time {}s\n".format(
                     tm - self.cur_time(), self.cur_time() - self.start_time))
         logging.info('Waiting for {}'.format(tm - self.cur_time()))
-        # print(
-        #     f'Next is: {self.scheduler.queue[0]}\nAfter: {self.scheduler.queue[-1]}\n Next < After: {self.scheduler.queue[0] < self.scheduler.queue[-1]}')
         with PNSim.wake_event:
             if tm == PNSim.INF:
                 interrupted = PNSim.wake_event.wait()
@@ -132,7 +130,6 @@ class PNSim(Thread):
                 action))
             net_runner = Thread(target=function, args=args)
             net_runner.start()
-            # print(args, 'started execution on ', net_runner)
             self._running_events.append(net_runner)
 
     def _wait_to_finish_or_new_event(self):
@@ -274,7 +271,7 @@ class Scheduler:
                 self.preplanned.append((timeval, executable, prior))
 
     def pop_planned(self):
-        """ 
+        """
         Returns and pops next planned executable form scheduler.
         Returns None when heap is empty
         """

@@ -58,8 +58,6 @@ def extend(module):
         def draw(self, filename, engine="dot", debug=False,
                     graph_attr=None, cluster_attr=None,
                     place_attr=None, trans_attr=None, arc_attr=None):
-            # ',net-with-colors.png',
-            #    place_attr=draw_place, trans_attr=draw_transition
 
             module.PetriNet.draw(self, filename, engine="dot", debug=False,
                     graph_attr=None, cluster_attr=None,

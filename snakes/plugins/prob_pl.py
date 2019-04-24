@@ -20,6 +20,12 @@ class Prob():
         if prob:
             self.set_probability(prob)
 
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return 'Probabalistic'
+
     def text_repr(self):
         if self.prob is None:
             raise ValueError(f'Probability was not set for {self.transition.name}')
@@ -119,7 +125,7 @@ def extend(module):
             if prob != None:
                 if self.extension is not None:
                     raise AttributeError(
-                        f'Transition "{name}" type is already set to {self.extension.__dict__.keys()}')
+                        f'Transition "{name}" type is already set to {self.extension}')
                 self.extension = Prob(self, prob)
 
         def _add_simulator(self, sim):
@@ -161,7 +167,6 @@ def extend(module):
                 for place, label in self.input() :
                     place.remove(label.flow(binding))
                 if self.extension:
-                    # print('extension is firing')
                     self.extension.check_and_fire(binding)
                 else:
                     self.add_bindings(binding)

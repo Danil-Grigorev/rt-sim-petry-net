@@ -14,6 +14,12 @@ class Timed():
         self.bindings = []
         self.ready = False
 
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return 'Timed'
+
     def prepare(self):
         self.simul = self.transition.simul
 
@@ -34,7 +40,6 @@ class Timed():
         self.transition.add_bindings(self.bindings.pop(0))
         self.simul.schedule(
             [self.simul.execute_net, self.transition.net], self.simul.NOW)
-        # print(f'\tAdded net execution of {self.net.name} to {self.simul.scheduler.queue}')
 
     def check_and_fire(self, binding):
         self.plan()
@@ -94,7 +99,6 @@ def extend(module):
                 for place, label in self.input() :
                     place.remove(label.flow(binding))
                 if self.extension:
-                    # print('extension is firing')
                     self.extension.check_and_fire(binding)
                 else:
                     self.add_bindings(binding)
