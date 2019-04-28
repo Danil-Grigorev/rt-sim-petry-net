@@ -2,7 +2,13 @@
 \chapter{Přehled teorie}
 \label{prehled}
 
-V teto kapitole jsou popsaný teoretické základy Petřino sítí. Taky tato kapitola se soustředí na popis několika podtříd Petriho sítě, zejména na „vysokoúrovňové Petriho sítě“ a „Značkované Petriho Sítě“ a  včetně přehledu míst, kdě se tento modelovací prostředek používá, a hra významnou roli. Účelem této kapitoly je seznámení čtenáře s matematickými popisy Petriho síti a grafy Petriho sítí, které jsou nezbytné pro porozumění principu prací simulátoru a knihovny $SNAKES$, na které je simulátor založen. Taky je tady zmíněno o simulační teorii, zaměřené na simulaci Petriho síti v reálném čase. Vyjasní se pojem distribuovaných systému, $HWIL$ a jejích vztah z Petriho sítěmi.
+V teto kapitole jsou popsaný teoretické základy Petřino sítí. Taky tato kapitola se soustředí na popis několika podtříd Petriho sítě, zejména na „vysokoúrovňové Petriho sítě“ a „Značkované Petriho Sítě“ a  včetně přehledu míst, kdě se tento modelovací prostředek používá, a hra významnou roli.
+
+Dalším účelem této kapitoly je seznámení čtenáře s matematickými popisy Petriho síti a grafy Petriho sítí, které jsou nezbytné pro porozumění principu prací simulátoru.
+
+Do obsahu patří popis protokolu MQTT \ref{subsec:mqtt-proto}, na kterém je založena externí komunikace simulátoru \ref{subsec:mqtt_impl}.
+
+Taky se tady zmíní o simulační teorii, zaměřené na simulaci Petriho síti v reálném čase. Vyjasní se pojem distribuovaných systému \ref{subsec:distr_system}, HWIL \ref{subsec:hwil} a jejích vztah z Petriho sítěmi.
 
 \subsection{Petriho sítě}
 V současné době se Petriho sítě často používají jako modelovací prostředek pro modelovaní chovaní systému, za účelem pochopení jeho slabších stránek, ještě než se system nasadí do provozu. Vyplňuje, tím pádem, díru mezi slovním popisem, návrhem, takovými modelovacími prostředky jako \href{https://en.wikipedia.org/wiki/Unified_Modeling_Language}{UML} a skutečnou implementací nějakého projektu. Použití Petriho síti pro účel modelování je velice vhodné, jen velmi málo modelovacích prostředku dokáže popsat ne jenom system jako celek, ale i zjistit slabší stránky jeho implementace, ještě před implementační fází. Stejně tak platí i pro testovací fází -- některé chyby se dá objevit jenom po implementací, když to Petriho sítě částečně řeší tento problém ještě ve fází navrchu.
@@ -28,7 +34,7 @@ Přechod v PS je povolen, dokud každé ze vstupních míst propojených s daný
 Pri vykonávaní sítě Petri, vznikají dvě posloupnosti - posloupnost značek a posloupnost přechodu, které byly provedeny. Teto dve posloupnosti zcela popisuji vykonání Petriho sítě.
 %[Petri net theory and model... par:2.4 p 18-19]
 
-Kazda ze šipek v Petriho sítí ma váhu. Váha reprezentuje číslo tokenu, které musí obsahovat vstupní místo pro to, aby přechod byl proveditelný. Pří provedení váha určuje kolík tokenů se vyjme ze vstupního místa, nebo kolík se jích vloží do místa výstupního.
+Kazda ze šipek v Petriho sítí ma váhu. Váha reprezentuje číslo tokenů, které se musí nacházet ve vstupním místě pro to, aby přechod byl proveditelný. Pří provedení váha určuje kolík tokenů se vyjme ze vstupního místa, nebo kolík se jích vloží do místa výstupního.
 
 \paragraph{Definice}
 
@@ -38,15 +44,14 @@ Značkovaná Petriho sit je šestice $PN = \left(P, T, I, O, W, M_0\right)$
   \item $T = \left\{t_1, t_2, \cdots , t_m\right\}$ je konečná množina přechodů, $m >= 0$; \\
   \item $I = T \rightarrow P^\infty$ je vstupní funkce, propojující přechody s množinou vstupních míst; \\
   \item $O = P \rightarrow T^\infty$ je výstupní funkce, propojující výstupní místa s množinou přechodů; \\
-  \item $W = F \rightarrow \left\{1, 2, 3, \cdots \right\}$ je váhová funkce;
-  \item $M_0 = TODO$
+  \item $W = F \rightarrow \left\{1, 2, 3, \cdots \right\}$ je váhová funkce; \\
+  \item $M_0$ je multimnožina počátečních značek;
 \end{itemize}
 P $\vee$ T = $\varnothing$, P $\wedge$ T != $\varnothing$.
-\todo{citace Petri net theory and model... par:2.4 p 18-19, M-0}
 
 Díky možnosti vykonávat Petriho sit, vzniká příležitost vytvořit simulační nastroj, který je založen na zmíněných teoretických základech. Podrobný popis simulace viz \ref{sec:implementation}.
 
-\subsection{Casovane petriho sítě}
+\subsection{Časované petriho sítě}
 Podtřída Časovaných petriho seti [Timed Petri Net] rozšiřuje pojem Značkovaných Petriho sítí o jednu důležitou zásadu -- přechod muže byt označen časovou funkcí. Aby se takový přechod provedl, ten čas musí uplynout, až potom se vyjmou tokeny ze vstupních míst, a vloží se do výstupních. Časová funkce nemusí být konstantní, ale v rámci této prací se použilo jenom konstantní čekaní na přechod, jelikož chovaní simulátoru musí být deterministické. Více o implementačních detailech viz. \ref{subsec:timed_pl}.
 
 \subsection{Vysokoúrovňové Petriho sítě}
@@ -54,7 +59,7 @@ Vysokoúrovňové petriho sítě (High Level Petri Nets) jsou dalším rozšíř
 
 \paragraph{Definice}
 
-High Level Petri Net $(HLPN)$ je struktura $HLPN == \left( P; T; D; T_{ype}; P_{re}; P_{ost}; M_0\right) $ kde:
+High Level Petri Net (HLPN) je struktura $HLPN = \left( P; T; D; T_{ype}; P_{re}; P_{ost}; M_0\right) $ kde \cite[p.11--12]{pnstd54}:
 
 \begin{itemize}
   \item $P$ je konečná množina míst. \\
@@ -68,14 +73,13 @@ High Level Petri Net $(HLPN)$ je struktura $HLPN == \left( P; T; D; T_{ype}; P_{
   \end{center}
   \item $M_0$ je $\mu PLACE$ je multimnožina počátečních značek.
 \end{itemize}
-\todo{Citace pnstd-4.7.1.pdf}
 
 \subsection{Pravidlo pro provedeni přechodu}
-Pokud je dane ze konečná multimnožina $T_\mu$ je zapnuta pro značku $M$, tedy přechod v $HLPN$ muže byt proveden pro značku $M'$ následujícím způsobem:
+Pokud je dane ze konečná multimnožina $T_\mu$ je zapnuta pro značku $M$, tedy přechod v $HLPN$ muže byt proveden pro značku $M'$ následujícím způsobem \cite[p.~12]{pnstd54}:
 \begin{center}
   $M' = M - Pre(T_\mu) + Post(T_\mu)$
 \end{center}
-\todo{citace pnstd p5.4}
+
 
 \subsection{$HLPN$ Graf}
 Graf $HLPN$ ma následující vlastnosti:
@@ -88,7 +92,20 @@ Graf $HLPN$ ma následující vlastnosti:
   \item $Deklaraci$: Vytvářejí definici typu míst, funkci a promenych.
 \end{itemize}
 
+\subsection{Aplikace Petriho sítí}
+
+\subsection{Značkovaná Petriho sít}
+Rozsah míst kdě se dá applikovat Petriho sítě je velmí široký. Jako modelovací prostředek můžou sloužit například pro reprezentací vzorů interakce a vznikájicich konfliktů mezí člověkem a autopilotém letadla, jak je popsané v nasledujícím \href{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597}{článku}.
+
+Příkladem použiti značkované petriho sítí muže taky sloužit implementace \uv{Dining philosophers problem} \cite[p.65--67]{PNandMoS}, coz je problém poprvé představeny profesorem Dijkstrou v roce 1965.
+Je to obecné známy problém paralelismu, který názorné zobrazuje dva případy chyb vznikajících pri paralelním vypočtu - vyhladověni a uváznutí \cite{dining_philosophers}.
+
+\subsection{Vysokoúrovňová Petriho sit}
+
+V našem případě vysokoúrovňová Petriho síť modeluje a nasledně simuluje chování systému topení.
+
 \subsection{Distribuovaný system}
+\label{subsec:distr_system}
 
 \paragraph{Definice}
 
@@ -96,11 +113,17 @@ Definice distribuovaného systému zni:
 Distribuovaný system je kolekce na sobe nezavislych pocitatcu, ktery konecny uzivatel vnima jako celek. 
 % http://barbie.uta.edu/~jli/Resources/MapReduce&Hadoop/Distributed%20Systems%20Principles%20and%20Paradigms.pdf
 
-Distribovane systemy museji pouzivat decentralizovane algoritmy, ktere pozaduji nasledující: 1. Zadny prvek nesmi vedet informaci o celkovem stavu systému. 2. Prvek uvazuje jenom na zaklade jeho stavu. 3. Chyba v zadnem z prvku ne ovlivni chovani algoritmu. 4. Neprovadi se synchronizace podle globalnich hodin. 
+Distribuované systémy musejí používat decentralizované algoritmy, které požaduji následující: 
+\begin{enumerate}
+  \item Žádný prvek nesmí vědět informaci o celkovém stavu systému.
+  \item Prvek uvazuje jenom na základe jeho stavu.
+  \item Chyba v žádném z prvku ne ovlivni chovaní algoritmu.
+  \item Neprovádí se synchronizace podle globálních hodin.
+\end{enumerate}
 
 Z definice taky vypliva, ze distribuovany system se obecne sestavuje s vice se opakujicich prvku, ktere funguji nezavisle na sobe a nemaji pristup ke sdilene pameti, neboli kazdy prvek ma svoi vlastni. Sdileni stavu ve pripade distribovaneho systému se provadi pomoci zasilani zprav.
 
-Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho siťěmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a přechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol MQTT(odkaz), ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace tepelneho rizeni(odkaz) nazorne ukazuje pouziti dane myslenky na praktice.
+Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho siťěmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a přechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol \href{http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/csprd02/mqtt-v3.1.1-csprd02.html}{MQTT}, ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace tepelneho rizeni(odkaz) nazorne ukazuje pouziti dane myslenky na praktice.
 \subsection{Simulace}
 \subsection{Diskretni simulace}
 Diskrétní simulace je založena ve svém základu na algoritmu známém pod názvem "NextEvent". Tento algoritmus se řídí nasledujícím pseudokodem:
@@ -141,54 +164,63 @@ Simulace v realnem case upravena pro ucely tohoto projektu je zalozena na vyse z
 \end{algorithmic}
 \end{algorithm}
 
-Tento algoritmus nachazi svoje pouziti ve mnoha simulacnich pripadech. Bezny priklad pouziti - pocitacove hry, kde uzivatele zaujme herni prostredi, ktere simuluje realni svet, vcetne casove roviny. Simulace v realnim case se taky pouziva, kdy obycejne diskretni simulace nestaci a cas neni zanedbatelny. Uzivatel muze chtit sledovat system v prubehu simulace, za ucelem zjisteni anomalii v chovani jeho prvku nebo zvyseni kvality systému pred jeho nasazenim do provozu. Takovy pristup se pouziva v simulace \hyperref[sec:hwil]{\uv{Hardware-in-the-loop}}.
+Tento algoritmus nachazi svoje pouziti ve mnoha simulacnich pripadech. Bezny priklad pouziti - pocitacove hry, kde uzivatele zaujme herni prostredi, ktere simuluje realni svet, vcetne casove roviny. Simulace v realnim case se taky pouziva, kdy obycejne diskretni simulace nestaci a cas neni zanedbatelny. Uzivatel muze chtit sledovat system v prubehu simulace, za ucelem zjisteni anomalii v chovani jeho prvku nebo zvyseni kvality systému pred jeho nasazenim do provozu. Takovy pristup se pouziva v simulace \hyperref[subsec:hwil]{\uv{Hardware-in-the-loop}}.
+
 \subsection{Hardware-in-the-loop(HWIL)}
-\label{sec:hwil}
+\label{subsec:hwil}
+
 Hardware-in-the-loop nebo $HIL$ je technika použivaná pro vývoj a testovaní řídicích časti komplexních systemů. Diky níž se fizické časti systemu nahrazují jejích simulaci a umožnuji plynulé testovaní ještě před nasazenim do provozu \cite{hil}.
 
-\subsection{Aplikace Petriho sítí}
+\subsection{MQTT protokol}
+\label{subsec:mqtt-proto}
 
-\subsection{Značkovaná Petriho sít}
-Rozsah míst kdě se dá applikovat Petriho sítě je velmí široký. Jako modelovací prostředek můžou sloužit například pro reprezentací vzorů interakce a vznikájicich konfliktů mezí člověkem a autopilotém letadla, jak je popsané v nasledujícím \href{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597}{článku}.
+\href{http://mqtt.org/}{MQTT} je protokol urceny pro komunikaci ve pripadech nizke propustnosti siti nebo jeji vysoke nespolehlivosti. V soucasne dobe svoje vyuziti nachazi v \href{https://en.wikipedia.org/wiki/Internet_of_things}{IoT}. MQTT zavadi takove pojmy jako \href{par:client}{klient}, \href{par:broker}{broker}, \href{par:message}{zpráva} a \href{par:topic}{téma}. Dalé nasledují popisy důležitých časti protokolu MQTT z daneho zdroje \cite{mqtt}.
 
-Prikladem pouziti znackovane petriho sítí muže taky slouzit implementace "problemu Večeřících filozofu", coz je problem poprve predstaveny professorem Dijkstrou v roce 1965.
-Je to obecne znamy problem paralelismu, ktery nazorne zobrazuje dva pripady chyb vznikájicich pri pararelnim vypoctu - vyhladoveni a uvaznuti.
-\url{https://en.wikipedia.org/wiki/Dining_philosophers_problem#cite_note-formalization-2} Petri nets theory and Modeling of Systems, p. 65-67, par 3.4.6
-\subsection{Vysokoúrovňová Petriho sit}
-V nášem případě vysokourovňová Petriho síť modeluje a nasledně simuluje chování systému topení.
+\paragraph{MQTT Klient}
+\label{par:client}
+
+Klient je tenka aplikace, schopna navazani spojeni s brokerem. K jeho vlastnostém patří podpora odebíraní zpráv pomoci filtrovaní na zakladě parametru, zvanemu \uv{topic} \ref{par:topic}. MQTT klient muže byt použit pro zarizeni, jejichz vykon je bod srazu, díky lehkosti MQTT protokolu.
+
+\paragraph{MQTT Broker}
+\label{par:broker}
+
+Broker je server, obsluhujici klienty, navazuje spojeni s klientem a provadi posilani zprav typu $PUBLISH$ klientům, které odebírají téma, nachazející v hlavičce této zpravy.
+
+\paragraph{Téma}
+\label{par:topic}
+
+Kazda zprava posilana klientem se nepredava primo dalsimu klientovi, ale obsluhuje se brokerem. Zprava musi mit specifikovane tema, podle ktere broker urci, kterym klientům tu zpravu musí přeposlat. 
+
+\paragraph{Zpráva}
+\label{par:message}
+
+Zpravy museji navic mit specifikovany obsah, a QoS. QoS muze byt 3 typu:
+\begin{itemize}
+  \item $QoS_0$ -- Nanejvys jedno dodani
+  \item $QoS_1$ -- Alespon jedno dodani
+  \item $QoS_2$ -- Presne jedno dodani
+\end{itemize}
+
+\paragraph{Tok nastavení}
+
+Pro navazani spojeni s brokerem po nastaveni sitoveho pripojeni klient musi nejdrive poslat zparavu $CONNECT$, po ktere server musi odpovedet zpravou typu $CONNACK$ podtvrzujici navazani spojeni. Potom klient je volen poslat zpravy typu $SUBSCRIBE$ s tematem na ktere chce dostavat zpravy. Server odpovida zpravou $SUBACK$. Potom uz zprava typu $PUBLISH$ z urcitym obsahem od klienta ktery provedl vsechny minule kroky bude zpracovana brokerem.
+
+
 \chapter{Implementace}
 \label{sec:implementation}
+
 \subsection{Knihovna $SNAKES$}
+
 \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/}{$SNAKES$} -- je knihovna v jazyce Python ktera nabizi vsechno potrebne pro definici a spousteni několíka variant Petriho sítí. Cilem knhovny $SNAKES$ je nabidnout badatelum moznost rychle namodelovat novy napad. Zvlastni vlastnosti knihovny $SNAKES$ je moznost vytvarzet Barevne Petriho site s pouzitim vyrazů v jazyce Python pro annotaci přechodu ci vstupnich nebo vystupnich šipek. \cite{snakes}
 
 Zvlastni vlastnosti $SNAKES$ je moznost implementace vlastnich rozsireni pro jednotlive casti Petriho sítí, nebo pridani novych vlastnosti pro modelovani jinych podtypu Petriho sítí. Tato vlastnost byla zvlast pouzita v této prací pro pridani rozsireni, podporujici vytvareni Petriho sítí urcenych pro modelovani distribuovanych systému.
 Jednou z nejdůležitějších pluginu je plugin umoznující napojení \hyperref[sec:aplikace-mqtt]{MQTT clientů} pro provazani portu Petriho sítí mezi sebou.
 
-\subsection{$MQTT$}
-\href{http://mqtt.org/}{$MQTT$} je protokol urceny pro komunikaci ve pripadech nizke propustnosti siti nebo jeji vysoke nespolehlivosti. V soucasne dobe svoje vyuziti nachazi v \href{https://en.wikipedia.org/wiki/Internet_of_things}{$IoT$}. $MQTT$ zavadi takove pojmy jako klient, broker, zpráva a téma.
+\subsection{Implementace MQTT}
+\label{subsec:mqtt_impl}
+\todo{add code example with paho mqtt}
 
-\paragraph{$MQTT$ Klient}
 
-Klient je tenka aplikace, schopna navazani spojeni s brokerem. Muže byt použite pro zarizeni, jejichz vykon je bod srazu, díky lehkosti $MQTT$
-
-\paragraph{$MQTT$ Broker}
-
-Broker je server, obsluhujici klienty, navazuje spojeni s klientem a provadi posilani zprav typu $PUBLISH$ klientum, které odebírjí témata (topics) a které odpovidá teto zprave.
-
-\paragraph{Téma}
-
-Kazda zprava posilana klientem se nepredava primo dalsimu klientovi, ale obsluhuje se brokerem. Zprava musi mit specifikovane tema, podle ktere broker urci, kterym klientum tu zpravu preposlat.
-
-\paragraph{Zpráva}
-
-Zpravy museji navic mit specifikovany obsah, a QoS. QoS muze byt 3 typu:
-\begin{itemize}
-  \item $QoS_0$ Nanejvys jedno dodani \\
-  \item $QoS_1$ Alespon jedno dodani \\
-  \item $QoS_2$ Presne jedno dodani 
-\end{itemize}
-
-Pro navazani spojeni s brokerem po nastaveni sitoveho pripojeni klient musi nejdrive poslat zparavu $CONNECT$, po ktere server musi odpovedet zpravou typu $CONNACK$ podtvrzujici navazani spojeni. Potom klient je volen poslat zpravy typu $SUBSCRIBE$ s tematem na ktere chce dostavat zpravy. Server odpovida zpravou $SUBACK$. Potom uz zprava typu $PUBLISH$ z urcitym obsahem od klienta ktery provedl vsechny minule kroky bude zpracovana brokerem.
 
 \subsection{Implementace pluginů}
 \label{sec:plug-impl}
