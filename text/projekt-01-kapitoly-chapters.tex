@@ -110,10 +110,10 @@ V našem případě vysokoúrovňová Petriho síť modeluje a nasledně simuluj
 \paragraph{Definice}
 
 Definice distribuovaného systému zni:
-Distribuovaný system je kolekce na sobe nezavislych pocitatcu, ktery konecny uzivatel vnima jako celek. 
+Distribuovaný system je kolekce na sobe nezavislych pocitatcu, ktery konecny uzivatel vnima jako celek.
 % http://barbie.uta.edu/~jli/Resources/MapReduce&Hadoop/Distributed%20Systems%20Principles%20and%20Paradigms.pdf
 
-Distribuované systémy musejí používat decentralizované algoritmy, které požaduji následující: 
+Distribuované systémy musejí používat decentralizované algoritmy, které požaduji následující:
 \begin{enumerate}
   \item Žádný prvek nesmí vědět informaci o celkovém stavu systému.
   \item Prvek uvazuje jenom na základe jeho stavu.
@@ -126,7 +126,7 @@ Z definice taky vypliva, ze distribuovany system se obecne sestavuje s vice se o
 Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho siťěmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a přechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol \href{http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/csprd02/mqtt-v3.1.1-csprd02.html}{MQTT}, ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace tepelneho rizeni(odkaz) nazorne ukazuje pouziti dane myslenky na praktice.
 \subsection{Simulace}
 \subsection{Diskretni simulace}
-Diskrétní simulace je založena ve svém základu na algoritmu známém pod názvem "NextEvent". Tento algoritmus se řídí nasledujícím pseudokodem:
+Diskrétní simulace je založena ve svém základu na algoritmu známém pod názvem \uv{NextEvent}. Tento algoritmus se řídí nasledujícím pseudokodem:
 \begin{algorithm}
   \caption{Diskretni simulace}\label{euclid}
   \begin{algorithmic}[1]
@@ -144,7 +144,7 @@ Diskrétní simulace je založena ve svém základu na algoritmu známém pod n�
 \subsection{Simulace v realnem case}
 Simulace v realnem case se lisi of diskretni simulace v jedne vlastnosti. Beh takove simulace musi byt synchronizovan s relanim casem. Obecne posuv v casove rovine se provadi kvazidistantnim krokem, pricemz ten krok musi byt dostatecne maly, na to aby simulace stacila cist vstupni parametry. ??? % Real-Time Simulation of Electric Vehicles for Distribution System Operation Assessment, Characteristics of Real-Time Simulation
 
-Simulace v realnem case upravena pro ucely tohoto projektu je zalozena na vyse zminenem algoritmu "Next Event" s jedinou zmenou, ktera pridava cekani na synchronizaci simulacniho casu s realnim nebo na prichod nove udalosti. Algoritmus v tom pripade vypadá nasledujim zpusobem:
+Simulace v realnem case upravena pro ucely tohoto projektu je zalozena na vyse zminenem algoritmu \uv{Next Event} s jedinou zmenou, ktera pridava cekani na synchronizaci simulacniho casu s realnim nebo na prichod nove udalosti. Algoritmus v tom pripade vypadá nasledujim zpusobem:
 
 \begin{algorithm}
 \caption{Real-time simulace}\label{euclid}
@@ -218,9 +218,28 @@ Jednou z nejdůležitějších pluginu je plugin umoznující napojení \hyperre
 
 \subsection{Implementace MQTT}
 \label{subsec:mqtt_impl}
-\todo{add code example with paho mqtt}
+Pro implementací mqtt klientu v simulatoru byla použitá knihovna \href{https://pypi.org/project/paho-mqtt/}{\texttt{paho-mqtt}}. Tato knihovna obsahuje všechno potřebné pro nastavení komunikačních kanálů mezí porty vzdalených Petriho sítí. Na základě použití této knihovny konečný uživatel může nastavit zvolené místo v Petriho sítí jako vstupní nebo vystupní port. viz \ref{code:remote-in-out}. Jejích vzhled je nasledující:
+\begin{figure}[hbt]
+  \centering
+  \includegraphics[width=0.5\textwidth]{obrazky-figures/port-in.png}
+  \caption{Příklad vstupního portu}
+  \label{port-in}
+\end{figure}
 
+\begin{figure}[hbt]
+  \centering
+  \includegraphics[width=0.5\textwidth]{obrazky-figures/port-out.png}
+  \caption{Příklad výstupního portu}
+  \label{port-out}
+\end{figure}
 
+Jak si můžete povšimnout, na rozdíl od ostatních míst sítě, vstupní a výstupní porty se označují barvou a dodatečným popisem. Pro vstupní port \ref{port-in} je to \texttt{Listening on: NET/TOPIC} a zelení barva, \texttt{Sending to: NET/TOPIC} pro výstupní \ref{port-out}. Ten, ve své řáde je označen červeně.
+
+Je předem definované, že každá simulační instance odebírá zprávy z tématu \texttt{control}. Je to ekvivalent broadcastové adresy u TCP/IP zásobníku.
+
+Implementace zevnítř vypadá podobně reprezentací samotných portů. Sít, pří volaní metody \texttt{add\_remote\_input} nastaví týp místa na vstupní, pak pošle zprávu na téma \texttt{control} obsahující dvojicí [jméno sítě, jméno místa], a uloží zprávu do čekací fronty. Pak, když se k brokeru přípojí nějaká simulační instance s požadovanou dvojící síť--místo, tak se to oznamí všem ostatním simulačním instancím. To se zase provede zasilaním zprávy na téma \texttt{control}. Hned po příjetí takové zprávy se port nastaví a bude vykonavat svou čínnost.
+
+Co se tyče směřovaní zpráv, tak na jeden vstupní port může být přípojeno 0 až několík vystupních portů, nebo jinymí slovy vstupní port příjma všechny zprávy na svoje temá.
 
 \subsection{Implementace pluginů}
 \label{sec:plug-impl}
@@ -243,7 +262,7 @@ Toto rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudiz
   \centering
   \includegraphics[width=0.6\textwidth]{obrazky-figures/prob-transition.png}
   \caption{Příklad pravděpodobnostního přechodu}
-  \label{timed-transition}
+  \label{prob-transition}
 \end{figure}
 
 \subsubsection{Plugin $prior_pl$}
@@ -253,7 +272,7 @@ Tento plugin je urceny pro pridani priorit k pechodum v siti. Podle nastavene pr
   \centering
   \includegraphics[width=0.3\textwidth]{obrazky-figures/prior-transition.png}
   \caption{Příklad prioritního přechodu s prioritou $1$}
-  \label{timed-transition}
+  \label{prior-transition}
 \end{figure}
 
 \subsection{Plugin $sim_pl$}
@@ -267,7 +286,8 @@ Na implementací tohoto pluginu je založená práce ostatních pluginů ze skup
 \end{lstlisting}
 
 Stejně tak podporuje nastavení vzdalených portů pro předaní tokenů jiným sítím připojeným na stejnou adresu $MQTT$ brokeru \ref{code:remote_in}, \ref{code:remote_out}.
-\begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right]
+
+\begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right, label={code:remote-in-out}]
   n.add_remote_input(it, 'temp_gen/Measurement') (*\label{code:remote_in}*)
   n.add_remote_output(hen, 'boiler_logic/Sensory_input') (*\label{code:remote_out}*)
 \end{lstlisting}
