@@ -214,7 +214,7 @@ Pro navazani spojeni s brokerem po nastaveni sitoveho pripojeni klient musi nejd
 \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/}{$SNAKES$} -- je knihovna v jazyce Python ktera nabizi vsechno potrebne pro definici a spousteni několíka variant Petriho sítí. Cilem knhovny $SNAKES$ je nabidnout badatelum moznost rychle namodelovat novy napad. Zvlastni vlastnosti knihovny $SNAKES$ je moznost vytvarzet Barevne Petriho site s pouzitim vyrazů v jazyce Python pro annotaci přechodu ci vstupnich nebo vystupnich šipek. \cite{snakes}
 
 Zvlastni vlastnosti $SNAKES$ je moznost implementace vlastnich rozsireni pro jednotlive casti Petriho sítí, nebo pridani novych vlastnosti pro modelovani jinych podtypu Petriho sítí. Tato vlastnost byla zvlast pouzita v této prací pro pridani rozsireni, podporujici vytvareni Petriho sítí urcenych pro modelovani distribuovanych systému.
-Jednou z nejdůležitějších pluginu je plugin umoznující napojení \hyperref[sec:aplikace-mqtt]{MQTT clientů} pro provazani portu Petriho sítí mezi sebou.
+Jednou z nejdůležitějších pluginu je plugin umoznující přípojení \hyperref[sec:aplikace-mqtt]{MQTT clientů} pro provazani portu Petriho sítí mezi sebou.
 
 \subsection{Implementace MQTT}
 \label{subsec:mqtt_impl}
@@ -235,15 +235,75 @@ Pro implementací mqtt klientu v simulatoru byla použitá knihovna \href{https:
 
 Jak si můžete povšimnout, na rozdíl od ostatních míst sítě, vstupní a výstupní porty se označují barvou a dodatečným popisem. Pro vstupní port \ref{port-in} je to \texttt{Listening on: NET/TOPIC} a zelení barva, \texttt{Sending to: NET/TOPIC} pro výstupní \ref{port-out}. Ten, ve své řáde je označen červeně.
 
-Je předem definované, že každá simulační instance odebírá zprávy z tématu \texttt{control}. Je to ekvivalent broadcastové adresy u TCP/IP zásobníku.
+Je předem definované, že každá simulační instance odebírá zprávy z tématu \texttt{control}. Je to ekvivalent broadcastové adresy u IP.
 
 Implementace zevnítř vypadá podobně reprezentací samotných portů. Sít, pří volaní metody \texttt{add\_remote\_input} nastaví týp místa na vstupní, pak pošle zprávu na téma \texttt{control} obsahující dvojicí [jméno sítě, jméno místa], a uloží zprávu do čekací fronty. Pak, když se k brokeru přípojí nějaká simulační instance s požadovanou dvojící síť--místo, tak se to oznamí všem ostatním simulačním instancím. To se zase provede zasilaním zprávy na téma \texttt{control}. Hned po příjetí takové zprávy se port nastaví a bude vykonavat svou čínnost.
 
-Co se tyče směřovaní zpráv, tak na jeden vstupní port může být přípojeno 0 až několík vystupních portů, nebo jinymí slovy vstupní port příjma všechny zprávy na svoje temá.
+\subsubsection{Směřování}
+Na jeden vstupní port může být přípojeno 0 až několík vystupních portů, nebo jinymí slovy vstupní port příjma všechny zprávy na svoje temá.
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{obrazky-figures/Port-routing.pdf}
+    \caption{Úkazka směřovaní zpráv.}
+    \label{route-viz}
+  \end{center}
+\end{figure}
+
+Na danem výše obrázku \ref{route-viz} můžete vidět ukázku směřovaní zpráv mezí porty. \texttt{AAA}, \texttt{BBB} a \texttt{CCC} jsou identifikatory Petriho sítí v ramcí jedného brokeru. Ve případě že se dvojice síť--port se vyskituje vícekrát, zprávy se přeposilají všem instancím. To si můžete všimnout na příkladu sítě \texttt{CCC}, která je na obrázku \ref{route-viz} dvakrát.
+
+Na obrázku jsou 6 vstupních portů a 5 výstupních. Vstupní porty jsou označené zeleně, výstupní červeně. Jak je vidět na příklade dvoujic \texttt{CCC/IN1} a \texttt{CCC/DATA}, dvoující nemusí být unikatní. Počet přípojených výstupních portu k jednému vstupnímu není nějak omezen. Je to dosažene použítím vlastností MQTT klientu popsané v \ref{par:topic}.
+
+Na příkladě vstupního portu \texttt{log} můžete vidět že není povinné, aby ten port byl zapojený. Ve případě simulatoru takový port nebude přiřázen do zkupíny vstupních portů, dokud se neobjeví nějaka applikace nebo síť, požadující přijetí a odesílaní zpráv na téma, kterou ten port odebírá. Více se o takovém nastavení viz \todo{ADD}
+
+\subsection{Vlastní protokol komunikace}
+Proto aby simulator měl podporu přídání vzdalených portů, zmíněnych v \ref{subsec:mqtt_impl} vznikla potřeba vymyslet vlastní protokol výměny informací. Ten protokol musí mít seznám zpráv pro takové simulační případy, kdy port musí předat nebo příjmout tokeny, nebo když se objeví instance Petriho síti v nějakém z už existujících či nově vytvořených simulačních úzlu. \todo{návod pro vytvoření takového}.
+
+Nasledující tabulka \ref{tab:mqtt-msg-types} obsahuje přehled typů zpráv, a jejích formatu pro naplnění:
+
+\begin{table}[H]
+	\vskip6pt
+	\caption{Tabulka typů zpráv}
+    \vskip6pt
+	\centering
+	\begin{tabular}{llllr}
+		\toprule
+		Typ & Zkrátka & Formát \\
+    \midrule
+    Update & U & U\_ACTION, SRC\_SIM\_ID, NEW\_NET\_NAME \\
+    Request & R & R\_ACTION, TARG\_NET/TARG\_PLACE, SRC\_NET/SRC\_PLACE \\
+    Success & S & REQUEST\_COPY \\
+    Failure & F & REQUEST\_COPY \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:mqtt-msg-types}
+\end{table}
+
+\paragraph{Update} Zprávy tohoto typu oznamují instancím simulatoru, jestli se v jejích okolí neobjevila nová Petriho síť, nebo naslouchající aplikace. Ve případě dodaní zprávy typu \uv{Update} \todo{}
 
 \subsection{Implementace pluginů}
 \label{sec:plug-impl}
-Tento pododdil popisuje implementaci růyných pluginu pro knihovnu $SNAKES$, které zesnadnuji návrch Petriho sítí a její modelovaní. Každý z níže popsaných pluginu se da  použít v kodu po jejích importu podle tohoto návodu \todo{Add $SNAKES$ plugin include page}
+Tento pododdil popisuje implementaci růyných pluginu pro knihovnu $SNAKES$, které zesnadnuji návrch Petriho sítí a její modelovaní. Každý z níže popsaných pluginu se da  použít v kodu po jejích importu podle tohoto \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu}.
+
+\subsection{Návod pro import rozšíření}
+Vzhledem k odlišnému postupu pří přídání rozšíření do SNAKES, pro import simulačního nástroje a dalších rozšíření ze skupíny, užívatel musí dodřet správné pořadí pri importu knihoven. Konvence probíhá nasledujícím způsobem.
+
+\begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right, label={code:remote-in-out}]
+  from snakes.nets import *   # Site, mista, prechody... (*\label{code:snakes-all}*)
+  from simul import PNSim     # Simulacni knihovna (*\label{code:pnsim}*)
+  snakes.plugins.load( (*\label{code:sim-plugins}*)
+    ["gv", "timed_pl", "sim_pl", "prob_pl", "prior_pl"],
+    "snakes.nets",
+    "plugins") # Seznam rozsireni pro import
+  from plugins import * # Redefinovane metody z rozsireni (*\label{code:pl-import}*)
+\end{lstlisting}
+
+\begin{enumerate}
+  \item Pridani knihovny snakes a její prvků \ref{code:snakes-all}.
+  \item Import simulační knihovny, která poskytné základ pro pluginy \ref{code:pnsim}.
+  \item Přidaní pluginů podle požadovaných vlastností síte \ref{code:sim-plugins}. Ze skupíny doporučených pluginů stojí za zmínku plugin \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Více o jeho použítí v ramcí simulatoru viz. \todo{}. Zbýtek je popsán v dalších sekcích \ref{subsec:timed_pl}.
+  \item Pro redefinici a přidání nových metod z rozšíření slouží řádek \ref{code:pl-import}. Od dané chvilí použítí knihovný SNAKES je stejné jako v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu} a taky \todo{Muj navod}.
+\end{enumerate}
 
 \subsubsection{Plugin $timed_pl$}
 \label{subsec:timed_pl}
@@ -278,7 +338,6 @@ Tento plugin je urceny pro pridani priorit k pechodum v siti. Podle nastavene pr
 \subsection{Plugin $sim_pl$}
 \label{sec:aplikace-mqtt}
 Na implementací tohoto pluginu je založená práce ostatních pluginů ze skupiny \ref{sec:plug-impl}. Je ve své podstatě spojovacím prvkém mezi simulatorem, $MQTT$ klientem a sětí Petri. Obsahuje přetežovaní metod ze knihovny $SNAKES$ pro vykreslování prvků, které jsou rozšiřené pluginy. Taky přidavá zasadní metody pro nastavení Petriho sítě, umožnující použítí simulatoru a provadění spouštění sítě \ref{code:add_simulator}.
-\newcounter{codecounter}
 \begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right]
   sim = PNSim()
   n = PetriNet('Sample net')

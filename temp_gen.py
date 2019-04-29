@@ -2,11 +2,13 @@
 
 import signal
 import snakes
-import snakes.plugins
-from simul import PNSim
-snakes.plugins.load(["gv", "timed_pl", "sim_pl", "prob_pl", "prior_pl"], "snakes.nets", "plugins")
-from snakes.nets import *
-from plugins import *
+from snakes.nets import *   # Site, mista, prechody...
+from simul import PNSim     # Simulacni knihovna
+snakes.plugins.load(
+    ["gv", "timed_pl", "sim_pl", "prob_pl", "prior_pl"],
+    "snakes.nets",
+    "plugins") # Seznam rozsireni pro import
+from plugins import * # Redefinovane metody z rozsireni
 
 nodes = []
 
