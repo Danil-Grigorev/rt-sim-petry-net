@@ -131,80 +131,90 @@ Diskrétní simulace je založena ve svém základu na algoritmu známém pod n�
   \caption{Diskretni simulace}\label{euclid}
   \begin{algorithmic}[1]
   \State $\text{nainicializuj simulaci, cas a planovac udalosti}$
-  \While {dokud je naplanovana udalost}
+  \While {dokud je naplánovaná událost}
   \State $\text{vyjmi prvni udalost ze seznamu}$
-  \If {$cas_udalosti >= T_END$}
-  \Return
+  \If {\texttt{cas\_udalosti >= T\_END}}
+    \Return
   \EndIf
   \State $\text{nastav cas na cas udalosti}$
   \State $\text{proved popis chovani udalosti}$
   \EndWhile
   \end{algorithmic}
   \end{algorithm}
-\subsection{Simulace v realnem case}
-Simulace v realnem case se lisi of diskretni simulace v jedne vlastnosti. Beh takove simulace musi byt synchronizovan s relanim casem. Obecne posuv v casove rovine se provadi kvazidistantnim krokem, pricemz ten krok musi byt dostatecne maly, na to aby simulace stacila cist vstupni parametry. ??? % Real-Time Simulation of Electric Vehicles for Distribution System Operation Assessment, Characteristics of Real-Time Simulation
+\subsection{Simulace v reálném čase}
+Simulace v reálném čase se lisí of diskrétní simulace v jedné vlastnosti. Běh takové simulace musí byt synchronizován s relacím časem. 
 
-Simulace v realnem case upravena pro ucely tohoto projektu je zalozena na vyse zminenem algoritmu \uv{Next Event} s jedinou zmenou, ktera pridava cekani na synchronizaci simulacniho casu s realnim nebo na prichod nove udalosti. Algoritmus v tom pripade vypadá nasledujim zpusobem:
+Simulace v reálném čase upravena pro účely tohoto projektu je založena na výše zmíněném algoritmu \uv{Next Event} s jedinou změnou, která přidává čekaní na synchronizaci simulačního času s reálným, nebo na příchod nové události. Algoritmus v tom případe vypadá následujícím způsobem:
 
 \begin{algorithm}
 \caption{Real-time simulace}\label{euclid}
 \begin{algorithmic}[1]
 \State $\text{nainicializuj simulaci, cas a planovac udalosti}$
-\While {dokud je naplanovana udalost}
+\While {dokud je naplánovaná událost}
 \State $\text{podivej se na cas dalsi udalosti}$
-\If {$cas_udalosti >= T_END$}
+\If {\texttt{cas\_udalosti >= T\_END}}
 \Return
 \EndIf
 \State $\text{pockej na cas udalosti nebo na prichod nove udalosti}$
-\If {nova udalost}:
-    \State Continue
+\If {\texttt{nova\_událost}}:
+    \State \texttt{Continue}
 \EndIf
-\State proved popis chovani udalosti
+\State proveď popis chovaní události
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
 
-Tento algoritmus nachazi svoje pouziti ve mnoha simulacnich pripadech. Bezny priklad pouziti - pocitacove hry, kde uzivatele zaujme herni prostredi, ktere simuluje realni svet, vcetne casove roviny. Simulace v realnim case se taky pouziva, kdy obycejne diskretni simulace nestaci a cas neni zanedbatelny. Uzivatel muze chtit sledovat system v prubehu simulace, za ucelem zjisteni anomalii v chovani jeho prvku nebo zvyseni kvality systému pred jeho nasazenim do provozu. Takovy pristup se pouziva v simulace \hyperref[subsec:hwil]{\uv{Hardware-in-the-loop}}.
+Tento algoritmus nachází svoje použiti ve mnoha simulačních případech. Běžný příklad použiti - počítačové hry, kde uživatele zaujme herní prostředí, které simuluje reální svět, včetně časové roviny. Simulace v reálném čase se taky používá, kdy obyčejné diskrétní simulace nestačí a cas není zanedbatelný. Uživatel muže chtít sledovat system v průběhu simulace, za účelem zjištěni anomálii v chovaní jeho prvku nebo zvýšeni kvality systému prev jeho nasazením do provozu. Takový přistup se používá ve případě simulace \hyperref[subsec:hwil]{\uv{Hardware-in-the-loop}}.
 
 \subsection{Hardware-in-the-loop(HWIL)}
 \label{subsec:hwil}
 
-Hardware-in-the-loop nebo $HIL$ je technika použivaná pro vývoj a testovaní řídicích časti komplexních systemů. Diky níž se fizické časti systemu nahrazují jejích simulaci a umožnuji plynulé testovaní ještě před nasazenim do provozu \cite{hil}.
+Hardware-in-the-loop nebo $HIL$ je technika používaná pro vývoj a testovaní řídicích častí komplexních systémů. Díky níž se fyzické častí systému nahrazují jejích simulaci a umožňují plynulé testovaní ještě před nasazením do provozu \cite{hil}.
 
 \subsection{MQTT protokol}
 \label{subsec:mqtt-proto}
 
-\href{http://mqtt.org/}{MQTT} je protokol urceny pro komunikaci ve pripadech nizke propustnosti siti nebo jeji vysoke nespolehlivosti. V soucasne dobe svoje vyuziti nachazi v \href{https://en.wikipedia.org/wiki/Internet_of_things}{IoT}. MQTT zavadi takove pojmy jako \href{par:client}{klient}, \href{par:broker}{broker}, \href{par:message}{zpráva} a \href{par:topic}{téma}. Dalé nasledují popisy důležitých časti protokolu MQTT z daneho zdroje \cite{mqtt}.
+\href{http://mqtt.org/}{MQTT} je protokol určeny pro komunikaci ve případech nízké propustnosti síti nebo její vysoké nespolehlivosti. V současné době svoje využiti nachází v \href{https://en.wikipedia.org/wiki/Internet_of_things}{IoT}. MQTT zavadí takové pojmy jako \href{par:client}{klient}, \href{par:broker}{broker}, \href{par:message}{zpráva} a \href{par:topic}{téma}. Dále nasledují popisy důležitých častí protokolu MQTT z daného zdroje \cite{mqtt}.
 
 \paragraph{MQTT Klient}
 \label{par:client}
 
-Klient je tenka aplikace, schopna navazani spojeni s brokerem. K jeho vlastnostém patří podpora odebíraní zpráv pomoci filtrovaní na zakladě parametru, zvanemu \uv{topic} \ref{par:topic}. MQTT klient muže byt použit pro zarizeni, jejichz vykon je bod srazu, díky lehkosti MQTT protokolu.
+Klient je tenká aplikace, schopna navázaní spojeni s brokerem. K jeho vlastnostem patří podpora odebíraní zpráv pomoci filtrovaní na základě parametru, zvanému \uv{topic} \ref{par:topic}. MQTT klient muže byt použit pro zařízeni, jejichž výkon je bod srazu, díky lehkosti MQTT protokolu.
 
 \paragraph{MQTT Broker}
 \label{par:broker}
 
-Broker je server, obsluhujici klienty, navazuje spojeni s klientem a provadi posilani zprav typu $PUBLISH$ klientům, které odebírají téma, nachazející v hlavičce této zpravy.
+Broker je server, obsluhující klienty, navazuje spojeni s klientem a provádí přeposíláni zprav typu $PUBLISH$, které odebírají téma, nacházející ve hlavičce zprávy. Každý klient se přípojí k brokeru tak, že otevře sezení, během kterého může se serverem komunikovat. Pro tén účel klient musí předem vědět IP adresu brokeru, která pro něj bude přístupní.
 
 \paragraph{Téma}
 \label{par:topic}
 
-Kazda zprava posilana klientem se nepredava primo dalsimu klientovi, ale obsluhuje se brokerem. Zprava musi mit specifikovane tema, podle ktere broker urci, kterym klientům tu zpravu musí přeposlat. 
+Kazda zprava posílaná klientem se nepředává primo dalšímu klientovi, ale obsluhuje se brokerem. Zprava musí mit specifikované téma, podle které broker určí, kterým klientům tu zprávu musí přeposlat. Takové téma je obvykle unikátní textový řetězec, který bude následně odebírat jeden či více klientů.
 
 \paragraph{Zpráva}
 \label{par:message}
 
-Zpravy museji navic mit specifikovany obsah, a QoS. QoS muze byt 3 typu:
+Zprávy musejí mit specifikovaný obsah, a parametr QoS. Obsah zprávy je tělo samotné zprávy, které dostane klient a na základě ní se bude jednat dál. Obsah se posílá v bytech, a pro případ zprávy typu \texttt{PUBLISH}, může být prázdný.
+
+QoS muže byt 3 typu:
 \begin{itemize}
-  \item $QoS_0$ -- Nanejvys jedno dodani
-  \item $QoS_1$ -- Alespon jedno dodani
-  \item $QoS_2$ -- Presne jedno dodani
+  \item $QoS_0$ -- Nanejvýš jedno dodaní.
+  \item $QoS_1$ -- Alespoň jedno dodaní.
+  \item $QoS_2$ -- Přesně jedno dodaní.
 \end{itemize}
+
+Podle hodnoty tohoto parametru se určí, jak důkladně se bude obsluhovat zpráva.
 
 \paragraph{Tok nastavení}
 
-Pro navazani spojeni s brokerem po nastaveni sitoveho pripojeni klient musi nejdrive poslat zparavu $CONNECT$, po ktere server musi odpovedet zpravou typu $CONNACK$ podtvrzujici navazani spojeni. Potom klient je volen poslat zpravy typu $SUBSCRIBE$ s tematem na ktere chce dostavat zpravy. Server odpovida zpravou $SUBACK$. Potom uz zprava typu $PUBLISH$ z urcitym obsahem od klienta ktery provedl vsechny minule kroky bude zpracovana brokerem.
+Pro navázaní spojeni s brokerem po nastaveni sítového připojeni s adresou brokeru, klient musí nejdříve poslat zprávu \texttt{CONNECT}, obsahující vlastní identifikátor. Na tu zprávu server musí odpovědět zprávou typu \texttt{CONNACK} potvrzující navázaní spojeni a nulovým návratovým kódem. Potom klient je volen poslat zprávy typu \texttt{SUBSCRIBE} s tématem na které chce dostávat zprávy a hodnotou \texttt{QoS}. Server odpovídá zprávou \texttt{SUBACK}, návratová hodnota je ve případě úspěchu je menší nebo rovná se hodnotě \texttt{QoS}. Potom uz zprava typu \texttt{PUBLISH} z určitým obsahem od klienta který provedl všechny minule kroky bude zpracovaná brokerem.
 
+\begin{figure}[hbt]
+  \centering
+  \includegraphics[width=0.5\textwidth]{obrazky-figures/MQTT-flow.pdf}
+  \caption{Ukázka komunikace Klientu a Brokeru.}
+  \label{mqtt-flow}
+\end{figure}
 
 \chapter{Implementace}
 \label{sec:implementation}
@@ -279,7 +289,14 @@ Nasledující tabulka \ref{tab:mqtt-msg-types} obsahuje přehled typů zpráv, a
 	\label{tab:mqtt-msg-types}
 \end{table}
 
-\paragraph{Update} Zprávy tohoto typu oznamují instancím simulatoru, jestli se v jejích okolí neobjevila nová Petriho síť, nebo naslouchající aplikace. Ve případě dodaní zprávy typu \uv{Update} \todo{}
+\paragraph{Update} Zprávy tohoto typu oznamují instancím simulatoru, jestli se v jejích okolí neobjevila nová Petriho síť, nebo naslouchající aplikace. Ve případě dodaní zprávy typu \uv{Update}, každá síť bude muset aktualizovat seznám svých aktivních portu, a ve případě že nějaký port čeká na nastavení, tak poslát požadavky na pro nově příchozího klienta. Poslední akcí je aktualizace tabulky znamých sití nově příchozího klienta, ve případě že klient není externí aplikace. Pro aplikaci je ten krok vynechan.
+\todo{priklady}
+
+\paragraph{Request} Tento týp zpráv nastavuje vstupní a výstupní porty. Parametr \uv{\texttt{R\_ACTION}} může nabývat hodnoty \texttt{set\_input} pro nastavení cíloveho místa \uv{\texttt{TARG\_PLACE}} jako vstupní port pro síť \uv{\texttt{TARG\_NET}}. Parametr \uv{\texttt{SRC\_NET}} je v tom případě není potřeba, stačí uvěst rozdelovač.
+
+Příklad: \texttt{R, set\_input, net1/port1, /}
+
+Pro nastavení výstupního portu stačí nastavit parametr
 
 \subsection{Implementace pluginů}
 \label{sec:plug-impl}
@@ -288,7 +305,7 @@ Tento pododdil popisuje implementaci růyných pluginu pro knihovnu $SNAKES$, kt
 \subsection{Návod pro import rozšíření}
 Vzhledem k odlišnému postupu pří přídání rozšíření do SNAKES, pro import simulačního nástroje a dalších rozšíření ze skupíny, užívatel musí dodřet správné pořadí pri importu knihoven. Konvence probíhá nasledujícím způsobem.
 
-\begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right, label={code:remote-in-out}]
+\begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right, label={code:plugin-setup}]
   from snakes.nets import *   # Site, mista, prechody... (*\label{code:snakes-all}*)
   from simul import PNSim     # Simulacni knihovna (*\label{code:pnsim}*)
   snakes.plugins.load( (*\label{code:sim-plugins}*)
@@ -305,7 +322,7 @@ Vzhledem k odlišnému postupu pří přídání rozšíření do SNAKES, pro im
   \item Pro redefinici a přidání nových metod z rozšíření slouží řádek \ref{code:pl-import}. Od dané chvilí použítí knihovný SNAKES je stejné jako v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu} a taky \todo{Muj navod}.
 \end{enumerate}
 
-\subsubsection{Plugin $timed_pl$}
+\subsubsection{Plugin \texttt{timed\_pl}}
 \label{subsec:timed_pl}
 Toto rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tranzice do budoucna. Toto rozsireni pouziva jednoduchou logiku pro provedeni přechodu - ve chvili kdy přechod bude spustitelny, tak se zapne casovac a zkonzumuji odpovidajici tokeny ze vstupnich mist. Cekani se neresetuje pridanim dalsich tokenu do vstupnich mist. Ve pripade teto implementace přechod vezme noveprichozi tokeny ktere se objevi ve vstupnich mistech a tudiz zapnou tranzici. Po ukonceni cekani, tokeny budou preneseny do vystupnich mist, s nasledujcimi upravami, ktere můžou nastat podle definice HLPN(odkaz).
 \begin{figure}[hbt]
@@ -315,7 +332,7 @@ Toto rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tran
   \label{timed-transition}
 \end{figure}
 
-\subsubsection{Plugin $prob_pl$}
+\subsubsection{Plugin \texttt{prob\_pl}}
 \label{subsec:prob_pl}
 Toto rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudiz rovnomerne rozdelit pravdepodobnost spousteni kazde z nich. Pro spojene přechody plati, ze museji mit stejnou sadu vstupnich mist. Pak se pri provedeni jedneho z nich se rozhodne na zaklade hodnoty jeho pravdepodobnosti jestli se tento přechod musi provest, nebo se provede nektery z jeho sousedu. Soucet pravdepodobnosti pro takovou skupinu přechodu musi byt vzdycky 1.
 \begin{figure}[hbt]
@@ -325,7 +342,7 @@ Toto rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudiz
   \label{prob-transition}
 \end{figure}
 
-\subsubsection{Plugin $prior_pl$}
+\subsubsection{Plugin \texttt{prior\_pl}}
 \label{subsec:prior_pl}
 Tento plugin je urceny pro pridani priorit k pechodum v siti. Podle nastavene priority se behem simulace bude rozhodovat, ktere tranzice se vyhodnoti a provedou jako prvni. Priority můžou byt v rozsahu 0 -- 100, a radi se sestupne. Pro nastaveni priority element `Transition` má dodatečný a nepovinný parametr `prior`. 
 \begin{figure}[hbt]
@@ -335,7 +352,7 @@ Tento plugin je urceny pro pridani priorit k pechodum v siti. Podle nastavene pr
   \label{prior-transition}
 \end{figure}
 
-\subsection{Plugin $sim_pl$}
+\subsection{Plugin \texttt{sim\_pl}}
 \label{sec:aplikace-mqtt}
 Na implementací tohoto pluginu je založená práce ostatních pluginů ze skupiny \ref{sec:plug-impl}. Je ve své podstatě spojovacím prvkém mezi simulatorem, $MQTT$ klientem a sětí Petri. Obsahuje přetežovaní metod ze knihovny $SNAKES$ pro vykreslování prvků, které jsou rozšiřené pluginy. Taky přidavá zasadní metody pro nastavení Petriho sítě, umožnující použítí simulatoru a provadění spouštění sítě \ref{code:add_simulator}.
 \begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right]
@@ -390,7 +407,7 @@ Vychazí to zhruba nasledne:
 
 \begin{table}[H]
 	\vskip6pt
-	\caption{Tabulka tepelných ztrát pokojů} 
+	\caption{Tabulka tepelných ztrát pokojů}
     \vskip6pt
 	\centering
 	\begin{tabular}{llr}
