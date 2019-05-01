@@ -55,6 +55,7 @@ Díky možnosti vykonávat Petriho sit, vzniká příležitost vytvořit simula�
 Podtřída Časovaných petriho seti [Timed Petri Net] rozšiřuje pojem Značkovaných Petriho sítí o jednu důležitou zásadu -- přechod muže byt označen časovou funkcí. Aby se takový přechod provedl, ten čas musí uplynout, až potom se vyjmou tokeny ze vstupních míst, a vloží se do výstupních. Časová funkce nemusí být konstantní, ale v rámci této prací se použilo jenom konstantní čekaní na přechod, jelikož chovaní simulátoru musí být deterministické. Více o implementačních detailech viz. \ref{subsec:timed_pl}.
 
 \subsection{Vysokoúrovňové Petriho sítě}
+\label{sec:hlpn}
 Vysokoúrovňové petriho sítě (High Level Petri Nets) jsou dalším rozšířením Petriho sítí, které umožňují jednodušší modelovaní takových procesů, pro které jsou důležité výpočty a matematické výrazy. Celkově, je tento druh Petriho sítě pohodlnější pro modelovaní toku řízení kódu nějakého programu, a ve své podstatě připomíná grafické programování.
 
 \paragraph{Definice}
@@ -174,17 +175,17 @@ Hardware-in-the-loop nebo $HIL$ je technika používaná pro vývoj a testovaní
 \subsection{MQTT protokol}
 \label{subsec:mqtt-proto}
 
-\href{http://mqtt.org/}{MQTT} je protokol určeny pro komunikaci ve případech nízké propustnosti síti nebo její vysoké nespolehlivosti. V současné době svoje využiti nachází v \href{https://en.wikipedia.org/wiki/Internet_of_things}{IoT}. MQTT zavadí takové pojmy jako \href{par:client}{klient}, \href{par:broker}{broker}, \href{par:message}{zpráva} a \href{par:topic}{téma}. Dále nasledují popisy důležitých častí protokolu MQTT z daného zdroje \cite{mqtt}.
+\href{http://mqtt.org/}{MQTT} je protokol určeny pro komunikaci ve případech nízké propustnosti síti nebo její vysoké nespolehlivosti. V současné době svoje využiti nachází v \href{https://en.wikipedia.org/wiki/Internet_of_things}{IoT}. MQTT zavadí takové pojmy jako \hyperref[par:client]{klient}, \hyperref[par:broker]{broker}, \hyperref[par:message]{zpráva} a \hyperref[par:topic]{téma}. Dále nasledují popisy důležitých častí protokolu MQTT z daného zdroje \cite{mqtt}.
 
 \paragraph{MQTT Klient}
 \label{par:client}
 
-Klient je tenká aplikace, schopna navázaní spojeni s brokerem. K jeho vlastnostem patří podpora odebíraní zpráv pomoci filtrovaní na základě parametru, zvanému \uv{topic} \ref{par:topic}. MQTT klient muže byt použit pro zařízeni, jejichž výkon je bod srazu, díky lehkosti MQTT protokolu.
+Klient je tenká aplikace, schopna navázaní spojeni s brokerem. K jeho vlastnostem patří podpora odebíraní zpráv pomoci filtrovaní na základě parametru, zvanému \hyperref[par:topic]{\uv{topic}}. MQTT klient muže byt použit pro zařízeni, jejichž výkon je bod srazu, díky lehkosti MQTT protokolu.
 
 \paragraph{MQTT Broker}
 \label{par:broker}
 
-Broker je server, obsluhující klienty, navazuje spojeni s klientem a provádí přeposíláni zprav typu $PUBLISH$, které odebírají téma, nacházející ve hlavičce zprávy. Každý klient se přípojí k brokeru tak, že otevře sezení, během kterého může se serverem komunikovat. Pro tén účel klient musí předem vědět IP adresu brokeru, která pro něj bude přístupní.
+Broker je server, obsluhující klienty, navazuje spojeni s klientem a provádí přeposíláni zprav typu \texttt{PUBLISH}, které odebírají téma, nacházející ve hlavičce zprávy. Každý klient se přípojí k brokeru tak, že otevře sezení, během kterého může se serverem komunikovat. Pro tén účel klient musí předem vědět IP adresu brokeru, která pro něj bude přístupní.
 
 \paragraph{Téma}
 \label{par:topic}
@@ -221,10 +222,9 @@ Pro navázaní spojeni s brokerem po nastaveni sítového připojeni s adresou b
 
 \subsection{Knihovna $SNAKES$}
 
-\href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/}{$SNAKES$} -- je knihovna v jazyce Python ktera nabizi vsechno potrebne pro definici a spousteni několíka variant Petriho sítí. Cilem knhovny $SNAKES$ je nabidnout badatelum moznost rychle namodelovat novy napad. Zvlastni vlastnosti knihovny $SNAKES$ je moznost vytvarzet Barevne Petriho site s pouzitim vyrazů v jazyce Python pro annotaci přechodu ci vstupnich nebo vystupnich šipek. \cite{snakes}
+\href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/}{\texttt{SNAKES}} -- je knihovna v jazyce Python která nabízí všechno potřebné pro definici a spouštěni několika variant Petriho sítí. Cílem knihovny \texttt{SNAKES} je nabídnout badatelům možnost rychle namodelovat novy nápad. Zvláštní vlastnosti knihovny \texttt{SNAKES} je možnost vytvářet Barevné Petriho site s použitím výrazů v jazyce Python pro anotaci přechodu ci vstupních nebo výstupních šipek. \cite{snakes}
 
-Zvlastni vlastnosti $SNAKES$ je moznost implementace vlastnich rozsireni pro jednotlive casti Petriho sítí, nebo pridani novych vlastnosti pro modelovani jinych podtypu Petriho sítí. Tato vlastnost byla zvlast pouzita v této prací pro pridani rozsireni, podporujici vytvareni Petriho sítí urcenych pro modelovani distribuovanych systému.
-Jednou z nejdůležitějších pluginu je plugin umoznující přípojení \hyperref[sec:aplikace-mqtt]{MQTT clientů} pro provazani portu Petriho sítí mezi sebou.
+Zvláštní vlastnosti \texttt{SNAKES} je možnost implementace vlastních rozšířeni pro jednotlivé častí Petriho sítí, nebo přidaní nových vlastnosti pro modelovaní jiných podtypu Petriho sítí. Tato vlastnost byla zvlášť použita v této prací pro přidaní rozšířeni \ref{sec:plug-impl}, podporující vytvářeni Petriho sítí určených pro modelovaní distribuovaných systému.
 
 \subsection{Implementace MQTT}
 \label{subsec:mqtt_impl}
@@ -253,18 +253,17 @@ Implementace zevnítř vypadá podobně reprezentací samotných portů. Sít, p
 Na jeden vstupní port může být přípojeno 0 až několík vystupních portů, nebo jinymí slovy vstupní port příjma všechny zprávy na svoje temá.
 
 \begin{figure}[htb]
-  \begin{center}
-    \includegraphics[width=0.7\textwidth]{obrazky-figures/Port-routing.pdf}
-    \caption{Úkazka směřovaní zpráv.}
-    \label{route-viz}
-  \end{center}
+  \centering
+  \includegraphics[width=0.7\textwidth]{obrazky-figures/Port-routing.pdf}
+  \caption{Úkazka směřovaní zpráv.}
+  \label{route-viz}
 \end{figure}
 
 Na danem výše obrázku \ref{route-viz} můžete vidět ukázku směřovaní zpráv mezí porty. \texttt{AAA}, \texttt{BBB} a \texttt{CCC} jsou identifikatory Petriho sítí v ramcí jedného brokeru. Ve případě že se dvojice síť--port se vyskituje vícekrát, zprávy se přeposilají všem instancím. To si můžete všimnout na příkladu sítě \texttt{CCC}, která je na obrázku \ref{route-viz} dvakrát.
 
 Na obrázku jsou 6 vstupních portů a 5 výstupních. Vstupní porty jsou označené zeleně, výstupní červeně. Jak je vidět na příklade dvoujic \texttt{CCC/IN1} a \texttt{CCC/DATA}, dvoující nemusí být unikatní. Počet přípojených výstupních portu k jednému vstupnímu není nějak omezen. Je to dosažene použítím vlastností MQTT klientu popsané v \ref{par:topic}.
 
-Na příkladě vstupního portu \texttt{log} můžete vidět že není povinné, aby ten port byl zapojený. Ve případě simulatoru takový port nebude přiřázen do zkupíny vstupních portů, dokud se neobjeví nějaka applikace nebo síť, požadující přijetí a odesílaní zpráv na téma, kterou ten port odebírá. Více se o takovém nastavení viz \todo{ADD}
+Na příkladě vstupního portu \texttt{log} můžete vidět že není povinné, aby ten port byl zapojený. Ve případě simulatoru takový port nebude přiřázen do skupíny vstupních portů, dokud se neobjeví nějaka applikace nebo síť, požadující přijetí a odesílaní zpráv na téma, kterou ten port odebírá. Více se o takovém nastavení viz \todo{ADD}
 
 \subsection{Vlastní protokol komunikace}
 Proto aby simulator měl podporu přídání vzdalených portů, zmíněnych v \ref{subsec:mqtt_impl} vznikla potřeba vymyslet vlastní protokol výměny informací. Ten protokol musí mít seznám zpráv pro takové simulační případy, kdy port musí předat nebo příjmout tokeny, nebo když se objeví instance Petriho síti v nějakém z už existujících či nově vytvořených simulačních úzlu. \todo{návod pro vytvoření takového}.
@@ -292,11 +291,19 @@ Nasledující tabulka \ref{tab:mqtt-msg-types} obsahuje přehled typů zpráv, a
 \paragraph{Update} Zprávy tohoto typu oznamují instancím simulatoru, jestli se v jejích okolí neobjevila nová Petriho síť, nebo naslouchající aplikace. Ve případě dodaní zprávy typu \uv{Update}, každá síť bude muset aktualizovat seznám svých aktivních portu, a ve případě že nějaký port čeká na nastavení, tak poslát požadavky na pro nově příchozího klienta. Poslední akcí je aktualizace tabulky znamých sití nově příchozího klienta, ve případě že klient není externí aplikace. Pro aplikaci je ten krok vynechan.
 \todo{priklady}
 
-\paragraph{Request} Tento týp zpráv nastavuje vstupní a výstupní porty. Parametr \uv{\texttt{R\_ACTION}} může nabývat hodnoty \texttt{set\_input} pro nastavení cíloveho místa \uv{\texttt{TARG\_PLACE}} jako vstupní port pro síť \uv{\texttt{TARG\_NET}}. Parametr \uv{\texttt{SRC\_NET}} je v tom případě není potřeba, stačí uvěst rozdelovač.
+\paragraph{Request} \label{par:request} Tento týp zpráv nastavuje vstupní a výstupní porty. Parametr \uv{\texttt{R\_ACTION}} může nabývat hodnoty \texttt{set\_input} pro nastavení cíloveho místa \uv{\texttt{TARG\_PLACE}} jako vstupní port pro síť \uv{\texttt{TARG\_NET}}. Parametr \uv{\texttt{SRC\_NET}} a \uv{\texttt{SRC\_PLACE}} není v tom případě potřeba, stačí uvěst rozdelovač.
 
 Příklad: \texttt{R, set\_input, net1/port1, /}
 
-Pro nastavení výstupního portu stačí nastavit parametr
+Pro nastavení výstupního portu stačí nastavit parametr \uv{\texttt{R\_ACTION}} na \texttt{set\_output} a dodát zdrojové místo a síť nastavením parametrů \uv{\texttt{SRC\_NET}} a \uv{\texttt{SRC\_PLACE}}.
+
+Příklad: \texttt{R, set\_output, net1/port1, net2/port2}
+
+\paragraph{Success} Táto zpráva se odesílá ve případě uspěšného zpracování nějakého požadavku z \ref{par:request}. Parametr \uv{\texttt{REQUEST\_COPY}} musí byt přesnou kopii příchozího požadavku.
+
+Příklad: \texttt{S, R, set\_output, net1/port1, net2/port2}
+
+Příjetí odesílající stránou podtvrzovací zprávy Success, znamená že nastavení bylo uspěšné alespoň v jedném případě, což má za následek nastavení místa s jménem \texttt{port1} sítě \texttt{net1} jako výstupní port do \texttt{net2/port2}.
 
 \subsection{Implementace pluginů}
 \label{sec:plug-impl}
@@ -305,26 +312,35 @@ Tento pododdil popisuje implementaci růyných pluginu pro knihovnu $SNAKES$, kt
 \subsection{Návod pro import rozšíření}
 Vzhledem k odlišnému postupu pří přídání rozšíření do SNAKES, pro import simulačního nástroje a dalších rozšíření ze skupíny, užívatel musí dodřet správné pořadí pri importu knihoven. Konvence probíhá nasledujícím způsobem.
 
-\begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right, label={code:plugin-setup}]
-  from snakes.nets import *   # Site, mista, prechody... (*\label{code:snakes-all}*)
+\begin{python}
+  from snakes.nets import *   # Site, mista, prechody... (*\label{code:snakes-all}*) (*\label{code:plugin-setup}*)
   from simul import PNSim     # Simulacni knihovna (*\label{code:pnsim}*)
   snakes.plugins.load( (*\label{code:sim-plugins}*)
     ["gv", "timed_pl", "sim_pl", "prob_pl", "prior_pl"],
     "snakes.nets",
     "plugins") # Seznam rozsireni pro import
   from plugins import * # Redefinovane metody z rozsireni (*\label{code:pl-import}*)
-\end{lstlisting}
+\end{python}
 
 \begin{enumerate}
   \item Pridani knihovny snakes a její prvků \ref{code:snakes-all}.
   \item Import simulační knihovny, která poskytné základ pro pluginy \ref{code:pnsim}.
-  \item Přidaní pluginů podle požadovaných vlastností síte \ref{code:sim-plugins}. Ze skupíny doporučených pluginů stojí za zmínku plugin \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Více o jeho použítí v ramcí simulatoru viz. \todo{}. Zbýtek je popsán v dalších sekcích \ref{subsec:timed_pl}.
+  \item Přidaní pluginů podle požadovaných vlastností síte \ref{code:sim-plugins}. Ze skupíny doporučených pluginů stojí za zmínku plugin \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Více o jeho použítí v ramcí simulatoru viz.\ref{subsec:mereni-teploty}. Zbýtek je popsán v dalších sekcích \ref{subsec:timed_pl}.
   \item Pro redefinici a přidání nových metod z rozšíření slouží řádek \ref{code:pl-import}. Od dané chvilí použítí knihovný SNAKES je stejné jako v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu} a taky \todo{Muj navod}.
 \end{enumerate}
 
 \subsubsection{Plugin \texttt{timed\_pl}}
 \label{subsec:timed_pl}
-Toto rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tranzice do budoucna. Toto rozsireni pouziva jednoduchou logiku pro provedeni přechodu - ve chvili kdy přechod bude spustitelny, tak se zapne casovac a zkonzumuji odpovidajici tokeny ze vstupnich mist. Cekani se neresetuje pridanim dalsich tokenu do vstupnich mist. Ve pripade teto implementace přechod vezme noveprichozi tokeny ktere se objevi ve vstupnich mistech a tudiz zapnou tranzici. Po ukonceni cekani, tokeny budou preneseny do vystupnich mist, s nasledujcimi upravami, ktere můžou nastat podle definice HLPN(odkaz).
+Toto rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tranzice do budoucna. Toto rozsireni pouziva jednoduchou logiku pro provedeni přechodu - ve chvili kdy přechod bude spustitelny, tak se zapne casovac a zkonzumuji odpovidajici tokeny ze vstupnich mist. Cekani se neresetuje pridanim dalsich tokenu do vstupnich mist. Ve pripade teto implementace přechod vezme noveprichozi tokeny, ktere se objeví ve vstupních mistech a tudiž zápnou tranzici. Po ukonceni cekani, tokeny budou preneseny do výstupnich mist, s nasledujcimi upravami, ktere můžou nastat podle definice HLPN \ref{sec:hlpn}.
+
+
+\begin{python}
+  # Vytvoreni prechodu s casovym spozdenim
+  pr1=Transition("Timed-transition", timeout=30) (*\label{code:timed-example}*)
+\end{python}
+
+Pro vytvaření takového přechodu stačí zadat parametr \texttt{timeout} do klauzule pro vytvoření přechodu - \texttt{Transition} jak je ukázano na řádku \ref{code:timed-example}. Hodnota \texttt{timeout} se uvádí v sekundách. Výsledný tvár nasledujícího přechodu je na obrázku \ref{timed-transition}. Ukázku použítí ve funkčním příkladě můžete vidět \hyperref[code:timed-temp-example]{dále}.
+
 \begin{figure}[hbt]
   \centering
   \includegraphics[width=0.3\textwidth]{obrazky-figures/timed-transition.png}
@@ -335,6 +351,22 @@ Toto rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tran
 \subsubsection{Plugin \texttt{prob\_pl}}
 \label{subsec:prob_pl}
 Toto rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudiz rovnomerne rozdelit pravdepodobnost spousteni kazde z nich. Pro spojene přechody plati, ze museji mit stejnou sadu vstupnich mist. Pak se pri provedeni jedneho z nich se rozhodne na zaklade hodnoty jeho pravdepodobnosti jestli se tento přechod musi provest, nebo se provede nektery z jeho sousedu. Soucet pravdepodobnosti pro takovou skupinu přechodu musi byt vzdycky 1.
+
+Takový přechod se definuje ve dvou krocích. Nejdříve se vytvaří prvek \texttt{Transition} s parametrem \texttt{prob}, jak je ukázáno na řádku \ref{code:prob-example}. Příklad použití v \hyperref[code:prob-ev-draw]{obecném} případě viz. řádek \ref{code:prob-temp-example}.
+\begin{python}
+  # Krok 1: Vytvoreni prechodu z parametrem prob
+  pr1=Transition("Prob-trans-1", prob=0.6) (*\label{code:prob-example}*)
+  pr2=Transition("Prob-trans-2", prob=0.4)
+\end{python}
+
+Dále stačí spojit pravdepodobnosti přechodu do jedné skupíny, pomoci klauzule \\ \texttt{add\_neighbour\_transition}. Viz. řádek \ref{code:prob-neghb-example} nebo řádek \ref{code:prob-temp-neghb-example} z kompletního \hyperref[code:prob-ev-draw]{příkladu}.
+\begin{python}
+  # Krok 2: Vytvoreni prechodu z parametrem prob
+  pr1.add_neighbour_transition(pr2) (*\label{code:prob-neghb-example}*)
+\end{python}
+
+Tato sekvence vytvoří nasledující zobrazení - \ref{prob-transition}.
+
 \begin{figure}[hbt]
   \centering
   \includegraphics[width=0.6\textwidth]{obrazky-figures/prob-transition.png}
@@ -355,18 +387,18 @@ Tento plugin je urceny pro pridani priorit k pechodum v siti. Podle nastavene pr
 \subsection{Plugin \texttt{sim\_pl}}
 \label{sec:aplikace-mqtt}
 Na implementací tohoto pluginu je založená práce ostatních pluginů ze skupiny \ref{sec:plug-impl}. Je ve své podstatě spojovacím prvkém mezi simulatorem, $MQTT$ klientem a sětí Petri. Obsahuje přetežovaní metod ze knihovny $SNAKES$ pro vykreslování prvků, které jsou rozšiřené pluginy. Taky přidavá zasadní metody pro nastavení Petriho sítě, umožnující použítí simulatoru a provadění spouštění sítě \ref{code:add_simulator}.
-\begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right]
-  sim = PNSim()
-  n = PetriNet('Sample net')
+\begin{python}
+  sim=PNSim() (*\label{code:sim-add}*)
+  n=PetriNet("Sample net")
   n.add_simulator(sim) (*\label{code:add_simulator}*)
-\end{lstlisting}
+\end{python}
 
 Stejně tak podporuje nastavení vzdalených portů pro předaní tokenů jiným sítím připojeným na stejnou adresu $MQTT$ brokeru \ref{code:remote_in}, \ref{code:remote_out}.
 
-\begin{lstlisting}[language=Python, escapeinside={(*}{*)}, numbers=right, label={code:remote-in-out}]
-  n.add_remote_input(it, 'temp_gen/Measurement') (*\label{code:remote_in}*)
-  n.add_remote_output(hen, 'boiler_logic/Sensory_input') (*\label{code:remote_out}*)
-\end{lstlisting}
+\begin{python}
+  n.add_remote_input(it, "temp_gen/Measurement") (*\label{code:remote_in}*) (*\label{code:remote-in-out}*)
+  n.add_remote_output(hen, "boiler_logic/Sensory_input") (*\label{code:remote_out}*)
+\end{python}
 
 
 \subsection{Planovac udalosti}
@@ -374,7 +406,14 @@ Stejně tak podporuje nastavení vzdalených portů pro předaní tokenů jiným
 Planovac udalosti je naimplementovan jako prioritni fronta za vyuziti vestavene knihovny heapq v Pythonu. Api naznacuje ze pro pridani a vyberu prvku se pouzivaji metody $heappush$ a $heappop$. \url{https://docs.python.org/3/library/heapq.html#theory} Priorita v takove fronte se urcuje ciselnou hodnotou, ktera se vklada do fronty. Tato hodnota muze byt prvnim prvkem v seznamu elementu. Druhym parametrem pro urceni priority je poradi, ve kterem prvek byl vlozen. Tato sada pravidel umoznuje vkladat zaznamy, obsahujici cas spusteni jako prvni prvek, a podle toho se zaradi na prisluhujici misto ve fronte. Metoda $heappop$ vybere prvek ze seznamu s nejvyssi prioritou, coz bude element s nejnizsi hodnotou casu.
 \chapter{Aplikace}
 \section{Tepelne rizeni}
-Pro demonstraci praci simulatoru bylo rozhodnuto namodelovat dystribovany system modelujici chovani topení, ktey nekteri z vas pravdepodobne pouzivaji u sebe doma. Takovy system se sestavuje z nekolika casti. Zakladnim prvkem je plynovy spotrebic, nebo karma. Ta ohriva vodu a uvadi ji do pohybu po potrubich. Pak kazdy z pokoju ma na starosti ?teplene cidlo? a rizeni, ktere udrzuje v pokoji nastavenou teplotu podle calendare. Kazdou hodinu se z tabulky teplot vezme aktualni teplota pro soucasnou hodiny a tento pokoj, pak rizeni rozhodne jestli ma zapnout topení nebo ne. Pokud zadny z pokoju v soucasne dobe nema zapnute topení, tak karma se musi vypnout za ucelem setreni plynu. Toto rizeni provadi vestaveny system, nebo je zcela mechanicky. Kazdy z tech prvku bude dale namodelovan Petriho siťěmi.
+Pro demonstraci praci simulatoru bylo rozhodnuto namodelovat dystribovany system modelujici chovani topení, ktey nekteri z vas pravdepodobne pouzivaji u sebe doma. Takovy system se sestavuje z nekolika casti. Zakladnim prvkem je plynovy spotrebic, nebo karma. Ta ohriva vodu a uvadi ji do pohybu po potrubich. Pak kazdy z pokoju ma na starosti tepelené čidlo a rizeni, ktere udrzuje v pokoji nastavenou teplotu podle calendare. Kazdou hodinu se z tabulky teplot vezme aktualni teplota pro soucasnou hodiny a tento pokoj, pak rizeni rozhodne jestli ma zapnout topení nebo ne. Pokud zadny z pokoju v soucasne dobe nema zapnute topení, tak karma se musi vypnout za ucelem setreni plynu. Toto rizeni provadi vestaveny system, nebo je zcela mechanicky. Kazdy z tech prvku bude dale namodelovan Petriho siťěmi. Pro pochopení struktury viz. \ref{boiler-net}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{obrazky-figures/boiler-net.pdf}
+  \caption{Arhitektura aplikace}
+  \label{boiler-net}
+\end{figure}
 
 Aby tento navrh co nejpresneji odpovidal realite, bylo rozhodnuto namodelovat chovani teploty v pokoji.
 Nejdrive musime vedet jak vykonne je topení v pokoji. Běžné hodnoty pro tři druhy pokujů mužete videt v nasledujici \hyperref[tab:TepelneZtraty]{tabulce}. Dale nas zajimaji tepelné ztraty a taky mnozstvi energii potrebne pro ohrati pokoje. Pro vypocet tohoto parametru pouzijeme nasledující vzorecek. Zakladni parametrem rozhodujicim o tepelnych kapacite pokoje je plocha vnitrniho povrchu pokoje $V$, respektive celkova plocha povrchu stopu, podlahy a sten. Pro ně je dulezte vědět koefficent ztrat tepla $K$. Zvlast se pocitaji okna a dvere, vzhledem k jejich vetshi teplovodivosti. Pak zbyva jenom zjistit rozdil současné teploty uvnitr pokoje a očekavane teploty pro tuto hodínu - $\Delta{T}$. To vsechno dosadime do vzorecku a zjistime celkové mnozstvi energii potrebne pro jeho ohrati. \cite{tep_calc}
@@ -382,7 +421,6 @@ Nejdrive musime vedet jak vykonne je topení v pokoji. Běžné hodnoty pro tři
   $Q[kW/h] = \frac{V*\Delta{T}*K}{860}$
 \end{center}
 
-Pro zjednoduseni vypoctu zanedbame parametry koefficentu ztrat tepla pro vsechny elementy, a vezmeme stredni hodnoty pro nekolik typickych druhu pokoju - kuchin, sklep a obyvaci pokoj. Kazdy z techto pokoju bude mit odlisny koefficent K a V. Pokoj bude mit 2 steny celici venku, kuchin bude mit 1. Pro sklep navic plati konstantni teplota vnejsiho prostredi, napriklad 5 stupnu. Taky se budeme pocitat s prijemnymi (skoro tropickymi) podminkami Ceske republiki - teplota venku je v prumeru v rozmezi 5 az 10 stupnu. \cite{cesko}
 Pak koefficenty vypadáji nasledně:
 
 \begin{table}[H]
@@ -395,14 +433,14 @@ Pak koefficenty vypadáji nasledně:
 		Typ pokoje & Koefficent tepelných ztrat & Objem $[m^3]$ & Očekavaný výkon topení $[W]$ \\
     \midrule
     Kuchin & 0.5 & $4*3*2.5$ & $1200$ \\
-    Pokoj & 0.6 & $6*4*2.5$ & $2300$ \\
+    Obývací pokoj & 0.6 & $6*4*2.5$ & $2300$ \\
     Sklep & 0.8 & $3*3*2.2$ & $300$ \\
 		\bottomrule
 	\end{tabular}
 	\label{tab:Parametry}
 \end{table}
 
-Na vypocet tepelnych ztrat pokoje jsem pouzil tento nastroj. \url{https://wpcalc.com/kalkulyator-teplopoter/}
+Na vypocet tepelnych ztrat pokoje jsem pouzil \href{https://wpcalc.com/kalkulyator-teplopoter/}{tento} nastroj.
 Vychazí to zhruba nasledne:
 
 \begin{table}[H]
@@ -424,10 +462,143 @@ Vychazí to zhruba nasledne:
 
 Cele chovani systému odpovida zákonu zachovaní energii, a tak muzeme odvodit rovnici pro vypocet potrebneho jeji mnozstvi.
 
+\subsection{Měření teploty venku}
+\label{subsec:mereni-teploty}
+Modelovani chovani teploty venku je stochasticky process, ktery neni mozne spocitat presne. Proto byla navyrzena Petriho sit, vyuzivajici pravděpodobnostní přechody. Ma na vstupu rozsah teplot den - noc, a podle vybrane doby dne, za pouziti funkcii $cos$ modeluje zmenu aktualni teploty. Rozhodnuti pouziti funkce $cos$ vychazi z jednoducheho pozorovani prubehu teplot behem dne, a pereodicita zmeny teplot ji trochu \href{https://forecast.weather.gov/MapClick.php?lat=42.3758&lon=-71.1187&lg=english&FcstType=graphical}{podobá}, za predpokladu ze prubeh funkce zacina v nejteplejsi hodinu, nebo alespoň modeluje spojitý průběh teplotních změn.
 
-Modelovani chovani teploty venku je stochasticky process, ktery neni mozne spocitat presne. Proto byla navyrzena Petriho sit, vyuzivajici pravděpodobnostní přechody. Ma na vstupu rozsah teplot den - noc, a podle vybrane doby dne, za pouziti funkcii $cos$ modeluje zmenu aktualni teploty. Rozhodnuti pouziti funkce $cos$ vychazi z jednoducheho pozorovani prubehu teplot behem dne, a pereodicita zmeny teplot ji trochu odpovida, za predpokladu ze prubeh funkce zacina v nejteplejsi hodinu. %https://forecast.weather.gov/MapClick.php?lat=42.3758&lon=-71.1187&lg=english&FcstType=graphical
-Pravděpodobnostní přechody modeluji nahodne jevy jako oteplení nebo ochlazení kvůli východu sluncie nebo jiné.
+Pravděpodobnostní přechody modeluji nahodne jevy jako oteplení nebo ochlazení kvůli východu sluncie nebo jiné. Vizuální reprezentací celé síťe můžete videt na obrázku \ref{thermometr-viz}.
 
+Obrázek \ref{thermometr-viz} byl vygenerovan v průběhu práci simulatoru, díky použítí rozšíření \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Toto rozšíření, spolu s měnšími vizualními změny jiných rozšíření, zaměřených na jednotlivé prvky sítě, dokáže spolehlívě vygenerovat obrázek Petrího sítě, podobný \ref{thermometr-viz}, v jakýkolív okámžík simulace. Táto síť je poměrně jednoduchá na pochopení, a zároveň ukazuje použítí většiny naimplementovaných rozšíření.
+
+Pro vytvoření obrázku je specifikován jednoduchý příkaz \pyth{draw("file.png")}, a celý \hyperref[code:thermometr-draw]{postup} vypadá následně:
+
+\begin{python}
+  # Import pluginu, knihovny SNAKES, viz (*\ref{code:plugin-setup}*) (*\label{code:thermometr-draw}*)
+  net_name="Thermometr"
+  n=PetriNet(net_name)
+  (*\ldots*) # Specifikace prechodu a mist: (*\ref{therm-gen-viz}*), (*\ref{therm-calc-viz}*) a (*\ref{prob-ev-viz}*)
+  n.draw(f"{path_to_img}/{net_name}.png")
+\end{python}
+
+\begin{python}
+  # Sit (*\ref{therm-gen-viz}*) (*\label{code:gen-therm-draw}*)
+  f=48 # Frekvence mereni behem dne
+  T=24*60*60/f # Perioda zmen teploty
+  k=0 # Citac pro generator
+  timeout=T
+  
+  # Deklarace globalnich promenych v ramci site
+  n.declare(f"f={f}") (*\label{code:snakes-glob-var}*)
+  
+  # Vytvoreni mist
+  gen=Place("Generator", [k], check=tInteger)
+  gen_k=Place("Generator_k", [], check=tInteger)
+  # Pridani mist do site
+  n.add_place(gen)
+  n.add_place(gen_k)
+
+  # Vytvoreni prechodu
+  takt=Transition("takt", timeout=timeout) (*\label{code:timed-temp-example}*)
+  takt.add_input(gen, Variable("k"))
+  takt.add_output(gen, Expression("(1 + k) % f"))
+  takt.add_output(gen_k, Variable("k"))
+  # A pridani do site
+  n.add_transition(takt)
+\end{python}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.4\textwidth]{obrazky-figures/therm-gen.png}
+  \caption{Generator doby dne.}
+  \label{therm-gen-viz}
+\end{figure}
+
+\begin{python}
+  # Sit (*\ref{therm-calc-viz}*)
+  # Globalni promene (*\label{code:therm-calc-draw}*)
+  low, high=5, 18
+  # Deklarace globalni knihovny a funkce pro vypocet teploty
+  n.declare("from math import cos, pi") (*\label{code:decl-libs}*)
+  n.declare("def temp_placement(Tmin, Tmax, k):" (*\label{code:decl-func}*)
+  "\n\tif k == 0:"
+  "\n\t\treturn float(format(Tmax, \".1f\"))"
+  "\n\telse:"
+  "\n\t\treturn float(format("
+  "Tmin + (Tmax-Tmin)*(cos(2*pi*k/f)/2 + 1/2)," (*\label{code:lib-import-usage}*)
+  "\".1f\"))")
+
+  # Vytvoreni mist
+  temp_pl=Place("Temp_placement", [(low, high)], check=tTuple)
+  traw=Place("Temperature_raw", [], check=tFloat)
+  n.add_place(temp_pl)
+  n.add_place(traw)
+
+  # Pridani prechodu
+  tcalc=Transition("tcalc")
+  tcalc.add_input(gen_k, Variable("k"))
+  tcalc.add_output(traw, Expression("temp_placement(Tmin, Tmax, k)"))
+  tcalc.add_input(temp_pl, Tuple((
+    Variable("Tmin"), Variable("Tmax"))))
+  tcalc.add_output(temp_pl, Tuple((
+    Variable("Tmin"), Variable("Tmax"))))
+  n.add_transition(tcalc)
+\end{python}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{obrazky-figures/calc.png}
+  \caption{Výpočet teploty pro danou doubu dne.}
+  \label{therm-calc-viz}
+\end{figure}
+
+\begin{python}
+  # Sit (*\ref{prob-ev-viz}*)
+  # Import globalnich knihoven (*\label{code:prob-ev-draw}*)
+  n.declare("from random import random")
+
+  # Pridani vystupnich mist
+  meas=Place("Measurement", [0.], check=tFloat)
+  n.add_place(meas)
+
+  # Nastaveni mista jako vystupni port
+  n.add_remote_output(meas, "temp_sens/Input temp")
+
+  trainy=Transition("trainy", prob=0.2) (*\label{code:prob-temp-example}*)
+  tsunny=Transition("tsunny", prob=0.2)
+  texpec=Transition("texpec", prob=0.6)
+  # Spojeni prechodu do skupiny
+  trainy.add_neighbour_transition(texpec)(*\label{code:prob-temp-neghb-example}*)
+  trainy.add_neighbour_transition(tsunny)
+
+  # Nahodna zmena teploty vedouci k ochlazeni
+  trainy.add_input(traw, Variable("Tnew"))
+  trainy.add_output(meas, Expression("Tnew-random()*2"))
+  n.add_transition(trainy)
+
+  # Teplota podle ocekavani
+  tsunny.add_input(traw, Variable("Tnew"))
+  tsunny.add_output(meas, Expression("Tnew+random()*2"))
+  n.add_transition(tsunny)
+
+  # Zvyseni teploty na porovnani s ocekavanou
+  texpec.add_input(traw, Variable("Tnew"))
+  texpec.add_output(meas, Variable("Tnew"))
+  n.add_transition(texpec)
+\end{python}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{obrazky-figures/measure.png}
+  \caption{Modelovaní náhodných změn templot.}
+  \label{prob-ev-viz}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.7\textwidth]{obrazky-figures/thermometr.png}
+  \caption{Simulace měření teploty.}
+  \label{thermometr-viz}
+\end{figure}
 
 \chapter{Závěr}
 \label{zaver}

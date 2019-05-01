@@ -1,7 +1,7 @@
 %==============================================================================
 % tento soubor pouzijte jako zaklad
 % this file should be used as a base for the thesis
-% Autoři / Authors: 2008 Michal Bidlo, 2018 Jaroslav Dytrych
+% Autoři / Authors: 2008 Michal Bidlo, 2019 Jaroslav Dytrych
 % Kontakt pro dotazy a připomínky: dytrych@fit.vutbr.cz
 % Contact for questions and comments: dytrych@fit.vutbr.cz
 %==============================================================================
@@ -112,40 +112,47 @@
 % This solves the problems with links which leads after the picture
 \usepackage[all]{hypcap}
 
+\usepackage{pythonhighlight}
+
+\lstset{numbers=left,
+firstnumber=1,
+numberfirstline=true,
+escapeinside={(*}{*)}}
+
 % Informace o práci/projektu / Information about the thesis
 %---------------------------------------------------------------------------
 \projectinfo{
   %Prace / Thesis
   project={BP},            %typ práce BP/SP/DP/DT/DR  / thesis type (SP = term project)
-  year={2018},             % rok odevzdání / year of submission
+  year={2019},             % rok odevzdání / year of submission
   date=\today,             % datum odevzdání / submission date
   %Nazev prace / thesis title
-  title.cs={Název práce},  % název práce v češtině či slovenštině (dle zadání) / thesis title in czech language (according to assignment)
-  title.en={Thesis title}, % název práce v angličtině / thesis title in english
+  title.cs={Interpret vysokoúrovňových Petriho sítí v Pythonu},  % název práce v češtině či slovenštině (dle zadání) / thesis title in czech language (according to assignment)
+  title.en={High-Level Petri Nets Interpreter in Pyhon}, % název práce v angličtině / thesis title in english
   %title.length={14.5cm}, % nastavení délky bloku s titulkem pro úpravu zalomení řádku (lze definovat zde nebo níže) / setting the length of a block with a thesis title for adjusting a line break (can be defined here or below)
   %Autor / Author
-  author.name={Jméno},   % jméno autora / author name
-  author.surname={Příjmení},   % příjmení autora / author surname 
+  author.name={Danil},   % jméno autora / author name
+  author.surname={Grigorev},   % příjmení autora / author surname 
   %author.title.p={Bc.}, % titul před jménem (nepovinné) / title before the name (optional)
   %author.title.a={Ph.D.}, % titul za jménem (nepovinné) / title after the name (optional)
   %Ustav / Department
-  department={UPGM}, % doplňte příslušnou zkratku dle ústavu na zadání: UPSY/UIFS/UITS/UPGM / fill in appropriate abbreviation of the department according to assignment: UPSY/UIFS/UITS/UPGM
+  department={UITS}, % doplňte příslušnou zkratku dle ústavu na zadání: UPSY/UIFS/UITS/UPGM / fill in appropriate abbreviation of the department according to assignment: UPSY/UIFS/UITS/UPGM
   % Školitel / supervisor
-  supervisor.name={Jméno},   % jméno školitele / supervisor name 
-  supervisor.surname={Příjmení},   % příjmení školitele / supervisor surname
-  supervisor.title.p={prof. RNDr.},   %titul před jménem (nepovinné) / title before the name (optional)
+  %, doc. Ing., Ph.D.
+  supervisor.name={Vladimír},   % jméno školitele / supervisor name 
+  supervisor.surname={Janoušek},   % příjmení školitele / supervisor surname
+  supervisor.title.p={doc. Ing.},   %titul před jménem (nepovinné) / title before the name (optional)
   supervisor.title.a={Ph.D.},    %titul za jménem (nepovinné) / title after the name (optional)
   % Klíčová slova / keywords
-  keywords.cs={Sem budou zapsána jednotlivá klíčová slova v českém (slovenském) jazyce, oddělená čárkami.}, % klíčová slova v českém či slovenském jazyce / keywords in czech or slovak language
-  keywords.en={Sem budou zapsána jednotlivá klíčová slova v anglickém jazyce, oddělená čárkami.}, % klíčová slova v anglickém jazyce / keywords in english
+  keywords.cs={Petriho síť, Python, HLPN, simulace, simulator, topení, interpret, real-time, SNAKES, graf}, % klíčová slova v českém či slovenském jazyce / keywords in czech or slovak language
+  keywords.en={Petri Net, Python, HLPN, simulation, interpret, real-time, SNAKES, graph}, % klíčová slova v anglickém jazyce / keywords in english
   %keywords.en={Here, individual keywords separated by commas will be written in English.},
   % Abstrakt / Abstract
-  abstract.cs={Do tohoto odstavce bude zapsán výtah (abstrakt) práce v českém (slovenském) jazyce.}, % abstrakt v českém či slovenském jazyce / abstract in czech or slovak language
-  abstract.en={Do tohoto odstavce bude zapsán výtah (abstrakt) práce v anglickém jazyce.}, % abstrakt v anglickém jazyce / abstract in english
+  abstract.cs={Tato práce je zaměřená na implementací interpretu vysokoúrovňových Petriho sítí v jayzce Python za použítí knihovny SNAKES. Je schopná provadění a pokročilé vizualizace navyřených sítí, které jsou popsané v jayzce Python. Vysledný simulator odpovidá zasadům distribuovaného systému, a podporuje provádí v realném čase. Konečný užívatel bude mít příležitost vyzkoušet intuitivní API pro vytvoření a spouštění vysokoúrovňových Petriho sítí.}, % abstrakt v českém či slovenském jazyce / abstract in czech or slovak language
+  abstract.en={This work is targeting a goal of implementing a high level Petri net interpret in Python. The implementation is based on SNAKES library. The final product is capable of executing and visualising Petri nets, created by user. The simulator is based on distributed systems theory and is executed in real-time. The end user is able to experience a simple and human-friendly API, made for creation and execution of High-Level Petri Nets.}, % abstrakt v anglickém jazyce / abstract in english
   %abstract.en={An abstract of the work in English will be written in this paragraph.},
   % Prohlášení (u anglicky psané práce anglicky, u slovensky psané práce slovensky) / Declaration (for thesis in english should be in english)
-  declaration={Prohlašuji, že jsem tuto bakalářskou práci vypracoval samostatně pod vedením pana X...
-Další informace mi poskytli...
+  declaration={Prohlašuji, že jsem tuto bakalářskou práci vypracoval samostatně pod vedením pana Janoušeka Vladimíra, doc. Ing., Ph.D.
 Uvedl jsem všechny literární prameny a publikace, ze kterých jsem čerpal.},
   %declaration={I declare that I have prepared this Bachelor´s/Master´s/dissertation thesis independently, under the supervision of ...
 % ... provided me with further information.
