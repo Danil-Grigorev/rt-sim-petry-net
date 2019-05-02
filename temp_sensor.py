@@ -1,29 +1,10 @@
 #!/usr/bin/python3.7
 
+from template import *
 import random
-import signal
-import snakes
-import snakes.plugins
-from simul import PNSim
-snakes.plugins.load(["gv", "sim_pl", "timed_pl", "prior_pl"], "snakes.nets", "plugins")
-from snakes.nets import *
-from plugins import *
-
-nodes = []
 
 
-class Terminate(Exception):
-    '''
-    Simulation end event, raised when SIGINT or SIGTERM
-    was captured.
-    '''
-    pass
-
-
-def terminate(*args):
-    raise Terminate
-
-def temp_sensor(run_id, name, expected):
+def temp_sensor(name, expected):
 
     n = PetriNet(name)
 
@@ -166,34 +147,15 @@ def temp_sensor(run_id, name, expected):
     n.add_remote_output(hen, 'boiler_logic/Sensory_input')
     n.add_remote_output(tupdate, 'TODO/TODO')
 
-    n.draw(f'nets_png/{run_id}/{name}-{rand_id}.png')
+    n.draw(f'nets_png/{name}.png')
 
     return n
 
+
 def execute():
-    sim = PNSim(detached=True)
-    sens = temp_sensor(sim.id, 'temp_sens', 21.0)
-
-    sens.add_simulator(sim)
-    sim.schedule_at([sim.execute_net, sens.name], PNSim.NOW)
-
-    sim.setup()
-    nodes.append(sim)
-    try:
-        sim.start()
-        for node in nodes:
-            node.join()
-    except Terminate:
-        for node in nodes:
-            node.kill = True
-        for node in nodes:
-            if node.is_alive():
-                node.wake()
-    for name, net in sim._nets.items():
-        net.draw(f'nets_png/{name}.png')
+    sens = temp_sensor('temp_sens', 21.0)
+    execute_nets(sens)
 
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGTERM, terminate)
-    signal.signal(signal.SIGINT, terminate)
     execute()

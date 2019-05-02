@@ -1,48 +1,38 @@
-#!/usr/bin/python3.7
+#!/usr/bin/python3
+import inspect
+from template import *
 
-import signal
-import snakes
-from snakes.nets import *   # Site, mista, prechody...
-from simul import PNSim     # Simulacni knihovna
-snakes.plugins.load(
-    ["gv", "timed_pl", "sim_pl", "prob_pl", "prior_pl"],
-    "snakes.nets",
-    "plugins") # Seznam rozsireni pro import
-from plugins import * # Redefinovane metody z rozsireni
-
-nodes = []
-
-class Terminate(Exception):
-    '''
-    Simulation end event, raised when SIGINT or SIGTERM
-    was captured.
-    '''
-    pass
+def temp_placement(Tmin, Tmax, k):
+    if k == 0:
+        return float(format(Tmax, ".1f"))
+    else:
+        return float(
+            format(Tmin + (Tmax-Tmin)*(cos(2*pi*k/f)/2 + 1/2), ".1f"))
 
 
-def terminate(*args):
-    raise Terminate
+def temp_generator(name, low, high, samples=48, speedup=1):
+    """
+    Jednoduchy generator vnejsiho prostredi - pocasi a casu
 
+    name -- jmeno site
+    low -- nejmensi teplota za den
+    high -- nejversi teplota za den
+    samples -- frekvence mereni teploty behem dne.
+    speedup -- nasobici argument pro beh casu
+    """
 
-def temp_generator(name, low, high, timeout):
     n = PetriNet(name)
 
-    f = 48 # Frekvence mereni behem dne
-    T = 24*60*60/f # Perioda zmen teploty
-    k = 0 # Citac pro generator
+    assert speedup >= 1
+    T = 24*60*60/samples/speedup  # Perioda zmen teploty
+    k = 0  # Citac pro generator
 
     n.declare('from math import cos, pi')
     n.declare('import time, random')
     n.declare('random.seed(time.time)')
     n.declare('from random import random as r')
-    n.declare(f'f = {f}')
-    n.declare('def temp_placement(Tmin, Tmax, k):'
-              '\n\tif k == 0:'
-              '\n\t\treturn float(format(Tmax, ".1f"))'
-              '\n\telse:'
-              '\n\t\treturn float(format('
-              'Tmin + (Tmax-Tmin)*(cos(2*pi*k/f)/2 + 1/2),'
-                '".1f"))')
+    n.declare(f'f = {samples}')
+    n.declare(inspect.getsource(temp_placement))
     temp_pl = Place('Temp_placement', [(low, high)], check=tTuple)
     gen = Place('Generator', [k], check=tInteger)
     gen_k = Place('Generator_k', [], check=tInteger)
@@ -54,7 +44,7 @@ def temp_generator(name, low, high, timeout):
     n.add_place(traw)
     n.add_place(meas)
 
-    takt = Transition('takt', timeout=timeout)
+    takt = Transition('takt', timeout=T)
     takt.add_input(gen, Variable('k'))
     takt.add_output(gen, Expression('(1 + k) % f'))
     takt.add_output(gen_k, Variable('k'))
@@ -95,29 +85,9 @@ def temp_generator(name, low, high, timeout):
 
 
 def execute():
-    sim = PNSim()
-    temp_gen = temp_generator('temp_gen', 5, 18, 30)
+    temp_gen = temp_generator(
+        'temp_gen', low=5, high=18, samples=100, speedup=100)
+    execute_nets(temp_gen, sim_id='Time-and-temperature')
 
-    temp_gen.add_simulator(sim)
-    sim.schedule_at([sim.execute_net, temp_gen.name], PNSim.NOW)
-
-    sim.setup()
-    nodes.append(sim)
-    try:
-        sim.start()
-        for node in nodes:
-            node.join()
-    except Terminate:
-        for node in nodes:
-            node.kill = True
-        for node in nodes:
-            if node.is_alive():
-                node.wake()
-    for name, net in sim._nets.items():
-        net.draw(f'nets_png/{name}.png')
-
-
-if __name__ == "__main__":
-    signal.signal(signal.SIGTERM, terminate)
-    signal.signal(signal.SIGINT, terminate)
+if __name__ == '__main__':
     execute()

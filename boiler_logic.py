@@ -1,26 +1,6 @@
 #!/usr/bin/python3.7
+from template import *
 
-import signal
-import snakes
-import snakes.plugins
-from simul import PNSim
-snakes.plugins.load(["gv", "sim_pl", "timed_pl", "prior_pl"], "snakes.nets", "plugins")
-from snakes.nets import *
-from plugins import *
-
-nodes = []
-
-
-class Terminate(Exception):
-    '''
-    Simulation end event, raised when SIGINT or SIGTERM
-    was captured.
-    '''
-    pass
-
-
-def terminate(*args):
-    raise Terminate
 
 def boiler_logic(name):
     n = PetriNet(name)
@@ -89,29 +69,8 @@ def boiler_logic(name):
     return n
 
 def execute():
-    sim = PNSim()
     boiler_log = boiler_logic('boiler_logic')
-
-    boiler_log.add_simulator(sim)
-    sim.schedule_at([sim.execute_net, boiler_log.name], PNSim.NOW)
-
-    sim.setup()
-    nodes.append(sim)
-    try:
-        sim.start()
-        for node in nodes:
-            node.join()
-    except Terminate:
-        for node in nodes:
-            node.kill = True
-        for node in nodes:
-            if node.is_alive():
-                node.wake()
-    for name, net in sim._nets.items():
-        net.draw(f'nets_png/{name}.png')
-
+    execute_nets(boiler_log)
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGTERM, terminate)
-    signal.signal(signal.SIGINT, terminate)
     execute()
