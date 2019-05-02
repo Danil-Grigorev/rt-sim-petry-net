@@ -89,21 +89,21 @@ Graf $HLPN$ ma následující vlastnosti:
   \item $Typy\:mist$ Každé místo musí mít přiraženy jeden typ. Množina typu nesmí byt prázdna.
   \item $Znackovani\:mist$: je kolekce prvku, které musejí odpovídat typu místa, ve kterém se nacházejí. Prvky se jmenuji $tokeny$ a můžou se opakovat.
   \item $Sipkove\:annotaci$: kazda šipka je anotovaná výrazem se sestavujícím z konstant, proměnách ($x, y$) nebo funkci($f(x)$). Kazda proměna je typovaná, a výrazy se provádějí přiražením hodnot ke každé ze proměnách. Vyhodnoceni výrazu produkuje kolekci prvku převzatých ze vstupního místa. Kolekce se muže opakovat.
-  \item $Podminky\:pro\:přechod$: jsou booleové výrazy ve tvaru $x < y$, které jsou zapsané v anotaci tranzite.
-  \item $Deklaraci$: Vytvářejí definici typu míst, funkci a promenych.
+  \item $Podminky\:pro\:přechod$: jsou booleově výrazy ve tvaru $x < y$, které jsou zapsané v anotaci tranzite.
+  \item $Deklaraci$: Vytvářejí definici typu míst, funkci a proměnách.
 \end{itemize}
 
 \subsection{Aplikace Petriho sítí}
 
 \subsection{Značkovaná Petriho sít}
-Rozsah míst kdě se dá applikovat Petriho sítě je velmí široký. Jako modelovací prostředek můžou sloužit například pro reprezentací vzorů interakce a vznikájicich konfliktů mezí člověkem a autopilotém letadla, jak je popsané v nasledujícím \href{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597}{článku}.
+Rozsah míst kdě se dá aplikovat Petriho sítě je velmi široký. Jako modelovací prostředek můžou sloužit například pro reprezentací vzorů interakce a vznikájicich konfliktů mezí člověkem a autopilotem letadla, jak je popsané v následujícím \href{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597}{článku}.
 
-Příkladem použiti značkované petriho sítí muže taky sloužit implementace \uv{Dining philosophers problem} \cite[p.65--67]{PNandMoS}, coz je problém poprvé představeny profesorem Dijkstrou v roce 1965.
+Příkladem použiti značkované petriho sítí muže taky sloužit implementace \uv{Dining philosophers problem} \cite[p.65--67]{PNandMoS}, což je problém poprvé představeny profesorem Dijkstrou v roce 1965.
 Je to obecné známy problém paralelismu, který názorné zobrazuje dva případy chyb vznikajících pri paralelním vypočtu - vyhladověni a uváznutí \cite{dining_philosophers}.
 
 \subsection{Vysokoúrovňová Petriho sit}
 
-V našem případě vysokoúrovňová Petriho síť modeluje a nasledně simuluje chování systému topení.
+V našem případě vysokoúrovňová Petriho síť modeluje a následně simuluje chování systému topení.
 
 \subsection{Distribuovaný system}
 \label{subsec:distr_system}
@@ -111,7 +111,7 @@ V našem případě vysokoúrovňová Petriho síť modeluje a nasledně simuluj
 \paragraph{Definice}
 
 Definice distribuovaného systému zni:
-Distribuovaný system je kolekce na sobe nezavislych pocitatcu, ktery konecny uzivatel vnima jako celek.
+Distribuovaný system je kolekce na sobe nezávislých počítačů, který konečný uživatel vnímá jako celek.
 % http://barbie.uta.edu/~jli/Resources/MapReduce&Hadoop/Distributed%20Systems%20Principles%20and%20Paradigms.pdf
 
 Distribuované systémy musejí používat decentralizované algoritmy, které požaduji následující:
@@ -122,14 +122,15 @@ Distribuované systémy musejí používat decentralizované algoritmy, které p
   \item Neprovádí se synchronizace podle globálních hodin.
 \end{enumerate}
 
-Z definice taky vypliva, ze distribuovany system se obecne sestavuje s vice se opakujicich prvku, ktere funguji nezavisle na sobe a nemaji pristup ke sdilene pameti, neboli kazdy prvek ma svoi vlastni. Sdileni stavu ve pripade distribovaneho systému se provadi pomoci zasilani zprav.
+Z definice taky vyplývá, ze distribuovaný system se obecně sestavuje s více se opakujících prvku, které funguji nezávisle na sobe a nemají přistup ke sdílené paměti, neboli kazdy prvek ma svob vlastni. Sdíleni stavu ve případe distribuovaného systému se provádí pomoci zasílaní zprav.
 
-Tento koncept je velice pouzitelny pro modelovani. Prvky budou reprezentovany Petriho siťěmi, provazane komunikacnimi kanaly. Jelikoz kazda petriho sit je prvek nezavisly na vnejsich podminkach, ale jen na soucasnem stavu mist a přechodu a taky jejich kombinaci, tak se da to prohlasit decentralizovanym algoritmem. Petriho sit si muzeme predstavit jako nezavisly blok, kdyzto pro kommunikaci mezi temito bloky se da pouzit protokol \href{http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/csprd02/mqtt-v3.1.1-csprd02.html}{MQTT}, ktery diky svym vlastnostem dokaze obslouzit neomezene mnozstvi klientu najednou. Pripad implementace tepelneho rizeni(odkaz) nazorne ukazuje pouziti dane myslenky na praktice.
+Tento koncept je velice použitelný pro modelovaní. Prvky budou reprezentovaný Petriho sítěmi, provázané komunikačními kanály. Jelikož kazda petriho sit je prvek nezávislý na vnějších podmínkách, ale jen na současném stavu mist a přechodu a taky jejich kombinaci, tak se da to prohlásit decentralizovaným algoritmem. Petriho sit si můžeme představit jako nezávislý blok, kdežto pro komunikaci mezi těmito bloky se da použit protokol \href{http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/csprd02/mqtt-v3.1.1-csprd02.html}{MQTT}, který díky svým vlastnostem dokaze obsloužit neomezené množství klientu najednou. Případ implementace tepelného řízeni \ref{sec:tepelne-rizeni} názorné ukazuje použiti dane myšlenky na praktice.
+
 \subsection{Simulace}
-\subsection{Diskretni simulace}
+\subsection{Diskrétní simulace}
 Diskrétní simulace je založena ve svém základu na algoritmu známém pod názvem \uv{NextEvent}. Tento algoritmus se řídí nasledujícím pseudokodem:
 \begin{algorithm}
-  \caption{Diskretni simulace}\label{euclid}
+  \caption{Diskrétní simulace}\label{euclid}
   \begin{algorithmic}[1]
   \State $\text{nainicializuj simulaci, cas a planovac udalosti}$
   \While {dokud je naplánovaná událost}
@@ -165,12 +166,12 @@ Simulace v reálném čase upravena pro účely tohoto projektu je založena na 
 \end{algorithmic}
 \end{algorithm}
 
-Tento algoritmus nachází svoje použiti ve mnoha simulačních případech. Běžný příklad použiti - počítačové hry, kde uživatele zaujme herní prostředí, které simuluje reální svět, včetně časové roviny. Simulace v reálném čase se taky používá, kdy obyčejné diskrétní simulace nestačí a cas není zanedbatelný. Uživatel muže chtít sledovat system v průběhu simulace, za účelem zjištěni anomálii v chovaní jeho prvku nebo zvýšeni kvality systému prev jeho nasazením do provozu. Takový přistup se používá ve případě simulace \hyperref[subsec:hwil]{\uv{Hardware-in-the-loop}}.
+Tento algoritmus nachází svoje použiti ve mnoha simulačních případech. Běžný příklad použiti -- počítačové hry, kde uživatele zaujme herní prostředí, které simuluje reální svět, včetně časové roviny. Simulace v reálném čase se taky používá, kdy obyčejné diskrétní simulace nestačí a cas není zanedbatelný. Uživatel muže chtít sledovat system v průběhu simulace, za účelem zjištěni anomálii v chovaní jeho prvku nebo zvýšeni kvality systému prev jeho nasazením do provozu. Takový přistup se používá ve případě simulace \hyperref[subsec:hwil]{\uv{Hardware-in-the-loop}}.
 
 \subsection{Hardware-in-the-loop(HWIL)}
 \label{subsec:hwil}
 
-Hardware-in-the-loop nebo $HIL$ je technika používaná pro vývoj a testovaní řídicích častí komplexních systémů. Díky níž se fyzické častí systému nahrazují jejích simulaci a umožňují plynulé testovaní ještě před nasazením do provozu \cite{hil}.
+Hardware-in-the-loop nebo HIL je technika používaná pro vývoj a testovaní řídicích častí komplexních systémů. Díky níž se fyzické častí systému nahrazují jejích simulaci a umožňují plynulé testovaní ještě před nasazením do provozu \cite{hil}.
 
 \subsection{MQTT protokol}
 \label{subsec:mqtt-proto}
@@ -191,6 +192,16 @@ Broker je server, obsluhující klienty, navazuje spojeni s klientem a provádí
 \label{par:topic}
 
 Kazda zprava posílaná klientem se nepředává primo dalšímu klientovi, ale obsluhuje se brokerem. Zprava musí mit specifikované téma, podle které broker určí, kterým klientům tu zprávu musí přeposlat. Takové téma je obvykle unikátní textový řetězec, který bude následně odebírat jeden či více klientů.
+
+Zvláštní význam má, ve případě MQTT tématu, znak \uv{\#} (U+0023). Téma se obecně skládá z 1 až několika řetězců, které jsou oddělené znakem \uv{/} (U+002F). Pokud takové téma končí značkou \uv{\#}, tak je výsledek totožný z \uv{wildcard} znakem \uv{*} (U+002A) z \href{https://en.wikipedia.org/wiki/Regular_expression}{regulárních výrazů}.
+
+\begin{tabbing}
+ Příklad: \= \\
+ \> \texttt{net1/\#} -- přijímá zprávy na téma \texttt{net1}, \texttt{net1/port1}, \texttt{net1/port1/log} atd.\\
+ \> \texttt{net2/portX} -- přijímá zprávy jenom na téma \texttt{net2/portX}. \\
+\end{tabbing}
+
+Příklady aplikace tohoto pojmu můžete vidět na příkladě \ref{code:remote-in-out}, nebo jiných aplikací \todo{}.
 
 \paragraph{Zpráva}
 \label{par:message}
@@ -228,7 +239,7 @@ Zvláštní vlastnosti \texttt{SNAKES} je možnost implementace vlastních rozš
 
 \subsection{Implementace MQTT}
 \label{subsec:mqtt_impl}
-Pro implementací mqtt klientu v simulatoru byla použitá knihovna \href{https://pypi.org/project/paho-mqtt/}{\texttt{paho-mqtt}}. Tato knihovna obsahuje všechno potřebné pro nastavení komunikačních kanálů mezí porty vzdalených Petriho sítí. Na základě použití této knihovny konečný uživatel může nastavit zvolené místo v Petriho sítí jako vstupní nebo vystupní port. viz \ref{code:remote-in-out}. Jejích vzhled je nasledující:
+Pro implementací mqtt klientu v simulátoru byla použitá knihovna \href{https://pypi.org/project/paho-mqtt/}{\texttt{paho-mqtt}}. Tato knihovna obsahuje všechno potřebné pro nastavení komunikačních kanálů mezí porty vzdálených Petriho sítí. Na základě použití této knihovny konečný uživatel může nastavit zvolené místo v Petriho sítí jako vstupní nebo výstupní port. viz \ref{code:remote-in-out}. Jejích vzhled je následující:
 \begin{figure}[hbt]
   \centering
   \includegraphics[width=0.5\textwidth]{obrazky-figures/port-in.png}
@@ -245,30 +256,30 @@ Pro implementací mqtt klientu v simulatoru byla použitá knihovna \href{https:
 
 Jak si můžete povšimnout, na rozdíl od ostatních míst sítě, vstupní a výstupní porty se označují barvou a dodatečným popisem. Pro vstupní port \ref{port-in} je to \texttt{Listening on: NET/TOPIC} a zelení barva, \texttt{Sending to: NET/TOPIC} pro výstupní \ref{port-out}. Ten, ve své řáde je označen červeně.
 
-Je předem definované, že každá simulační instance odebírá zprávy z tématu \texttt{control}. Je to ekvivalent broadcastové adresy u IP.
+Je předem definované, že každá simulační instance odebírá zprávy z tématu \texttt{control}. Je to ekvivalent broadkastové adresy u IP.
 
-Implementace zevnítř vypadá podobně reprezentací samotných portů. Sít, pří volaní metody \texttt{add\_remote\_input} nastaví týp místa na vstupní, pak pošle zprávu na téma \texttt{control} obsahující dvojicí [jméno sítě, jméno místa], a uloží zprávu do čekací fronty. Pak, když se k brokeru přípojí nějaká simulační instance s požadovanou dvojící síť--místo, tak se to oznamí všem ostatním simulačním instancím. To se zase provede zasilaním zprávy na téma \texttt{control}. Hned po příjetí takové zprávy se port nastaví a bude vykonavat svou čínnost.
+Implementace zevnitř vypadá podobně reprezentací samotných portů. Sít, pří volaní metody \texttt{add\_remote\_input} nastaví týp místa na vstupní, pak pošle zprávu na téma \texttt{control} obsahující dvojicí [jméno sítě, jméno místa], a uloží zprávu do čekací fronty. Pak, když se k brokeru přípojí nějaká simulační instance s požadovanou dvojicí síť--místo, tak se to oznámí všem ostatním simulačním instancím. To se zase provede zasíláním zprávy na téma \texttt{control}. Hned po příjetí takové zprávy se port nastaví a bude vykonávat svou činnost.
 
 \subsubsection{Směřování}
-Na jeden vstupní port může být přípojeno 0 až několík vystupních portů, nebo jinymí slovy vstupní port příjma všechny zprávy na svoje temá.
+Na jeden vstupní port může být přípojeno 0 až několik výstupních portů, nebo jinými slovy vstupní port přijímá všechny zprávy na svoje téma.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.7\textwidth]{obrazky-figures/Port-routing.pdf}
-  \caption{Úkazka směřovaní zpráv.}
+  \caption{Ukázka směřovaní zpráv.}
   \label{route-viz}
 \end{figure}
 
-Na danem výše obrázku \ref{route-viz} můžete vidět ukázku směřovaní zpráv mezí porty. \texttt{AAA}, \texttt{BBB} a \texttt{CCC} jsou identifikatory Petriho sítí v ramcí jedného brokeru. Ve případě že se dvojice síť--port se vyskituje vícekrát, zprávy se přeposilají všem instancím. To si můžete všimnout na příkladu sítě \texttt{CCC}, která je na obrázku \ref{route-viz} dvakrát.
+Na danem výše obrázku \ref{route-viz} můžete vidět ukázku směřovaní zpráv mezí porty. \texttt{AAA}, \texttt{BBB} a \texttt{CCC} jsou identifikátory Petriho sítí v rámci jedeného brokeru. Ve případě že se dvojice síť--port se vyskytuje vícekrát, zprávy se přeposílají všem instancím. To si můžete všimnout na příkladu sítě \texttt{CCC}, která je na obrázku \ref{route-viz} dvakrát.
 
-Na obrázku jsou 6 vstupních portů a 5 výstupních. Vstupní porty jsou označené zeleně, výstupní červeně. Jak je vidět na příklade dvoujic \texttt{CCC/IN1} a \texttt{CCC/DATA}, dvoující nemusí být unikatní. Počet přípojených výstupních portu k jednému vstupnímu není nějak omezen. Je to dosažene použítím vlastností MQTT klientu popsané v \ref{par:topic}.
+Na obrázku jsou 6 vstupních portů a 5 výstupních. Vstupní porty jsou označené zeleně, výstupní červeně. Jak je vidět na příklade dvojic \texttt{CCC/IN1} a \texttt{CCC/DATA}, dvojicí nemusí být unikátní. Počet přípojených výstupních portu k jedenému vstupnímu není nějak omezen. Je to dosažené použitím vlastností MQTT klientu popsané v \ref{par:topic}.
 
-Na příkladě vstupního portu \texttt{log} můžete vidět že není povinné, aby ten port byl zapojený. Ve případě simulatoru takový port nebude přiřázen do skupíny vstupních portů, dokud se neobjeví nějaka applikace nebo síť, požadující přijetí a odesílaní zpráv na téma, kterou ten port odebírá. Více se o takovém nastavení viz \todo{ADD}
+Na příkladě vstupního portu \texttt{log} můžete vidět že není povinné, aby ten port byl zapojený. Ve případě simulátoru takový port nebude přiřazen do skupiny vstupních portů, dokud se neobjeví nějaká aplikace nebo síť, požadující přijetí a odesílaní zpráv na téma, kterou ten port odebírá. Více se o takovém nastavení viz \todo{ADD}
 
 \subsection{Vlastní protokol komunikace}
-Proto aby simulator měl podporu přídání vzdalených portů, zmíněnych v \ref{subsec:mqtt_impl} vznikla potřeba vymyslet vlastní protokol výměny informací. Ten protokol musí mít seznám zpráv pro takové simulační případy, kdy port musí předat nebo příjmout tokeny, nebo když se objeví instance Petriho síti v nějakém z už existujících či nově vytvořených simulačních úzlu. \todo{návod pro vytvoření takového}.
+Proto aby simulator měl podporu přidání vzdálených portů, zmíněných v \ref{subsec:mqtt_impl} vznikla potřeba vymyslet vlastní protokol výměny informací. Ten protokol musí mít seznám zpráv pro takové simulační případy, kdy port musí předat nebo přijmout tokeny, nebo když se objeví instance Petriho síti v nějakém z už existujících či nově vytvořených simulačních uzlů. \todo{návod pro vytvoření takového}.
 
-Nasledující tabulka \ref{tab:mqtt-msg-types} obsahuje přehled typů zpráv, a jejích formatu pro naplnění:
+Následující tabulka \ref{tab:mqtt-msg-types} obsahuje přehled typů zpráv, a jejích formátu pro naplnění:
 
 \begin{table}[H]
 	\vskip6pt
@@ -288,29 +299,38 @@ Nasledující tabulka \ref{tab:mqtt-msg-types} obsahuje přehled typů zpráv, a
 	\label{tab:mqtt-msg-types}
 \end{table}
 
-\paragraph{Update} Zprávy tohoto typu oznamují instancím simulatoru, jestli se v jejích okolí neobjevila nová Petriho síť, nebo naslouchající aplikace. Ve případě dodaní zprávy typu \uv{Update}, každá síť bude muset aktualizovat seznám svých aktivních portu, a ve případě že nějaký port čeká na nastavení, tak poslát požadavky na pro nově příchozího klienta. Poslední akcí je aktualizace tabulky znamých sití nově příchozího klienta, ve případě že klient není externí aplikace. Pro aplikaci je ten krok vynechan.
+\paragraph{Update} Zprávy tohoto typu oznamují instancím simulátoru, jestli se v jejích okolí neobjevila nová Petriho síť, nebo naslouchající aplikace. Ve případě dodaní zprávy typu \uv{Update}, každá síť bude muset aktualizovat seznám svých aktivních portu, a ve případě že nějaký port čeká na nastavení, tak poslat požadavky na pro nově příchozího klienta. Poslední akcí je aktualizace tabulky známých sítí nově příchozího klienta, ve případě že klient není externí aplikace. Pro aplikaci je ten krok vynechán.
 \todo{priklady}
 
-\paragraph{Request} \label{par:request} Tento týp zpráv nastavuje vstupní a výstupní porty. Parametr \uv{\texttt{R\_ACTION}} může nabývat hodnoty \texttt{set\_input} pro nastavení cíloveho místa \uv{\texttt{TARG\_PLACE}} jako vstupní port pro síť \uv{\texttt{TARG\_NET}}. Parametr \uv{\texttt{SRC\_NET}} a \uv{\texttt{SRC\_PLACE}} není v tom případě potřeba, stačí uvěst rozdelovač.
+\paragraph{Request} \label{par:request} Tento týp zpráv nastavuje vstupní a výstupní porty. Parametr \uv{\texttt{R\_ACTION}} může nabývat hodnoty \texttt{set\_input} pro nastavení cílového místa \uv{\texttt{TARG\_PLACE}} jako vstupní port pro síť \uv{\texttt{TARG\_NET}}. Parametr \uv{\texttt{SRC\_NET}} a \uv{\texttt{SRC\_PLACE}} není v tom případě potřeba, stačí uvést rozdělovač.
 
-Příklad: \texttt{R, set\_input, net1/port1, /}
+\begin{tabbing}
+  Příklad: \= \\
+  \>\texttt{R, set\_input, net1/port1, /}
+\end{tabbing}
 
-Pro nastavení výstupního portu stačí nastavit parametr \uv{\texttt{R\_ACTION}} na \texttt{set\_output} a dodát zdrojové místo a síť nastavením parametrů \uv{\texttt{SRC\_NET}} a \uv{\texttt{SRC\_PLACE}}.
+Pro nastavení výstupního portu stačí nastavit parametr \uv{\texttt{R\_ACTION}} na \texttt{set\_output} a dodat zdrojové místo a síť nastavením parametrů \uv{\texttt{SRC\_NET}} a \uv{\texttt{SRC\_PLACE}}.
 
-Příklad: \texttt{R, set\_output, net1/port1, net2/port2}
+\begin{tabbing}
+  Příklad: \= \\
+  \> \texttt{R, set\_output, net1/port1, net2/port2} \\
+\end{tabbing}
 
-\paragraph{Success} Táto zpráva se odesílá ve případě uspěšného zpracování nějakého požadavku z \ref{par:request}. Parametr \uv{\texttt{REQUEST\_COPY}} musí byt přesnou kopii příchozího požadavku.
+\paragraph{Success} Táto zpráva se odesílá ve případě úspěšného zpracování nějakého požadavku z \ref{par:request}. Parametr \uv{\texttt{REQUEST\_COPY}} musí byt přesnou kopii příchozího požadavku.
 
-Příklad: \texttt{S, R, set\_output, net1/port1, net2/port2}
+\begin{tabbing}
+  Příklad: \= \\
+  \> \texttt{S, R, set\_output, net1/port1, net2/port2} \\
+\end{tabbing}
 
-Příjetí odesílající stránou podtvrzovací zprávy Success, znamená že nastavení bylo uspěšné alespoň v jedném případě, což má za následek nastavení místa s jménem \texttt{port1} sítě \texttt{net1} jako výstupní port do \texttt{net2/port2}.
+Příjetí odesílající stranou potvrzovací zprávy Success, znamená že nastavení bylo úspěšné alespoň v jedněm případě, což má za následek nastavení místa s jménem \texttt{port1} sítě \texttt{net1} jako výstupní port do \texttt{net2/port2}.
 
-\subsection{Implementace pluginů}
+\subsection{Implementace rozšíření}
 \label{sec:plug-impl}
-Tento pododdil popisuje implementaci růyných pluginu pro knihovnu $SNAKES$, které zesnadnuji návrch Petriho sítí a její modelovaní. Každý z níže popsaných pluginu se da  použít v kodu po jejích importu podle tohoto \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu}.
+Tento pododdíl popisuje implementaci různých rozšíření pro knihovnu $SNAKES$, které znesnadňuji navrch Petriho sítí a její modelovaní. Každý z níže popsaných pluginů se da  použít v komu po jejích importu podle tohoto \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu}.
 
 \subsection{Návod pro import rozšíření}
-Vzhledem k odlišnému postupu pří přídání rozšíření do SNAKES, pro import simulačního nástroje a dalších rozšíření ze skupíny, užívatel musí dodřet správné pořadí pri importu knihoven. Konvence probíhá nasledujícím způsobem.
+Vzhledem k odlišnému postupu pří přidání rozšíření do SNAKES, pro import simulačního nástroje a dalších rozšíření ze skupiny, uživatel musí dodrat správné pořadí pri importu knihoven. Konvence probíhá následujícím způsobem.
 
 \begin{python}
   from snakes.nets import *   # Site, mista, prechody... (*\label{code:snakes-all}*) (*\label{code:plugin-setup}*)
@@ -323,15 +343,15 @@ Vzhledem k odlišnému postupu pří přídání rozšíření do SNAKES, pro im
 \end{python}
 
 \begin{enumerate}
-  \item Pridani knihovny snakes a její prvků \ref{code:snakes-all}.
-  \item Import simulační knihovny, která poskytné základ pro pluginy \ref{code:pnsim}.
-  \item Přidaní pluginů podle požadovaných vlastností síte \ref{code:sim-plugins}. Ze skupíny doporučených pluginů stojí za zmínku plugin \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Více o jeho použítí v ramcí simulatoru viz.\ref{subsec:mereni-teploty}. Zbýtek je popsán v dalších sekcích \ref{subsec:timed_pl}.
-  \item Pro redefinici a přidání nových metod z rozšíření slouží řádek \ref{code:pl-import}. Od dané chvilí použítí knihovný SNAKES je stejné jako v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu} a taky \todo{Muj navod}.
+  \item Přidaní knihovny snakes a její prvků \ref{code:snakes-all}.
+  \item Import simulační knihovny, která poskytne základ pro rozšíření \ref{code:pnsim}.
+  \item Přidaní pluginů podle požadovaných vlastností sítě \ref{code:sim-plugins}. Ze skupiny doporučených pluginů stojí za zmínku plugin \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Více o jeho použití v rámci simulátoru viz.\ref{subsec:mereni-teploty}. Zbytek je popsán v dalších sekcích \ref{subsec:timed_pl}.
+  \item Pro redefinici a přidání nových metod z rozšíření slouží řádek \ref{code:pl-import}. Od dané chvílí použití knihovny SNAKES je stejné jako v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu} a taky \todo{Muj navod}.
 \end{enumerate}
 
 \subsubsection{Plugin \texttt{timed\_pl}}
 \label{subsec:timed_pl}
-Toto rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tranzice do budoucna. Toto rozsireni pouziva jednoduchou logiku pro provedeni přechodu - ve chvili kdy přechod bude spustitelny, tak se zapne casovac a zkonzumuji odpovidajici tokeny ze vstupnich mist. Cekani se neresetuje pridanim dalsich tokenu do vstupnich mist. Ve pripade teto implementace přechod vezme noveprichozi tokeny, ktere se objeví ve vstupních mistech a tudiž zápnou tranzici. Po ukonceni cekani, tokeny budou preneseny do výstupnich mist, s nasledujcimi upravami, ktere můžou nastat podle definice HLPN \ref{sec:hlpn}.
+Toto rozšířeni používá plánovač události pro spolehlivé plánovaní spouštěni tranzite do budoucna. Toto rozšířeni používá jednoduchou logiku pro provedeni přechodu - ve chvíli kdy přechod bude spustitelný, tak se zapne časovač a zkonzumuji odpovídající tokeny ze vstupních mist. Čekaní se neresetuje přidáním dalších tokenů do vstupních mist. Ve případe teto implementace přechod vezme nověpříchozí tokeny, které se objeví ve vstupních místech a tudíž zapnou přechod. Po ukončeni čekaní, tokeny budou přeneseny do výstupních mist, s následujícími úpravami, které můžou nastat podle definice HLPN \ref{sec:hlpn}.
 
 
 \begin{python}
@@ -339,7 +359,7 @@ Toto rozsireni pouziva planovac udalosti pro spolehlive planovani spousteni tran
   pr1=Transition("Timed-transition", timeout=30) (*\label{code:timed-example}*)
 \end{python}
 
-Pro vytvaření takového přechodu stačí zadat parametr \texttt{timeout} do klauzule pro vytvoření přechodu - \texttt{Transition} jak je ukázano na řádku \ref{code:timed-example}. Hodnota \texttt{timeout} se uvádí v sekundách. Výsledný tvár nasledujícího přechodu je na obrázku \ref{timed-transition}. Ukázku použítí ve funkčním příkladě můžete vidět \hyperref[code:timed-temp-example]{dále}.
+Pro vytváření takového přechodu stačí zadat parametr \texttt{timeout} do klauzule pro vytvoření přechodu - \texttt{Transition} jak je ukázano na řádku \ref{code:timed-example}. Hodnota \texttt{timeout} se uvádí v sekundách. Výsledný tvár nasledujícího přechodu je na obrázku \ref{timed-transition}. Ukázku použítí ve funkčním příkladě můžete vidět \hyperref[code:timed-temp-example]{dále}.
 
 \begin{figure}[hbt]
   \centering
@@ -402,10 +422,14 @@ Stejně tak podporuje nastavení vzdalených portů pro předaní tokenů jiným
 
 
 \subsection{Planovac udalosti}
-\url{https://docs.python.org/3/library/heapq.html}
-Planovac udalosti je naimplementovan jako prioritni fronta za vyuziti vestavene knihovny heapq v Pythonu. Api naznacuje ze pro pridani a vyberu prvku se pouzivaji metody $heappush$ a $heappop$. \url{https://docs.python.org/3/library/heapq.html#theory} Priorita v takove fronte se urcuje ciselnou hodnotou, ktera se vklada do fronty. Tato hodnota muze byt prvnim prvkem v seznamu elementu. Druhym parametrem pro urceni priority je poradi, ve kterem prvek byl vlozen. Tato sada pravidel umoznuje vkladat zaznamy, obsahujici cas spusteni jako prvni prvek, a podle toho se zaradi na prisluhujici misto ve fronte. Metoda $heappop$ vybere prvek ze seznamu s nejvyssi prioritou, coz bude element s nejnizsi hodnotou casu.
+\label{subsec:event-planner}
+Plánovač události je naimplementován jako prioritní fronta za využiti vestavěné knihovny \href{https://docs.python.org/3/library/heapq.html}{\texttt{heapq}} v Pythonu. Api naznačuje ze pro přidaní a vyberu prvku se používají metody \texttt{heappush} a \texttt{heappop}. Priorita v takové frontě se určuje číselnou hodnotou, která se vkládá do fronty. Tato hodnota muže byt prvním prvkem v seznamu elementu. Druhým parametrem pro určeni priority je poradí, ve kterém prvek byl vložen. Tato sada pravidel umožňuje vkládat záznamy, obsahující čas spuštěni jako první prvek, a podle toho se zařadí na přisluhující místo ve frontě. Metoda \texttt{heappop} vybere prvek ze seznamu s nejvyšší prioritou, což bude element s nejnižší hodnotou času.
+
+
 \chapter{Aplikace}
+
 \section{Tepelne rizeni}
+\label{sec:tepelne-rizeni}
 Pro demonstraci praci simulatoru bylo rozhodnuto namodelovat dystribovany system modelujici chovani topení, ktey nekteri z vas pravdepodobne pouzivaji u sebe doma. Takovy system se sestavuje z nekolika casti. Zakladnim prvkem je plynovy spotrebic, nebo karma. Ta ohriva vodu a uvadi ji do pohybu po potrubich. Pak kazdy z pokoju ma na starosti tepelené čidlo a rizeni, ktere udrzuje v pokoji nastavenou teplotu podle calendare. Kazdou hodinu se z tabulky teplot vezme aktualni teplota pro soucasnou hodiny a tento pokoj, pak rizeni rozhodne jestli ma zapnout topení nebo ne. Pokud zadny z pokoju v soucasne dobe nema zapnute topení, tak karma se musi vypnout za ucelem setreni plynu. Toto rizeni provadi vestaveny system, nebo je zcela mechanicky. Kazdy z tech prvku bude dale namodelovan Petriho siťěmi. Pro pochopení struktury viz. \ref{boiler-net}.
 
 \begin{figure}[htb]

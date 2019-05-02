@@ -27,20 +27,21 @@ def terminate(*args):
 def temp_generator(name, low, high, timeout):
     n = PetriNet(name)
 
-    f = 48
-    T = 24*60/f
-    k = 0
+    f = 48 # Frekvence mereni behem dne
+    T = 24*60*60/f # Perioda zmen teploty
+    k = 0 # Citac pro generator
 
-    n.declare('import math')
-    n.declare('import random, time')
+    n.declare('from math import cos, pi')
+    n.declare('import time, random')
     n.declare('random.seed(time.time)')
+    n.declare('from random import random as r')
     n.declare(f'f = {f}')
     n.declare('def temp_placement(Tmin, Tmax, k):'
               '\n\tif k == 0:'
               '\n\t\treturn float(format(Tmax, ".1f"))'
               '\n\telse:'
               '\n\t\treturn float(format('
-              'Tmin + (Tmax-Tmin)*(math.cos(2*math.pi*k/f)/2 + 1/2),'
+              'Tmin + (Tmax-Tmin)*(cos(2*pi*k/f)/2 + 1/2),'
                 '".1f"))')
     temp_pl = Place('Temp_placement', [(low, high)], check=tTuple)
     gen = Place('Generator', [k], check=tInteger)
@@ -75,11 +76,11 @@ def temp_generator(name, low, high, timeout):
     trainy.add_neighbour_transition(tsunny)
 
     trainy.add_input(traw, Variable('Tnew'))
-    trainy.add_output(meas, Expression('Tnew-random.random()*2'))
+    trainy.add_output(meas, Expression('Tnew-r()*2'))
     n.add_transition(trainy)
 
     tsunny.add_input(traw, Variable('Tnew'))
-    tsunny.add_output(meas, Expression('Tnew+random.random()*2'))
+    tsunny.add_output(meas, Expression('Tnew+r()*2'))
     n.add_transition(tsunny)
 
     texpec.add_input(traw, Variable('Tnew'))
