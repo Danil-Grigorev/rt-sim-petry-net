@@ -5,10 +5,30 @@
 % Placing of table of contents of the memory media here should be consulted with a supervisor
 %\chapter{Obsah přiloženého paměťového média}
 
-%\chapter{Manuál}
+\chapter{Instalační manuál}
 
-%\chapter{Konfigurační soubor} % Configuration file
+Pokud byste potřebovali odzkoušet simulační nástroj z této práci, tak bych doporučoval udělat této kroky instalace.
+\begin{enumerate}
+    \item Nainstalovat si balíčky \texttt{python3.6}, \texttt{graphviz}, \texttt{python3-pip}, \texttt{git}.
+    \item Nainstalovat knihovnu SNAKES podle nějakého z postupu v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu}. \label{pip-snakes}
+    Doporučený postup, nainstalovat to přes pip:
 
-%\chapter{RelaxNG Schéma konfiguračního souboru} % Scheme of RelaxNG configuration file
+    \texttt{pip3 install git+git://github.com/fpom/snakes \-\-user}.
+    \item Nainstalovat této knihovny přes \texttt{pip3 install xxx \-\-user} pro podporu MQTT, kde \texttt{xxx} je:
+    \begin{itemize}
+        \item \texttt{pahomqtt}
+        \item \texttt{hbmqtt}
+    \end{itemize}
+    \item Naklonovat git repositář simulační knihovny do libovolného místa na disku:
 
-%\chapter{Plakát} % poster
+    \href{https://github.com/Danil-Grigorev/rt-sim-petry-net}{\texttt{https://github.com/Danil-Grigorev/rt-sim-petry-net}}.
+    \item Provést potřebné úpravy pro rozšíření \uv{gv} v poslední verzí knihovny SNAKES, a nakopírovat jiné rozšíření do složky pro rozšíření. Tá se obecně po kroku \ref{pip-snakes} nachází v \texttt{$\sim$/.local/lib/python3.6/site-packages/snakes/plugins}, ale může se to lišit v závislosti od nastavení balíčku Python. Seznám rozšíření pro kopírovaní/nahrazení ze složky \texttt{rt-sim-petry-net/plugins} je následující:
+    \begin{itemize}
+        \item \texttt{prior\_pl.py}
+        \item \texttt{prob\_pl.py}
+        \item \texttt{sim\_pl.py}
+        \item \texttt{timed\_pl.py}
+        \item \texttt{gv.py}
+    \end{itemize}
+
+\end{enumerate}

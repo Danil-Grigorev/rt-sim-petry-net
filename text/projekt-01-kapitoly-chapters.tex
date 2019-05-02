@@ -396,7 +396,12 @@ Tato sekvence vytvoří nasledující zobrazení - \ref{prob-transition}.
 
 \subsubsection{Plugin \texttt{prior\_pl}}
 \label{subsec:prior_pl}
-Tento plugin je urceny pro pridani priorit k pechodum v siti. Podle nastavene priority se behem simulace bude rozhodovat, ktere tranzice se vyhodnoti a provedou jako prvni. Priority můžou byt v rozsahu 0 -- 100, a radi se sestupne. Pro nastaveni priority element `Transition` má dodatečný a nepovinný parametr `prior`. 
+Tento plugin je určeny pro přidaní prioritních pochodů do Petriho sítě. Podle nastavené priority se během simulace bude rozhodovat, který přechod se vyhodnotí a provede jako první. Priority můžou byt v rozsahu 0 -- 100, a radí se sestupné. Pro nastaveni priority element \texttt{Transition} má dodatečný a nepovinný parametr \texttt{prior} -- \ref{code:prior-transition-example}.
+\begin{python}
+  # Ukazka prioritniho prechodu
+  tr=Transition('Enable boiler', prior=1) (*\label{code:prior-transition-example}*)
+\end{python}
+
 \begin{figure}[hbt]
   \centering
   \includegraphics[width=0.3\textwidth]{obrazky-figures/prior-transition.png}
