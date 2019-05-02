@@ -26,7 +26,7 @@ class PNSim(Thread):
     barier = None
     wake_event = Condition()
 
-    def __init__(self, broker="127.0.0.1", detached=False):
+    def __init__(self, *, broker="127.0.0.1", simul_id=None, detached=True):
         self._nets = {}
         self.end_time = PNSim.INF
         self.scheduler = Scheduler()
@@ -36,20 +36,22 @@ class PNSim(Thread):
         self.mqtt = Mqtt_client(self, broker)
         self.kill = False
         self.detached = detached    # If is True, topic messages will not be stored
-        self.id = self.setup_id()
+        self.id = self.setup_id(simul_id)
         Thread.__init__(self)
 
-    def setup_id(self):
-        rand_id = random.randint(0, 10000)
+    def setup_id(self, predefined_id=None):
+        if not predefined_id:
+            rand_id = f'sim_run-{random.randint(0, 10000)}'
+        else:
+            rand_id = predefined_id
         png_dir = os.path.dirname(__file__)
         png_dir = os.path.join(png_dir, 'nets_png')
         if not os.path.exists(png_dir):
             os.mkdir(png_dir)
-        run_id = f'sim_run_{rand_id}'
-        png_dir = os.path.join(png_dir, run_id)
+        png_dir = os.path.join(png_dir, rand_id)
         if not os.path.exists(png_dir):
             os.mkdir(png_dir)
-        return run_id
+        return rand_id
 
     def setup(self, end_time=INF):
         assert isinstance(end_time, (int, float))
