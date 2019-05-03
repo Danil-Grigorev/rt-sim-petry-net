@@ -5,11 +5,13 @@ from template import *
 def boiler_logic(name):
     n = PetriNet(name)
 
-    sin = Place('Sensory_input', [], check=tAll)
+    sin = Place('Sensory input', [], check=tAll)
     tabl = Place('Table', [], check=tTuple)
     atabl = Place('Active Table', [], check=tString)
     poll = Place('Poll state', [], check=tBlackToken)
     boien = Place('Boiler enabled', [False], check=tBoolean)
+    bost = Place('Boiler state', [], check=tBoolean)
+    n.add_place(bost)
     n.add_place(boien)
     n.add_place(poll)
     n.add_place(atabl)
@@ -54,15 +56,15 @@ def boiler_logic(name):
     enboil.add_input(boien, Variable('old_state'))
     enboil.add_output(boien, Value(True))
     enboil.add_output(atabl, Variable('name'))
+    enboil.add_output(bost, Value(True))
     n.add_transition(enboil)
 
     disboil = Transition('Disable boiler')
     disboil.add_input(poll, Variable('d'))
     disboil.add_input(boien, Variable('old_state'))
     disboil.add_output(boien, Value(False))
+    disboil.add_output(bost, Value(False))
     n.add_transition(disboil)
-
-    n.add_remote_input(sin, 'temp_sens/Enable_heater')
 
     n.draw(f'nets_png/{name}.png')
 

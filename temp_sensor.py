@@ -3,9 +3,9 @@
 from template import *
 
 def room_sens(room_name, starting_exp):
-    room_name = f'{room_name}-sensors'
-    n = PetriNet(room_name)
-    n.declare(f'name = "{room_name}"')
+    name = f'{room_name}-sensors'
+    n = PetriNet(name)
+    n.declare(f'name = "{name}"')
 
     table_up = Place('Table update', [], check=tFloat)
     exp_t = Place('Expected temperature', [starting_exp], check=tFloat)
@@ -36,25 +36,26 @@ def room_sens(room_name, starting_exp):
     up_exp.add_output(exp_t, Variable('Tnew'))
     n.add_transition(up_exp)
 
-    n.add_remote_input(temp_ins, 'kitchen-sim/Temperature updated')
-    n.add_remote_input(table_up, 'kitchen-table/expected_temp') # TODO: change
-    n.add_remote_output(val_st, 'boiler_logic/valve_state') # TODO: change
+    n.add_remote_input(
+        temp_ins, f'{room_name}-temperature-updater/Inside update')
+    # n.add_remote_input(table_up, f'{room_name}-temperature-table/expected_temp')
+    n.add_remote_output(val_st, 'boiler_logic/Sensory input')
     return n
 
 def room_outside_exchange(room_name):
-    room_name = f'{room_name}-outside-exchange'
-    n = PetriNet(room_name)
+    name = f'{room_name}-outside-exchange'
+    n = PetriNet(name)
 
     exch_time = 30  # Timeout for temp loss/gain update
     Qlps = 0.2  # W/s
-    n.declare(f'name = "{room_name}"')
+    n.declare(f'name = "{name}"')
     n.declare(f'Qlps = float({Qlps}) # W/s')
     n.declare(f'exch_time = float({exch_time})')
 
     temp_new = 12. # TODO: remove
 
     out_up = Place('Outside update', [temp_new], check=tFloat)
-    ins_up = Place('Inside update', [], check=tFloat)
+    ins_up = Place('Inside temp update', [], check=tFloat)
     to = Place('Temperature outside', [], check=tFloat)
     ti = Place('Temperature inside', [], check=tFloat)
     uout = Place('Update outside', [dot], check=tBlackToken)
@@ -107,15 +108,18 @@ def room_outside_exchange(room_name):
     comp_outside.add_output(twarm, Expression('Tin < Tout'))
     n.add_transition(comp_outside)
 
+    n.add_remote_output(qexch, f'{room_name}-temperature-updater/Q change')
+    n.add_remote_input(out_up, 'T outside generator/Measurement')
+
     return n
 
 def room_temp_update(room_name):
 
-    room_name = f'{room_name}-temperature-updater'
-    n = PetriNet(room_name)
+    name = f'{room_name}-temperature-updater'
+    n = PetriNet(name)
 
     q_per_cels = 17.5
-    n.declare(f'name = "{room_name}"')
+    n.declare(f'name = "{name}"')
     temp_start = 0.
 
     ti = Place('Temperature inside', [temp_start], check=tFloat)
@@ -144,17 +148,18 @@ def room_temp_update(room_name):
     n.add_transition(upd_ins)
 
     # TODO: Qchange - input
-    # TODO: Inside update - output
+    n.add_remote_output(
+        in_up, f'{room_name}-outside-exchange/Inside temp update')
 
     return n
 
 def room_heating(room_name):
-    room_name = f'{room_name}-heating'
-    n = PetriNet(room_name)
+    name = f'{room_name}-heating'
+    n = PetriNet(name)
 
     heat_time = 5  # Timeout for heater output update
     Qgps = 0.34  # W/s
-    n.declare(f'name = "{room_name}"')
+    n.declare(f'name = "{name}"')
     n.declare(f'Qgps = float({Qgps}) # W/s')
     n.declare(f'heat_time = float({heat_time})')
 
@@ -178,7 +183,9 @@ def room_heating(room_name):
     n.add_transition(heating)
 
     # TODO: Q gain -- output
-    # TODO: Headter update -- input
+    n.add_remote_output(qgain, f'{room_name}-temperature-updater/Q change')
+    # TODO: Heater update -- input
+    n.add_remote_input(h_upd, 'boiler_logic/Sensory input')
 
     return n
 

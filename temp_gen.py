@@ -77,7 +77,7 @@ def temp_generator(name, low, high, samples=48, speedup=1):
     texpec.add_output(meas, Variable('Tnew'))
     n.add_transition(texpec)
 
-    n.add_remote_output(meas, 'temp_sens/Input temp')
+    # n.add_remote_output(meas, 'temp_sens/Input temp')
 
     n.draw(f'nets_png/{name}.png')
 
@@ -86,7 +86,7 @@ def temp_generator(name, low, high, samples=48, speedup=1):
 
 def execute():
     temp_gen = temp_generator(
-        'temp_gen', low=5, high=18, samples=100, speedup=100)
+        'T outside generator', low=5, high=18, samples=100, speedup=100)
     execute_nets(temp_gen, sim_id='Surroundings-simulation')
 
 if __name__ == '__main__':
