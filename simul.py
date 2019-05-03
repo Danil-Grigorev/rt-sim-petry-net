@@ -159,12 +159,18 @@ class PNSim(Thread):
             if self.kill:
                 sys.exit()
             finished_execution = self.execute_groups(presorted_tr)
-        try:
-            net.draw(f'nets_png/{self.id}/{net.name}.png')
-        except:
-            pass
+        self.draw_net(net, act=True)
         net.send_tokens()
         self.wake()
+
+    def draw_net(self, net, act=False):
+        try:
+            if act:
+                net.draw(f'nets_png/{self.id}/{net.name}-current-state.png')
+            else:
+                net.draw(f'nets_png/{self.id}/{net.name}.png')
+        except:
+            pass
 
     def execute_groups(self, groups):
         finished_execution = True
