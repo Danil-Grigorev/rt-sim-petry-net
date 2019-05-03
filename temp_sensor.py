@@ -1,68 +1,78 @@
 #!/usr/bin/python3.7
 
 from template import *
-import random
 
+def room_sens(room_name, starting_exp):
+    room_name = f'{room_name}-sensors'
+    n = PetriNet(room_name)
+    n.declare(f'name = "{room_name}"')
 
-def temp_sensor(name, expected):
+    table_up = Place('Table update', [], check=tFloat)
+    exp_t = Place('Expected temperature', [starting_exp], check=tFloat)
+    temp_ins = Place('Temperature inside', [], check=tFloat)
+    val_st = Place('Valve state', [], check=tTuple)
+    n.add_place(table_up)
+    n.add_place(exp_t)
+    n.add_place(temp_ins)
+    n.add_place(val_st)
 
-    n = PetriNet(name)
+    h_dis = Transition('Heater disable', guard=Expression('Texp <= Tcurr'))
+    h_dis.add_output(val_st, Tuple([Expression('name'), Value(False)]))
+    h_dis.add_input(temp_ins, Variable('Tcurr'))
+    h_dis.add_input(exp_t, Variable('Texp'))
+    h_dis.add_output(exp_t, Variable('Texp'))
+    n.add_transition(h_dis)
 
-    n.declare('import random')
+    h_en = Transition('Heater enable', guard=Expression('Texp > Tcurr'))
+    h_en.add_output(val_st, Tuple([Expression('name'), Value(True)]))
+    h_en.add_input(temp_ins, Variable('Tcurr'))
+    h_en.add_input(exp_t, Variable('Texp'))
+    h_en.add_output(exp_t, Variable('Texp'))
+    n.add_transition(h_en)
 
-    rand_id = random.randint(0, 10000)
-    q_per_cels = 17.5
-    exch_time = 30 # Timeout for temp loss/gain update
-    heat_time = 5 # Timeout for heater output update
-    Qgps = 0.34 # W/s
-    Qlps = 0.2 # W/s
-    n.declare(f'name = "{name}-{rand_id}"')
-    n.declare(f'Qgps = float({Qgps}) # W/s')
+    up_exp = Transition('Update expected', prior=1)
+    up_exp.add_input(table_up, Variable('Tnew'))
+    up_exp.add_input(exp_t, Variable('Told'))
+    up_exp.add_output(exp_t, Variable('Tnew'))
+    n.add_transition(up_exp)
+
+    n.add_remote_input(temp_ins, 'kitchen-sim/Temperature updated')
+    n.add_remote_input(table_up, 'kitchen-table/expected_temp') # TODO: change
+    n.add_remote_output(val_st, 'boiler_logic/valve_state') # TODO: change
+    return n
+
+def room_outside_exchange(room_name):
+    room_name = f'{room_name}-outside-exchange'
+    n = PetriNet(room_name)
+
+    exch_time = 30  # Timeout for temp loss/gain update
+    Qlps = 0.2  # W/s
+    n.declare(f'name = "{room_name}"')
     n.declare(f'Qlps = float({Qlps}) # W/s')
     n.declare(f'exch_time = float({exch_time})')
-    n.declare(f'heat_time = float({heat_time})')
 
-    temp_new = 12.
-    temp_start = 0.
+    temp_new = 12. # TODO: remove
 
-    it = Place('Input temp', [temp_new], check=tFloat)
-    to = Place('Temperature outside', [temp_start], check=tFloat)
-    ti = Place('Temperature inside', [temp_start], check=tFloat)
-    tupdate = Place('Temperature updated', [], check=tFloat)
-    texp = Place('Temperature expected', [expected], check=tFloat)
-    hen = Place('Enable_heater', [], check=tTuple)
-    hstate = Place('Heater state', [], check=tBoolean)
-    heat_gen = Place('Heaters', [], check=tBlackToken)
+    out_up = Place('Outside update', [temp_new], check=tFloat)
+    ins_up = Place('Inside update', [], check=tFloat)
+    to = Place('Temperature outside', [], check=tFloat)
+    ti = Place('Temperature inside', [], check=tFloat)
     uout = Place('Update outside', [dot], check=tBlackToken)
-    texgen = Place('Exchange gener', [dot], check=tBlackToken)
     twarm = Place('Outside warmer', [], check=tBoolean)
     qexch = Place('Q exchange', [], check=tFloat)
-    qgain = Place('Q gain', [], check=tFloat)
-    q1c = Place('Q per C', [q_per_cels], check=tFloat)
-    deltat = Place('deltaT', [], check=tFloat)
-    n.add_place(hstate)
+    n.add_place(ins_up)
     n.add_place(uout)
-    n.add_place(qgain)
-    n.add_place(heat_gen)
-    n.add_place(tupdate)
-    n.add_place(deltat)
-    n.add_place(q1c)
     n.add_place(qexch)
     n.add_place(twarm)
-    n.add_place(texgen)
     n.add_place(to)
-    n.add_place(it)
+    n.add_place(out_up)
     n.add_place(ti)
-    n.add_place(hen)
-    n.add_place(texp)
 
     temp_gain = Transition(
         'Temperature gain',
         guard=Expression('Twarm == True'),
         timeout=exch_time)
     temp_gain.add_output(uout, Value(dot))
-    temp_gain.add_input(texgen, Variable('d'))
-    temp_gain.add_output(texgen, Variable('d'))
     temp_gain.add_input(twarm, Variable('Twarm'))
     temp_gain.add_output(qexch, Expression('Qlps*exch_time'))
     n.add_transition(temp_gain)
@@ -72,47 +82,21 @@ def temp_sensor(name, expected):
         guard=Expression('Twarm == False'),
         timeout=exch_time)
     temp_loss.add_output(uout, Value(dot))
-    temp_loss.add_input(texgen, Variable('d'))
-    temp_loss.add_output(texgen, Variable('d'))
     temp_loss.add_input(twarm, Variable('Twarm'))
     temp_loss.add_output(qexch, Expression('-Qlps*exch_time'))
     n.add_transition(temp_loss)
 
     updated_out = Transition('Updated outside')
-    updated_out.add_input(it, Variable('t'))
-    updated_out.add_input(to, Variable('tlast'))
-    updated_out.add_output(to, Variable('t'))
+    updated_out.add_input(out_up, Variable('Tnew'))
+    updated_out.add_input(to, Variable('Told'))
+    updated_out.add_output(to, Variable('Tnew'))
     n.add_transition(updated_out)
 
-    hswitch = Transition('Heater switch', timeout=heat_time)
-    hswitch.add_output(hstate, Expression('Tcurr < Texp'))
-    hswitch.add_input(ti, Variable('Tcurr'))
-    hswitch.add_output(ti, Variable('Tcurr'))
-    hswitch.add_input(texp, Variable('Texp'))
-    hswitch.add_output(texp, Variable('Texp'))
-    hswitch.add_output(hen, Tuple((Expression('name'), Expression('Tcurr < Texp'))))
-    n.add_transition(hswitch)
-
-    temp_exchange = Transition('Temperature exchange')
-    temp_exchange.add_input(q1c, Variable('Q1c'))
-    temp_exchange.add_output(q1c, Variable('Q1c'))
-    temp_exchange.add_input(qexch, Variable('Qex'))
-    temp_exchange.add_output(deltat, Expression('Qex/Q1c'))
-    n.add_transition(temp_exchange)
-
-    heater_gain = Transition('Heater gain')
-    heater_gain.add_input(qgain, Variable('Qg'))
-    heater_gain.add_input(q1c, Variable('q1c'))
-    heater_gain.add_output(q1c, Variable('q1c'))
-    heater_gain.add_output(deltat, Expression('Qg/q1c'))
-    n.add_transition(heater_gain)
-
-    temp_update = Transition('Temperature update')
-    temp_update.add_input(deltat, Variable('deltaT'))
-    temp_update.add_output(tupdate, Expression('Tins+deltaT'))
-    temp_update.add_input(ti, Variable('Tins'))
-    temp_update.add_output(ti, Expression('Tins+deltaT'))
-    n.add_transition(temp_update)
+    updated_in = Transition('Updated inside')
+    updated_in.add_input(ins_up, Variable('Tnew'))
+    updated_in.add_input(ti, Variable('Tnew'))
+    updated_in.add_output(ti, Variable('Tnew'))
+    n.add_transition(updated_in)
 
     comp_outside = Transition('Compare outside')
     comp_outside.add_input(uout, Variable('d'))
@@ -123,38 +107,91 @@ def temp_sensor(name, expected):
     comp_outside.add_output(twarm, Expression('Tin < Tout'))
     n.add_transition(comp_outside)
 
-    heating = Transition('Heating', timeout=heat_time)
-    heating.add_input(heat_gen, Variable('d'))
+    return n
+
+def room_temp_update(room_name):
+
+    room_name = f'{room_name}-temperature-updater'
+    n = PetriNet(room_name)
+
+    q_per_cels = 17.5
+    n.declare(f'name = "{room_name}"')
+    temp_start = 0.
+
+    ti = Place('Temperature inside', [temp_start], check=tFloat)
+    in_up = Place('Inside update', [], check=tFloat)
+    qch = Place('Q change', [], check=tFloat)
+    qpc = Place('Q per C', [q_per_cels], check=tFloat)
+    deltat = Place('deltaT', [], check=tFloat)
+    n.add_place(in_up)
+    n.add_place(deltat)
+    n.add_place(qpc)
+    n.add_place(qch)
+    n.add_place(ti)
+
+    temp_ch = Transition('Temperature change')
+    temp_ch.add_input(qch, Variable('Qch'))
+    temp_ch.add_input(qpc, Variable('Q1c'))
+    temp_ch.add_output(qpc, Variable('Q1c'))
+    temp_ch.add_output(deltat, Expression('Qch/Q1c'))
+    n.add_transition(temp_ch)
+
+    upd_ins = Transition('Update inside')
+    upd_ins.add_input(ti, Variable('T'))
+    upd_ins.add_input(deltat, Variable('dT'))
+    upd_ins.add_output(ti, Expression('T + dT'))
+    upd_ins.add_output(in_up, Expression('T + dT'))
+    n.add_transition(upd_ins)
+
+    # TODO: Qchange - input
+    # TODO: Inside update - output
+
+    return n
+
+def room_heating(room_name):
+    room_name = f'{room_name}-heating'
+    n = PetriNet(room_name)
+
+    heat_time = 5  # Timeout for heater output update
+    Qgps = 0.34  # W/s
+    n.declare(f'name = "{room_name}"')
+    n.declare(f'Qgps = float({Qgps}) # W/s')
+    n.declare(f'heat_time = float({heat_time})')
+
+    h_upd = Place('Heater update', [], check=tBoolean)
+    hstate = Place('Heater state', [False], check=tBoolean)
+    qgain = Place('Q gain', [], check=tFloat)
+    n.add_place(hstate)
+    n.add_place(qgain)
+    n.add_place(h_upd)
+
+    upd = Transition('Update', prior=1)
+    upd.add_input(h_upd, Variable('Hst_new'))
+    upd.add_input(hstate, Variable('Hst_old'))
+    upd.add_output(hstate, Variable('Hst_new'))
+    n.add_transition(upd)
+
+    heating = Transition('Heating', guard=Expression('Hst == True'), timeout=heat_time)
+    heating.add_input(hstate, Variable('Hst'))
+    heating.add_output(hstate, Variable('Hst'))
     heating.add_output(qgain, Expression('Qgps*heat_time'))
     n.add_transition(heating)
 
-    heater_enable = Transition(
-        'Start heater',
-        guard=Expression('Hen == True'))
-    heater_enable.add_input(hstate, Variable('Hen'))
-    heater_enable.add_output(heat_gen, Value(dot))
-    n.add_transition(heater_enable)
-
-    stop_dump = Transition(
-        'Dump stop',
-        guard=Expression('Hen == False')
-    )
-    stop_dump.add_input(hstate, Variable('Hen'))
-    n.add_transition(stop_dump)
-
-
-    n.add_remote_input(it, 'temp_gen/Measurement')
-    n.add_remote_output(hen, 'boiler_logic/Sensory_input')
-    n.add_remote_output(tupdate, 'TODO/TODO')
-
-    n.draw(f'nets_png/{name}.png')
+    # TODO: Q gain -- output
+    # TODO: Headter update -- input
 
     return n
 
 
 def execute():
-    sens = temp_sensor('temp_sens', 21.0)
-    execute_nets(sens)
+    nets = []
+
+    nets.append(room_heating('kitchen'))
+    nets.append(room_temp_update('kitchen'))
+    nets.append(room_outside_exchange('kitchen'))
+    nets.append(room_sens('kitchen', 21.0))
+
+    execute_nets(nets, sim_id='room-simulation')
 
 
 if __name__ == "__main__":
