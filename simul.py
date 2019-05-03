@@ -85,12 +85,11 @@ class PNSim(Thread):
         logging.info(
             f'Simulation ended at {self.cur_time() - self.start_time}')
         if self.kill:
-            logging.info(f'Simulation interrupted')
-            logging.info(
-                f'Remote requests left unserved: {self.mqtt.remote_requests}')
-            print('Simulation interrupted')
+            logging.info(f'Simulation ended')
             if self.mqtt.remote_requests:
-                print('Unserved remote requests:', self.mqtt.remote_requests)
+                logging.info(
+                    f'Remote requests left unserved: {self.mqtt.remote_requests}')
+            print('Simulation interrupted')
         sys.exit()
 
     def _wait_to_event_begin(self):
