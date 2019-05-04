@@ -85,6 +85,7 @@ class PNSim(Thread):
         logging.info(
             f'Simulation ended at {self.cur_time() - self.start_time}')
         if self.kill:
+            self.mqtt.close()
             logging.info(f'Simulation ended')
             if self.mqtt.remote_requests:
                 logging.info(
@@ -147,8 +148,7 @@ class PNSim(Thread):
                 PNSim.wake_event.wait(self.end_time - self.cur_time())
 
     def execute_net(self, net):
-        if not isinstance(net, snakes.nets.PetriNet):
-            net = self._nets[str(net)]
+        net = self._nets[str(net)]
         print(f'{self.id}: Executing net {net.name}')
         logging.info(
             f'Started execution "{net}" at {self.cur_time() - self.start_time}')

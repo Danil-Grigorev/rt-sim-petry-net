@@ -39,7 +39,7 @@ class Timed():
         self.ready = True
         self.transition.add_bindings(self.bindings.pop(0))
         self.simul.schedule(
-            [self.simul.execute_net, self.transition.net], self.simul.NOW)
+            [self.simul.execute_net, self.transition.net.name], self.simul.NOW)
 
     def check_and_fire(self, binding):
         self.plan()

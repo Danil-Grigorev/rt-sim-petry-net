@@ -56,8 +56,8 @@ def room_outside_exchange(room_name):
 
     out_up = Place('Outside update', [temp_new], check=tFloat)
     ins_up = Place('Inside temp update', [], check=tFloat)
-    to = Place('Temperature outside', [], check=tFloat)
-    ti = Place('Temperature inside', [], check=tFloat)
+    to = Place('Temperature outside', [0.0], check=tFloat)
+    ti = Place('Temperature inside', [0.0], check=tFloat)
     uout = Place('Update outside', [dot], check=tBlackToken)
     twarm = Place('Outside warmer', [], check=tBoolean)
     qexch = Place('Q exchange', [], check=tFloat)
@@ -95,7 +95,7 @@ def room_outside_exchange(room_name):
 
     updated_in = Transition('Updated inside')
     updated_in.add_input(ins_up, Variable('Tnew'))
-    updated_in.add_input(ti, Variable('Tnew'))
+    updated_in.add_input(ti, Variable('Told'))
     updated_in.add_output(ti, Variable('Tnew'))
     n.add_transition(updated_in)
 
@@ -163,9 +163,13 @@ def room_heating(room_name):
     n.declare(f'Qgps = float({Qgps}) # W/s')
     n.declare(f'heat_time = float({heat_time})')
 
+    vupd = Place('Valve update', [], check=tTuple)
+    vstate = Place('Valve state', [False], check=tBoolean)
     h_upd = Place('Heater update', [], check=tBoolean)
     hstate = Place('Heater state', [False], check=tBoolean)
     qgain = Place('Q gain', [], check=tFloat)
+    n.add_place(vupd)
+    n.add_place(vstate)
     n.add_place(hstate)
     n.add_place(qgain)
     n.add_place(h_upd)
@@ -176,16 +180,23 @@ def room_heating(room_name):
     upd.add_output(hstate, Variable('Hst_new'))
     n.add_transition(upd)
 
-    heating = Transition('Heating', guard=Expression('Hst == True'), timeout=heat_time)
+    heating = Transition('Heating', guard=Expression('Hst == True and Vstate == True'), timeout=heat_time)
     heating.add_input(hstate, Variable('Hst'))
     heating.add_output(hstate, Variable('Hst'))
+    heating.add_input(vstate, Variable('Vstate'))
+    heating.add_output(vstate, Variable('Vstate'))
     heating.add_output(qgain, Expression('Qgps*heat_time'))
     n.add_transition(heating)
 
-    # TODO: Q gain -- output
+    valve_upd = Transition('Update state', prior=1)
+    valve_upd.add_input(vstate, Variable('Vst_old'))
+    valve_upd.add_input(vupd, Tuple([Variable('name'), Variable('Vst_new')]))
+    valve_upd.add_output(vstate, Variable('Vst_new'))
+    n.add_transition(valve_upd)
+
     n.add_remote_output(qgain, f'{room_name}-temperature-updater/Q change')
-    # TODO: Heater update -- input
-    n.add_remote_input(h_upd, 'boiler_logic/Sensory input')
+    n.add_remote_input(h_upd, 'boiler_logic/Boiler state')
+    n.add_remote_input(vupd, f'{room_name}-sensors/Valve state')
 
     return n
 
