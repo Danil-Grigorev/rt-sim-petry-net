@@ -71,7 +71,7 @@ def boiler_logic(name):
     return n
 
 def execute():
-    boiler_log = boiler_logic('boiler_logic')
+    boiler_log = boiler_logic('boiler-logic')
     execute_nets(boiler_log, sim_id='boiler-logic')
 
 if __name__ == "__main__":

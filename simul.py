@@ -183,7 +183,7 @@ class PNSim(Thread):
                 for m in modes:
                     if not t.enabled(m):
                         continue
-                    print(f'Executing t: {t.name} with {m}')
+                    print(f'Firing: <{t.name}> with {m}')
                     t.fire(m)
                     return finished_execution
         return finished_execution

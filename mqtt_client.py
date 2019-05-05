@@ -1,7 +1,7 @@
 #!/bin/python3.7
 
 import paho.mqtt.client as mqtt
-from threading import RLock
+from threading import Lock
 
 def simulationFailure(simul, msg):
     import sys
@@ -17,7 +17,7 @@ class Mqtt_client():
         self.nets = {}
         self.remote_nets = set()
         self.remote_requests = {}
-        self.req_lock = RLock()
+        self.lock = Lock()
         self.pending_requests = []
         self.pending_req_cnt = 0
         self.client = None
@@ -36,7 +36,7 @@ class Mqtt_client():
     def close(self):
         if self.client:
             remove_nets = f'U, remove_nets, {self.client._client_id}, {"&".join(self.nets.keys())}'
-            self.client.publish('control', remove_nets, 2)
+            self.publish('control', remove_nets, 2)
             self.client.loop_stop()
 
     def add_subscription(self, topic):
@@ -88,7 +88,7 @@ class Mqtt_client():
                     return
                 # Notify source to update it's list of remote nets
                 self.remote_nets.update(message['nets'])
-                new_net_list = f"U, remove_nets, {message['client_id']}, {'&'.join(self.nets.keys())}"
+                new_net_list = f"U, update_nets, {message['client_id']}, {'&'.join(self.nets.keys())}"
                 self.private_publish(message['client_id'], new_net_list)
                 for net in message['nets']:
                     if not net in self.remote_requests.keys():
@@ -118,7 +118,7 @@ class Mqtt_client():
         place = self.nets[net].place(place)
         tokens = message['payload'].split('&')
         self.parse_tokens(place, tokens)
-        self.simul.execute_net(net) # TODO: move to planned
+        self.simul.execute_net(net)
 
     def parse_tokens(self, place, tokens):
         for tp, val in map(lambda x: x.split(':', 1), tokens):
@@ -287,26 +287,26 @@ class Mqtt_client():
             if topic == 'control':
                 self.control_publish(message)
             else:
-                self.client.publish(topic, message)
+                self.publish(topic, message)
 
     def control_publish(self, message):
         if message[0] == 'R':
             self.pending_requests.append(message)
             self.pending_req_cnt += 1  # Waiting for ack and success message
-        self.client.publish('control', message, 2)
+        self.publish('control', message, 2)
 
     def private_publish(self, target, message):
-        self.client.publish(f'private/{target}', message, 2)
+        self.publish(f'private/{target}', message, 2)
 
     def topic_publish(self, topic, tokens):
         net, place = topic.split('/')
-        if net in self.nets.keys(): # Net is in curent simulator
+        if net in self.nets.keys(): # Net is in running simulator instance
             net = self.nets[net]
             place = net.place(place)
             self.parse_tokens(place, tokens)
             self.simul.schedule([self.simul.execute_net, net.name], self.simul.NOW)
         elif net in self.remote_nets: # Net is in other simulator
-            self.client.publish(topic, '&'.join(tokens), 2)
+            self.publish(topic, '&'.join(tokens), 2)
         else: # Net is not yet registered
             self.update_remote_requests(net, '&'.join(tokens), topic)
         # self.simul.schedule([self.topic_publish, topic], self.simul.INF)
@@ -316,6 +316,7 @@ class Mqtt_client():
         self.client._client_id = hash(str(self.nets.keys()))
         # Subscribe to private messages to the MQTT client, mostly of type Update
         self.client.subscribe(f'private/{self.client._client_id}', 2)
+        self.notify_others()
         for net in self.nets.values():
             for place in net.place():
                 if place.state == place.SEPARATED:
@@ -327,12 +328,11 @@ class Mqtt_client():
                     for output_topic in place.out_topics:
                         self.output_port_setup(net, place, output_topic)
         self.wait_net_ports()
-        self.notify_others()
 
     def notify_others(self):
         net_list = '&'.join(self.nets.keys())
         net_list = f'U, update_nets, {self.client._client_id}, {net_list}'
-        self.client.publish('control', net_list, 2)
+        self.publish('control', net_list, 2)
 
     def wait_net_ports(self):
         for net in self.nets.values():
@@ -341,3 +341,7 @@ class Mqtt_client():
             return
         with self.simul.wake_event:
             self.simul.wake_event.wait()
+
+    def publish(self, *args, **kwargs):
+        with self.lock:
+            self.client.publish(*args, **kwargs)
