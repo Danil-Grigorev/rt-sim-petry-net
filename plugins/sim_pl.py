@@ -103,10 +103,12 @@ def extend(module):
             if place.state == Place.SEPARATED:
                 return
             elif place.state == Place.INPUT:
+                topics = '\n'.join(place.inp_topics)
                 attr['color'] = '#00FF00'
-                attr['label'] = f"Listening on: {', '.join(place.inp_topics)}\\n{attr['label']}"
+                attr['label'] = f"Listening on: \\n{topics}\\n{attr['label']}"
             elif place.state == Place.OUTPUT:
+                topics = '\n'.join(place.out_topics)
                 attr['color'] = '#FF0000'
-                attr['label'] = f"Sending to: {', '.join(place.out_topics)}\\n{attr['label']}"
+                attr['label'] = f"Sending to: \\n{topics}\\n{attr['label']}"
 
     return PetriNet, Place

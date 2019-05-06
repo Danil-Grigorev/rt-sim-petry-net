@@ -26,7 +26,20 @@ class PNSim(Thread):
     barier = None
     wake_event = Condition()
 
-    def __init__(self, *, broker="127.0.0.1", simul_id=None, detached=True):
+    def __init__(self, *, broker="127.0.0.1", simul_id=None, detached=True, debug=True):
+        """
+        Simulation main class initializer.
+
+        broker --   IP address of broker to use
+        simul_id -- The name of the simulation instance. Is used for unique identification.
+                    If not specified, will be generated from expression sim_run-<rand(0,10000)>.
+        detached -- boolean value, which specify if the tokens from Petri Net remote ports
+                    should be stored for future sending, or will just disappear, when the
+                    target remote port to send is non existing yet, which is corresponds to True.
+                    Default value is True.
+        debug --    boolean, which specify, if every execution of Petri Net
+                    will create a new drawing of it's state.
+        """
         self._nets = {}
         self.end_time = PNSim.INF
         self.scheduler = Scheduler()
@@ -37,6 +50,7 @@ class PNSim(Thread):
         self.kill = False
         self.detached = detached    # If is True, topic messages will not be stored
         self.id = self.setup_id(simul_id)
+        self.debug = debug
         Thread.__init__(self)
 
     def setup_id(self, predefined_id=None):
@@ -158,11 +172,22 @@ class PNSim(Thread):
             if self.kill:
                 sys.exit()
             finished_execution = self.execute_groups(presorted_tr)
-        self.draw_net(net, act=True)
+        if self.debug:
+            self.draw_net(net, act=True)
         net.send_tokens()
         self.wake()
 
     def draw_net(self, net, act=False):
+        """
+        Simple function to draw net images for visualization.
+
+        The structure is following:
+            <simulator path>/nets_png/<simulation name>/<net name>.png
+
+        net -- Petri Net instance to be drawn.
+        act -- by default is false, allows to draw an instance with prefix:
+                    -current-state.png, for debugging purposes.
+        """
         try:
             if act:
                 net.draw(f'nets_png/{self.id}/{net.name}-current-state.png')
@@ -172,30 +197,43 @@ class PNSim(Thread):
             pass
 
     def execute_groups(self, groups):
+        """
+        Exectuting presorted transitions.
+
+        groups -- list of transitions to execute.
+        """
         finished_execution = True
         for group in groups:
             for t in group:
                 modes = t.modes()
                 if not modes:
                     continue
-                finished_execution = False
+                # Sorting modes to preserve the order in repeatable execution
                 modes.sort(key=lambda x: x.items())
+                finished_execution = False
                 for m in modes:
                     if not t.enabled(m):
                         continue
                     print(f'Firing: <{t.name}> with {m}')
                     t.fire(m)
+                    # Should return to give chance to other transitions
+                    # with new bindings to be evaluated
                     return finished_execution
         return finished_execution
 
     def presort_transitions(self, net):
+        """
+        Sorting transitions to groups under their priority and hash.
+
+        net -- PetriNet instance to evaluate.
+        """
         tgroups = []
         t_list = net.transition()
         t_list.sort(key=lambda x: x.__hash__())
 
         prior_tr_sort = {}
         for t in t_list:
-            pr = t.priority()
+            pr = t.priority() # Extracts priority from transition
             if pr in prior_tr_sort.keys():
                 prior_tr_sort[pr].append(t)
             else:
@@ -206,6 +244,12 @@ class PNSim(Thread):
         return tgroups
 
     def add_petri_net(self, net):
+        """
+        Method is registering selected Petri net to the
+        simulation instance and the connected MQTT client.
+
+        net -- Petri net instance
+        """
         if net.name not in self._nets:
             self._nets[net.name] = net
             self.mqtt.nets[net.name] = net
@@ -213,6 +257,20 @@ class PNSim(Thread):
             raise NameError("Net {} already exists".format(net.name))
 
     def schedule(self, event, tm=NOW, prior=0):
+        """
+        Event planning on time after current running time of simulation.
+
+        event --    element or list of elements, where first element
+                    is a pointer to function, and others are arguments
+                    to pass.
+                    Example: [execute_net, self, net.name]
+                        planner will call execute_net function with args
+                        self and net.name at planned moment.
+        tm --       time value to plan event at. Default value is 'now'.
+        prior --    priority of event. The elements with higher
+                    priority will be sorted first.
+
+        """
         if self.start_time == PNSim.INF:
             raise Exception("Simulation is not running")
         if not isinstance(event, list):
@@ -220,7 +278,7 @@ class PNSim(Thread):
         if tm == PNSim.NOW: # Do at once
             self.scheduler.plan(PNSim.NOW, event, prior)
         elif tm <= 0:
-            raise ValueError('Sheduling at past')
+            raise ValueError('Scheduling at past')
         else:   # Wait some time
             self.scheduler.plan(self.start_time + tm, event, prior)
         self.wake()
@@ -230,8 +288,11 @@ class PNSim(Thread):
         self.schedule(event, tm, prior)
 
     def schedule_at(self, event, tm, prior=0):
+        """
+        Event planning on time from beginning of simulation.
+        """
         if tm <= 0 and tm != PNSim.NOW:
-            raise ValueError("Sheduling at past")
+            raise ValueError("Scheduling at past")
         if not isinstance(event, list):
             event = [event]
         if not callable(event[0]):
@@ -302,5 +363,11 @@ class Scheduler:
                 return None
 
     def remove_planned(self, timeval, executable, prior=0):
+        """
+        Removes planned event
+
+        timeval -- value of time for event
+        executable -- list of function instance and it's arguments
+        """
         with self.lock:
             self.queue.remove((timeval, prior, executable))

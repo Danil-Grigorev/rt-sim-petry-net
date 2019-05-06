@@ -66,8 +66,6 @@ def boiler_logic(name):
     disboil.add_output(bost, Value(False))
     n.add_transition(disboil)
 
-    n.draw(f'nets_png/{name}.png')
-
     return n
 
 def execute():

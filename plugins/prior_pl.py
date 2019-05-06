@@ -12,6 +12,7 @@ class Priority():
         self.prior = 100 - prior
 
     def prepare(self):
+        "No preparations needed"
         return
 
     def check_prior(self, prior):
@@ -25,6 +26,10 @@ class Priority():
             self.transition.add_bindings(binding)
 
     def text_repr(self):
+        """
+            Returns text representation of
+            the transition for draw method of 'gv' plugin.
+        """
         if self.prior == 0:
             return ''
         else:
@@ -46,6 +51,9 @@ def extend(module):
                 self.extension = Priority(self, prior)
 
         def priority(self):
+            """
+            Returns priority of the transition
+            """
             if self.extension and self.extension.type == 'priority':
                 return self.extension.prior
             else:

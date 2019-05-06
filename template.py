@@ -28,10 +28,10 @@ def add_net(net, sim):
     sim.schedule_at([sim.execute_net, net.name], PNSim.NOW)
 
 
-def execute_nets(net_list, sim_id=None):
+def execute_nets(net_list, sim_id=None, detached=True, debug=True):
     signal.signal(signal.SIGTERM, terminate)
     signal.signal(signal.SIGINT, terminate)
-    sim = PNSim(simul_id=sim_id)
+    sim = PNSim(simul_id=sim_id, detached=detached, debug=debug)
     if isinstance(net_list, list):
         for net in net_list:
             add_net(net, sim)

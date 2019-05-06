@@ -351,7 +351,7 @@ Vzhledem k odlišnému postupu pří přidání rozšíření do SNAKES, pro imp
 
 \subsubsection{Plugin \texttt{timed\_pl}}
 \label{subsec:timed_pl}
-Toto rozšířeni používá plánovač události pro spolehlivé plánovaní spouštěni tranzite do budoucna. Toto rozšířeni používá jednoduchou logiku pro provedeni přechodu - ve chvíli kdy přechod bude spustitelný, tak se zapne časovač a zkonzumuji odpovídající tokeny ze vstupních mist. Čekaní se neresetuje přidáním dalších tokenů do vstupních mist. Ve případe teto implementace přechod vezme nověpříchozí tokeny, které se objeví ve vstupních místech a tudíž zapnou přechod. Po ukončeni čekaní, tokeny budou přeneseny do výstupních mist, s následujícími úpravami, které můžou nastat podle definice HLPN \ref{sec:hlpn}.
+Toto rozšířeni používá plánovač události pro spolehlivé plánovaní spouštěni tranzite do budoucna. Toto rozšířeni používá jednoduchou logiku pro provedeni přechodu - ve chvíli kdy přechod bude spustitelný, tak se zapne časovač a zkonzumuji odpovídající tokeny ze vstupních mist. Čekaní se neresetuje přidáním dalších tokenů do vstupních mist. Ve případe teto implementace přechod vezme nově příchozí tokeny, které se objeví ve vstupních místech a tudíž zapnou přechod. Po ukončeni čekaní, tokeny budou přeneseny do výstupních mist, s následujícími úpravami, které můžou nastat podle definice HLPN \ref{sec:hlpn}.
 
 
 \begin{python}
@@ -359,7 +359,7 @@ Toto rozšířeni používá plánovač události pro spolehlivé plánovaní sp
   pr1=Transition("Timed-transition", timeout=30) (*\label{code:timed-example}*)
 \end{python}
 
-Pro vytváření takového přechodu stačí zadat parametr \texttt{timeout} do klauzule pro vytvoření přechodu - \texttt{Transition} jak je ukázano na řádku \ref{code:timed-example}. Hodnota \texttt{timeout} se uvádí v sekundách. Výsledný tvár nasledujícího přechodu je na obrázku \ref{timed-transition}. Ukázku použítí ve funkčním příkladě můžete vidět \hyperref[code:timed-temp-example]{dále}.
+Pro vytváření takového přechodu stačí zadat parametr \texttt{timeout} do klauzule pro vytvoření přechodu - \texttt{Transition} jak je ukázáno na řádku \ref{code:timed-example}. Hodnota \texttt{timeout} se uvádí v sekundách. Výsledný tvar následujícího přechodu je na obrázku \ref{timed-transition}. Ukázku použítí ve funkčním příkladě můžete vidět \hyperref[code:timed-temp-example]{dále}.
 
 \begin{figure}[hbt]
   \centering
@@ -370,9 +370,9 @@ Pro vytváření takového přechodu stačí zadat parametr \texttt{timeout} do 
 
 \subsubsection{Plugin \texttt{prob\_pl}}
 \label{subsec:prob_pl}
-Toto rozsireni pridava moznost spojit nekolik tranzici do jedne skupiny, a tudiz rovnomerne rozdelit pravdepodobnost spousteni kazde z nich. Pro spojene přechody plati, ze museji mit stejnou sadu vstupnich mist. Pak se pri provedeni jedneho z nich se rozhodne na zaklade hodnoty jeho pravdepodobnosti jestli se tento přechod musi provest, nebo se provede nektery z jeho sousedu. Soucet pravdepodobnosti pro takovou skupinu přechodu musi byt vzdycky 1.
+Toto rozšířeni přidává možnost spojit několik přechodu do jedné skupiny, a tudíž rovnoměrné rozdělit pravděpodobnosti spouštěni každé z nich. Pro spojené přechody platí, ze musejí mit stejnou sadu vstupních mist. Pak se pri provedeni jedeného z nich se rozhodne na základe hodnoty jeho pravděpodobnosti jestli se tento přechod musí provést, nebo se provede některý z jeho sousedu. Součet pravděpodobnosti pro takovou skupinu přechodu musí byt vždycky roven 1.
 
-Takový přechod se definuje ve dvou krocích. Nejdříve se vytvaří prvek \texttt{Transition} s parametrem \texttt{prob}, jak je ukázáno na řádku \ref{code:prob-example}. Příklad použití v \hyperref[code:prob-ev-draw]{obecném} případě viz. řádek \ref{code:prob-temp-example}.
+Takový přechod se definuje ve dvou krocích. Nejdříve se vytváří prvek \texttt{Transition} s parametrem \texttt{prob}, jak je ukázáno na řádku \ref{code:prob-example}. Příklad použití v \hyperref[code:prob-ev-draw]{obecném} případě viz. řádek \ref{code:prob-temp-example}.
 \begin{python}
   # Krok 1: Vytvoreni prechodu z parametrem prob
   pr1=Transition("Prob-trans-1", prob=0.6) (*\label{code:prob-example}*)
@@ -385,7 +385,7 @@ Dále stačí spojit pravdepodobnosti přechodu do jedné skupíny, pomoci klauz
   pr1.add_neighbour_transition(pr2) (*\label{code:prob-neghb-example}*)
 \end{python}
 
-Tato sekvence vytvoří nasledující zobrazení - \ref{prob-transition}.
+Tato sekvence vytvoří následující zobrazení - \ref{prob-transition}.
 
 \begin{figure}[hbt]
   \centering
@@ -411,18 +411,18 @@ Tento plugin je určeny pro přidaní prioritních pochodů do Petriho sítě. P
 
 \subsection{Plugin \texttt{sim\_pl}}
 \label{sec:aplikace-mqtt}
-Na implementací tohoto pluginu je založená práce ostatních pluginů ze skupiny \ref{sec:plug-impl}. Je ve své podstatě spojovacím prvkém mezi simulatorem, $MQTT$ klientem a sětí Petri. Obsahuje přetežovaní metod ze knihovny $SNAKES$ pro vykreslování prvků, které jsou rozšiřené pluginy. Taky přidavá zasadní metody pro nastavení Petriho sítě, umožnující použítí simulatoru a provadění spouštění sítě \ref{code:add_simulator}.
+Na implementací tohoto pluginu je založená práce ostatních pluginů ze skupiny \ref{sec:plug-impl}. Je ve své podstatě spojovacím prvkém mezi simulatorem, $MQTT$ klientem a seti Petri. Obsahuje přetěžovaní metod ze knihovny $SNAKES$ pro vykreslování prvků, které jsou rozšiřené pluginy. Taky přidavá zasadní metody pro nastavení Petriho sítě, umožnující použiti simulátoru a provádění spouštění sítě \ref{code:add_simulator}.
 \begin{python}
   sim=PNSim() (*\label{code:sim-add}*)
   n=PetriNet("Sample net")
   n.add_simulator(sim) (*\label{code:add_simulator}*)
 \end{python}
 
-Stejně tak podporuje nastavení vzdalených portů pro předaní tokenů jiným sítím připojeným na stejnou adresu $MQTT$ brokeru \ref{code:remote_in}, \ref{code:remote_out}.
+Stejně tak podporuje nastavení vzdálených portů pro předaní tokenů jiným sítím připojeným na stejnou adresu \texttt{MQTT} brokeru \ref{code:remote_in}, \ref{code:remote_out}.
 
 \begin{python}
   n.add_remote_input(it, "temp_gen/Measurement") (*\label{code:remote_in}*) (*\label{code:remote-in-out}*)
-  n.add_remote_output(hen, "boiler_logic/Sensory_input") (*\label{code:remote_out}*)
+  n.add_remote_output(hen, "boiler-logic/Sensory_input") (*\label{code:remote_out}*)
 \end{python}
 
 
@@ -433,24 +433,25 @@ Plánovač události je naimplementován jako prioritní fronta za využiti vest
 
 \chapter{Aplikace}
 
-\section{Tepelne rizeni}
+\section{Tepelné řízeni}
 \label{sec:tepelne-rizeni}
-Pro demonstraci praci simulatoru bylo rozhodnuto namodelovat dystribovany system modelujici chovani topení, ktey nekteri z vas pravdepodobne pouzivaji u sebe doma. Takovy system se sestavuje z nekolika casti. Zakladnim prvkem je plynovy spotrebic, nebo karma. Ta ohriva vodu a uvadi ji do pohybu po potrubich. Pak kazdy z pokoju ma na starosti tepelené čidlo a rizeni, ktere udrzuje v pokoji nastavenou teplotu podle calendare. Kazdou hodinu se z tabulky teplot vezme aktualni teplota pro soucasnou hodiny a tento pokoj, pak rizeni rozhodne jestli ma zapnout topení nebo ne. Pokud zadny z pokoju v soucasne dobe nema zapnute topení, tak karma se musi vypnout za ucelem setreni plynu. Toto rizeni provadi vestaveny system, nebo je zcela mechanicky. Kazdy z tech prvku bude dale namodelovan Petriho siťěmi. Pro pochopení struktury viz. \ref{boiler-net}.
+Pro demonstraci prací simulátoru bylo rozhodnuto namodelovat distribuovaný system modelující chovaní topení, který pravděpodobně používáte u sebe doma. Takový system se sestavuje z několika častí. Základním prvkem je plynový spotřebič, nebo boiler. Ten ohřívá vodu a uvádí ji do pohybu po potrubích. Pak kazdy z pokojů ma na starosti tepelné čidlo a řízeni, které udržuje v pokoji nastavenou teplotu podle kalendáře teplot pro daný čas. Kazdou hodinu se z tabulky teplot vezme aktuální teplota pro současnou hodiny a tento pokoj, pak řízeni rozhodne jestli ma zapnout topení nebo ne. Pokud žádný z pokojů v současné době nemá zapnuté topení, tak karma se musí vypnout za účelem setřeni plynu. Toto řízeni provádí vestavěny system v boileru, protože je zcela mechanicky. Kazdy z tech prvku bude dale namodelován Petriho sítěmi. Pro pochopení struktury viz. \ref{boiler-net}.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{obrazky-figures/boiler-net.pdf}
-  \caption{Arhitektura aplikace}
+  \caption{Architektura aplikace}
   \label{boiler-net}
 \end{figure}
 
-Aby tento navrh co nejpresneji odpovidal realite, bylo rozhodnuto namodelovat chovani teploty v pokoji.
-Nejdrive musime vedet jak vykonne je topení v pokoji. Běžné hodnoty pro tři druhy pokujů mužete videt v nasledujici \hyperref[tab:TepelneZtraty]{tabulce}. Dale nas zajimaji tepelné ztraty a taky mnozstvi energii potrebne pro ohrati pokoje. Pro vypocet tohoto parametru pouzijeme nasledující vzorecek. Zakladni parametrem rozhodujicim o tepelnych kapacite pokoje je plocha vnitrniho povrchu pokoje $V$, respektive celkova plocha povrchu stopu, podlahy a sten. Pro ně je dulezte vědět koefficent ztrat tepla $K$. Zvlast se pocitaji okna a dvere, vzhledem k jejich vetshi teplovodivosti. Pak zbyva jenom zjistit rozdil současné teploty uvnitr pokoje a očekavane teploty pro tuto hodínu - $\Delta{T}$. To vsechno dosadime do vzorecku a zjistime celkové mnozstvi energii potrebne pro jeho ohrati. \cite{tep_calc}
+Aby tento návrh co nejpřesněji odpovídal realitě, bylo rozhodnuto namodelovat chovaní teploty v pokoji.
+
+Pro splnění tohoto úkolu, nejdříve musíme vědět jak výkonné je topení v pokoji. Běžné hodnoty pro tři druhy pokojů můžete vidět v následující tabulce \ref{tab:TepelneZtraty}. Dale nas zajímají tepelné ztráty a taky množství energii potřebné pro ohráti pokoje. Pro výpočet tohoto parametru použijeme následující vzoreček. Základní parametrem rozhodujícím o tepelné kapacitě pokoje je plocha vnitřního povrchu pokoje $V$, respektive celková plocha povrchu stopu, podlahy a sten. Pro ně je dolezte vědět koeficient ztrať tepla $K$. Zvlášť se počítají okna a dveře, vzhledem k jejich vetší vodivosti tepla. Pak zbývá jenom zjistit rozdíl současné teploty uvnitř pokoje a očekávané teploty pro tuto hodinu - $\Delta{T}$. To všechno dosadíme do vzorečku a zjistíme celkové množství energii potřebné pro jeho ohráti. \cite{tep_calc}
 \begin{center}
   $Q[kW/h] = \frac{V*\Delta{T}*K}{860}$
 \end{center}
 
-Pak koefficenty vypadáji nasledně:
+Pak koeficienty vypadají následně:
 
 \begin{table}[H]
 	\vskip6pt
@@ -459,9 +460,9 @@ Pak koefficenty vypadáji nasledně:
 	\centering
 	\begin{tabular}{lllr}
 		\toprule
-		Typ pokoje & Koefficent tepelných ztrat & Objem $[m^3]$ & Očekavaný výkon topení $[W]$ \\
+		Typ pokoje & Koeficient tepelných ztrát & Objem $[m^3]$ & Očekávaný výkon topení $[W]$ \\
     \midrule
-    Kuchin & 0.5 & $4*3*2.5$ & $1200$ \\
+    Kuchyně & 0.5 & $4*3*2.5$ & $1200$ \\
     Obývací pokoj & 0.6 & $6*4*2.5$ & $2300$ \\
     Sklep & 0.8 & $3*3*2.2$ & $300$ \\
 		\bottomrule
@@ -469,8 +470,8 @@ Pak koefficenty vypadáji nasledně:
 	\label{tab:Parametry}
 \end{table}
 
-Na vypocet tepelnych ztrat pokoje jsem pouzil \href{https://wpcalc.com/kalkulyator-teplopoter/}{tento} nastroj.
-Vychazí to zhruba nasledne:
+Na výpočet tepelných ztrať pokoje jsem použil \href{https://wpcalc.com/kalkulyator-teplopoter/}{tento} nastroj.
+Vychází to zhruba následné:
 
 \begin{table}[H]
 	\vskip6pt
@@ -481,23 +482,29 @@ Vychazí to zhruba nasledne:
 		\toprule
 		Typ pokoje & Ztráty $[kW/h]$ \\
 		\midrule
-		Kuchin & $0.7$ \\
-    Pokoj & $1$ \\
+		Kuchyně & $0.7$ \\
+    Obývací pokoj & $1$ \\
     Sklep & $0.4$ \\
 		\bottomrule
 	\end{tabular}
 	\label{tab:TepelneZtraty}
 \end{table}
 
-Cele chovani systému odpovida zákonu zachovaní energii, a tak muzeme odvodit rovnici pro vypocet potrebneho jeji mnozstvi.
+Cele chovaní systému odpovídá zákonu zachovaní energii, a tak můžeme odvodit rovnici pro výpočet potřebného její množství.
+
+\subsubsection{Přesnost simulace}
+
+Stojí za to se zmínit, že účelem této aplikace není zcela přesná simulace chování topení, ale její zjednodušená kopie. Do úvahy se nebere například to, že rychlost výměny tepla ze vnějším prostředím není konstantní, jak je uvedená v tabulce \ref{tab:TepelneZtraty}, ale je závislá na spoustě parametru, jako teplota vnějšího prostředí, material a tloušťka stěn pokoje atd. To se nepočítá v současném navrchu, ale může být přidáno ve případě potřeby. Účelem této aplikace je vizualizace práce vytvořeného simulátoru.
 
 \subsection{Měření teploty venku}
 \label{subsec:mereni-teploty}
-Modelovani chovani teploty venku je stochasticky process, ktery neni mozne spocitat presne. Proto byla navyrzena Petriho sit, vyuzivajici pravděpodobnostní přechody. Ma na vstupu rozsah teplot den - noc, a podle vybrane doby dne, za pouziti funkcii $cos$ modeluje zmenu aktualni teploty. Rozhodnuti pouziti funkce $cos$ vychazi z jednoducheho pozorovani prubehu teplot behem dne, a pereodicita zmeny teplot ji trochu \href{https://forecast.weather.gov/MapClick.php?lat=42.3758&lon=-71.1187&lg=english&FcstType=graphical}{podobá}, za predpokladu ze prubeh funkce zacina v nejteplejsi hodinu, nebo alespoň modeluje spojitý průběh teplotních změn.
+Modelovaní chovaní teploty venku je stochasticky process, který není možné spočítat přesné. Ale ve snaze její simulace byla navržena Petriho sit, využívající pravděpodobnostní přechody. Ma na vstupu rozsah teplot den - noc, a podle vybrané doby dne, za použiti funkci $cos$ modeluje změnu aktuální teploty. Rozhodnuti použiti funkce $cos$ vychází z jednoduchého pozorovaní průběhu teplot během dne, a periodicita změny teploty ji trochu \href{https://forecast.weather.gov/MapClick.php?lat=42.3758&lon=-71.1187&lg=english&FcstType=graphical}{podobá}, za předpokladu ze průběh funkce začíná v nejteplejší hodinu během dne, což je počáteční bod funkce $cos$. Ale základní cílí použité funkce, je modelování spojitého průběh teplotních změn.
 
-Pravděpodobnostní přechody modeluji nahodne jevy jako oteplení nebo ochlazení kvůli východu sluncie nebo jiné. Vizuální reprezentací celé síťe můžete videt na obrázku \ref{thermometr-viz}.
+Pravděpodobnostní přechody modeluji náhodné jevy jako oteplení nebo ochlazení kvůli východu slunci nebo jiné. Ukázku implementace můžete vidět v \ref{prob-ev-viz}.
 
-Obrázek \ref{thermometr-viz} byl vygenerovan v průběhu práci simulatoru, díky použítí rozšíření \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Toto rozšíření, spolu s měnšími vizualními změny jiných rozšíření, zaměřených na jednotlivé prvky sítě, dokáže spolehlívě vygenerovat obrázek Petrího sítě, podobný \ref{thermometr-viz}, v jakýkolív okámžík simulace. Táto síť je poměrně jednoduchá na pochopení, a zároveň ukazuje použítí většiny naimplementovaných rozšíření.
+Vizuální reprezentací celé site můžete vidět na obrázku \ref{thermometr-viz}.
+
+Obrázek \ref{thermometr-viz} byl vygenerován v průběhu práci simulátoru, díky použítí rozšíření \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Toto rozšíření, spolu s menšími vizuálními změny jiných rozšíření, zaměřených na jednotlivé prvky sítě, dokáže spolehlivě vygenerovat obrázek Petřino sítě, podobný \ref{thermometr-viz}, v jakýkoliv okamžik simulace. Táto síť je poměrně jednoduchá na pochopení, a zároveň názorně ukazuje použítí většiny neimplementovaných rozšíření.
 
 Pro vytvoření obrázku je specifikován jednoduchý příkaz \pyth{draw("file.png")}, a celý \hyperref[code:thermometr-draw]{postup} vypadá následně:
 
@@ -626,6 +633,55 @@ Pro vytvoření obrázku je specifikován jednoduchý příkaz \pyth{draw("file.
   \centering
   \includegraphics[width=0.7\textwidth]{obrazky-figures/thermometr.png}
   \caption{Simulace měření teploty.}
+  \label{thermometr-viz}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{obrazky-figures/room-exchange.png}
+  \caption{Simulace výměny teploly se vnějším prostředím.}
+  \label{exchange-viz}
+\end{figure}
+
+\begin{sidewaysfigure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{obrazky-figures/room-heating.png}
+  \caption{Simulace ohřívání pokojů.}
+  \label{heater-viz}
+\end{sidewaysfigure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{obrazky-figures/room-sensors.png}
+  \caption{Simulace senzorů a stavu ventilu v pokoji.}
+  \label{sensor-viz}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{obrazky-figures/room-temp-upd.png}
+  \caption{Převod energii na stupnici celsia.}
+  \label{thermometr-viz}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{obrazky-figures/room-timetable.png}
+  \caption{Tabulka teplot pro pokoj.}
+  \label{thermometr-viz}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{obrazky-figures/weather-sim.png}
+  \caption{Simulace počasí a času.}
+  \label{thermometr-viz}
+\end{figure}
+
+\begin{figure}[httb]
+  \centering
+  \includegraphics[width=\textwidth]{obrazky-figures/boiler-logic.png}
+  \caption{Simulace boileru.}
   \label{thermometr-viz}
 \end{figure}
 

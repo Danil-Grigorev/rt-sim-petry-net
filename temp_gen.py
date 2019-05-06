@@ -99,8 +99,6 @@ def temp_generator(name, low, high, samples=48, speedup=1):
     texpec.add_output(meas, Variable('Tnew'))
     n.add_transition(texpec)
 
-    n.draw(f'nets_png/{name}.png')
-
     return n
 
 def room_timetable(room_name, timetable):
