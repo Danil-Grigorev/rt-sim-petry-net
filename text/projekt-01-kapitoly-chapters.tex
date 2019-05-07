@@ -2,7 +2,7 @@
 \chapter{Přehled teorie}
 \label{prehled}
 
-V teto kapitole jsou popsaný teoretické základy Petřino sítí. Taky tato kapitola se soustředí na popis několika podtříd Petriho sítě, zejména na „vysokoúrovňové Petriho sítě“ a „Značkované Petriho Sítě“ a  včetně přehledu míst, kdě se tento modelovací prostředek používá, a hra významnou roli.
+V teto kapitole jsou popsaný teoretické základy Petřino sítí. Taky tato kapitola se soustředí na popis několika podtříd Petriho sítě, zejména na „vysokoúrovňové Petriho sítě“ a „Značkované Petriho Sítě“ \ref{subsec:marked-pn} a  včetně přehledu míst, kdě se tento modelovací prostředek používá, a hra významnou roli.
 
 Dalším účelem této kapitoly je seznámení čtenáře s matematickými popisy Petriho síti a grafy Petriho sítí, které jsou nezbytné pro porozumění principu prací simulátoru.
 
@@ -10,7 +10,7 @@ Do obsahu patří popis protokolu MQTT \ref{subsec:mqtt-proto}, na kterém je za
 
 Taky se tady zmíní o simulační teorii, zaměřené na simulaci Petriho síti v reálném čase. Vyjasní se pojem distribuovaných systému \ref{subsec:distr_system}, HWIL \ref{subsec:hwil} a jejích vztah z Petriho sítěmi.
 
-\subsection{Petriho sítě}
+\section{Petriho sítě}
 V současné době se Petriho sítě často používají jako modelovací prostředek pro modelovaní chovaní systému, za účelem pochopení jeho slabších stránek, ještě než se system nasadí do provozu. Vyplňuje, tím pádem, díru mezi slovním popisem, návrhem, takovými modelovacími prostředky jako \href{https://en.wikipedia.org/wiki/Unified_Modeling_Language}{UML} a skutečnou implementací nějakého projektu. Použití Petriho síti pro účel modelování je velice vhodné, jen velmi málo modelovacích prostředku dokáže popsat ne jenom system jako celek, ale i zjistit slabší stránky jeho implementace, ještě před implementační fází. Stejně tak platí i pro testovací fází -- některé chyby se dá objevit jenom po implementací, když to Petriho sítě částečně řeší tento problém ještě ve fází navrchu.
 
 \paragraph{Definice}
@@ -26,7 +26,10 @@ P $\vee$ T = $\varnothing$, P $\wedge$ T != $\varnothing$.
 
 \section{Typy Petriho sítě}
 
+V této sekcí budou popsáné teoretické základy několika druhů Petriho sítí, značkovaných -- \ref{subsec:marked-pn} a Vysokoúrovňových Petriho sítí -- \ref{subsec:hlpn} a její grafu -- \ref{subsec:hlpn-graph} a jak se v takovém grafu provádí přechod -- \ref{subsec:graph-transition}. Taky bude něco málo zmíněno o Časovaných Petriho sítí -- \ref{subsec:timed-pn}.
+
 \subsection{Značkované Petriho sítě}
+\label{subsec:marked-pn}
 Značkované petriho seti (ZPS) zavadí takový pojem jako značka nebo \uv{token}. Značka je základní prvek v ZPS, umožnující její vykonávaní. Vykonávaní se provádí provedením přechodu, během kterého se vymaže odpovídající počet značek ze množiny vstupních míst, a do výstupních míst se potřebný počet značek vloží. Tato operace se muže vykonávat dokud nezbude žádný povoleny přechod. Na tento myšlence je založena simulace provádění Petriho sítě.
 
 Přechod v PS je povolen, dokud každé ze vstupních míst propojených s daným přechodem obsahuje alespoň jednu značku.
@@ -52,10 +55,12 @@ P $\vee$ T = $\varnothing$, P $\wedge$ T != $\varnothing$.
 Díky možnosti vykonávat Petriho sit, vzniká příležitost vytvořit simulační nastroj, který je založen na zmíněných teoretických základech. Podrobný popis simulace viz \ref{sec:implementation}.
 
 \subsection{Časované petriho sítě}
+\label{subsec:timed-pn}
+
 Podtřída Časovaných petriho seti [Timed Petri Net] rozšiřuje pojem Značkovaných Petriho sítí o jednu důležitou zásadu -- přechod muže byt označen časovou funkcí. Aby se takový přechod provedl, ten čas musí uplynout, až potom se vyjmou tokeny ze vstupních míst, a vloží se do výstupních. Časová funkce nemusí být konstantní, ale v rámci této prací se použilo jenom konstantní čekaní na přechod, jelikož chovaní simulátoru musí být deterministické. Více o implementačních detailech viz. \ref{subsec:timed_pl}.
 
 \subsection{Vysokoúrovňové Petriho sítě}
-\label{sec:hlpn}
+\label{subsec:hlpn}
 Vysokoúrovňové petriho sítě (High Level Petri Nets) jsou dalším rozšířením Petriho sítí, které umožňují jednodušší modelovaní takových procesů, pro které jsou důležité výpočty a matematické výrazy. Celkově, je tento druh Petriho sítě pohodlnější pro modelovaní toku řízení kódu nějakého programu, a ve své podstatě připomíná grafické programování.
 
 \paragraph{Definice}
@@ -76,6 +81,8 @@ High Level Petri Net (HLPN) je struktura $HLPN = \left( P; T; D; T_{ype}; P_{re}
 \end{itemize}
 
 \subsection{Pravidlo pro provedeni přechodu}
+\label{subsec:graph-transition}
+
 Pokud je dane ze konečná multimnožina $T_\mu$ je zapnuta pro značku $M$, tedy přechod v $HLPN$ muže byt proveden pro značku $M'$ následujícím způsobem \cite[p.~12]{pnstd54}:
 \begin{center}
   $M' = M - Pre(T_\mu) + Post(T_\mu)$
@@ -83,6 +90,8 @@ Pokud je dane ze konečná multimnožina $T_\mu$ je zapnuta pro značku $M$, ted
 
 
 \subsection{$HLPN$ Graf}
+\label{subsec:hlpn-graph}
+
 Graf $HLPN$ ma následující vlastnosti:
 \begin{itemize}
   \item $Graf\:site$ je sestaveny s dvou prvku - $mist$ a $tansici$, které jsou propojeny mezi sebou šipkami ($arks$).
@@ -93,7 +102,8 @@ Graf $HLPN$ ma následující vlastnosti:
   \item $Deklaraci$: Vytvářejí definici typu míst, funkci a proměnách.
 \end{itemize}
 
-\subsection{Aplikace Petriho sítí}
+\section{Aplikace Petriho sítí}
+Tato sekce popisuje použítí Petriho sítí v praxe.
 
 \subsection{Značkovaná Petriho sít}
 Rozsah míst kdě se dá aplikovat Petriho sítě je velmi široký. Jako modelovací prostředek můžou sloužit například pro reprezentací vzorů interakce a vznikájicich konfliktů mezí člověkem a autopilotem letadla, jak je popsané v následujícím \href{https://www-tandfonline-com.ezproxy.lib.vutbr.cz/doi/full/10.1080/00140139.2013.877597}{článku}.
@@ -103,7 +113,12 @@ Je to obecné známy problém paralelismu, který názorné zobrazuje dva příp
 
 \subsection{Vysokoúrovňová Petriho sit}
 
-V našem případě vysokoúrovňová Petriho síť modeluje a následně simuluje chování systému topení.
+\todo{}
+V našem případě vysokoúrovňová Petriho síť modeluje a následně simuluje chování systému topení -- \ref{sec:implementation}.
+
+\section{Teoretické základy simulátoru}
+
+\todo{popis}
 
 \subsection{Distribuovaný system}
 \label{subsec:distr_system}
@@ -277,7 +292,7 @@ Na obrázku jsou 6 vstupních portů a 5 výstupních. Vstupní porty jsou ozna�
 Na příkladě vstupního portu \texttt{log} můžete vidět že není povinné, aby ten port byl zapojený. Ve případě simulátoru takový port nebude přiřazen do skupiny vstupních portů, dokud se neobjeví nějaká aplikace nebo síť, požadující přijetí a odesílaní zpráv na téma, kterou ten port odebírá. Více se o takovém nastavení viz \todo{ADD}
 
 \subsection{Vlastní protokol komunikace}
-Proto aby simulator měl podporu přidání vzdálených portů, zmíněných v \ref{subsec:mqtt_impl} vznikla potřeba vymyslet vlastní protokol výměny informací. Ten protokol musí mít seznám zpráv pro takové simulační případy, kdy port musí předat nebo přijmout tokeny, nebo když se objeví instance Petriho síti v nějakém z už existujících či nově vytvořených simulačních uzlů. \todo{návod pro vytvoření takového}.
+Proto aby simulator měl podporu přidání vzdálených portů, zmíněných v \ref{subsec:mqtt_impl} vznikla potřeba vymyslet vlastní protokol výměny informací. Ten protokol musí mít seznám zpráv pro takové simulační případy, kdy port musí předat nebo přijmout tokeny, nebo když se objeví instance Petriho síti v nějakém z už existujících či nově vytvořených simulačních uzlů. Návod pro vytvoření takového je v \ref{subsec:aplikace-mqtt}.
 
 Následující tabulka \ref{tab:mqtt-msg-types} obsahuje přehled typů zpráv, a jejích formátu pro naplnění:
 
@@ -325,33 +340,13 @@ Pro nastavení výstupního portu stačí nastavit parametr \uv{\texttt{R\_ACTIO
 
 Příjetí odesílající stranou potvrzovací zprávy Success, znamená že nastavení bylo úspěšné alespoň v jedněm případě, což má za následek nastavení místa s jménem \texttt{port1} sítě \texttt{net1} jako výstupní port do \texttt{net2/port2}.
 
-\subsection{Implementace rozšíření}
+\section{Implementace rozšíření}
 \label{sec:plug-impl}
 Tento pododdíl popisuje implementaci různých rozšíření pro knihovnu $SNAKES$, které znesnadňuji navrch Petriho sítí a její modelovaní. Každý z níže popsaných pluginů se da  použít v komu po jejích importu podle tohoto \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu}.
 
-\subsection{Návod pro import rozšíření}
-Vzhledem k odlišnému postupu pří přidání rozšíření do SNAKES, pro import simulačního nástroje a dalších rozšíření ze skupiny, uživatel musí dodrat správné pořadí pri importu knihoven. Konvence probíhá následujícím způsobem.
-
-\begin{python}
-  from snakes.nets import *   # Site, mista, prechody... (*\label{code:snakes-all}*) (*\label{code:plugin-setup}*)
-  from simul import PNSim     # Simulacni knihovna (*\label{code:pnsim}*)
-  snakes.plugins.load( (*\label{code:sim-plugins}*)
-    ["gv", "timed_pl", "sim_pl", "prob_pl", "prior_pl"],
-    "snakes.nets",
-    "plugins") # Seznam rozsireni pro import
-  from plugins import * # Redefinovane metody z rozsireni (*\label{code:pl-import}*)
-\end{python}
-
-\begin{enumerate}
-  \item Přidaní knihovny snakes a její prvků \ref{code:snakes-all}.
-  \item Import simulační knihovny, která poskytne základ pro rozšíření \ref{code:pnsim}.
-  \item Přidaní pluginů podle požadovaných vlastností sítě \ref{code:sim-plugins}. Ze skupiny doporučených pluginů stojí za zmínku plugin \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Více o jeho použití v rámci simulátoru viz.\ref{subsec:mereni-teploty}. Zbytek je popsán v dalších sekcích \ref{subsec:timed_pl}.
-  \item Pro redefinici a přidání nových metod z rozšíření slouží řádek \ref{code:pl-import}. Od dané chvílí použití knihovny SNAKES je stejné jako v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu} a taky \todo{Muj navod}.
-\end{enumerate}
-
-\subsubsection{Plugin \texttt{timed\_pl}}
+\subsection{Plugin \texttt{timed\_pl}}
 \label{subsec:timed_pl}
-Toto rozšířeni používá plánovač události pro spolehlivé plánovaní spouštěni tranzite do budoucna. Toto rozšířeni používá jednoduchou logiku pro provedeni přechodu - ve chvíli kdy přechod bude spustitelný, tak se zapne časovač a zkonzumuji odpovídající tokeny ze vstupních mist. Čekaní se neresetuje přidáním dalších tokenů do vstupních mist. Ve případe teto implementace přechod vezme nově příchozí tokeny, které se objeví ve vstupních místech a tudíž zapnou přechod. Po ukončeni čekaní, tokeny budou přeneseny do výstupních mist, s následujícími úpravami, které můžou nastat podle definice HLPN \ref{sec:hlpn}.
+Toto rozšířeni používá plánovač události pro spolehlivé plánovaní spouštěni tranzite do budoucna. Toto rozšířeni používá jednoduchou logiku pro provedeni přechodu - ve chvíli kdy přechod bude spustitelný, tak se zapne časovač a zkonzumuji odpovídající tokeny ze vstupních mist. Čekaní se neresetuje přidáním dalších tokenů do vstupních mist. Ve případe teto implementace přechod vezme nově příchozí tokeny, které se objeví ve vstupních místech a tudíž zapnou přechod. Po ukončeni čekaní, tokeny budou přeneseny do výstupních mist, s následujícími úpravami, které můžou nastat podle definice HLPN \ref{subsec:hlpn}.
 
 
 \begin{python}
@@ -368,7 +363,7 @@ Pro vytváření takového přechodu stačí zadat parametr \texttt{timeout} do 
   \label{timed-transition}
 \end{figure}
 
-\subsubsection{Plugin \texttt{prob\_pl}}
+\subsection{Plugin \texttt{prob\_pl}}
 \label{subsec:prob_pl}
 Toto rozšířeni přidává možnost spojit několik přechodu do jedné skupiny, a tudíž rovnoměrné rozdělit pravděpodobnosti spouštěni každé z nich. Pro spojené přechody platí, ze musejí mit stejnou sadu vstupních mist. Pak se pri provedeni jedeného z nich se rozhodne na základe hodnoty jeho pravděpodobnosti jestli se tento přechod musí provést, nebo se provede některý z jeho sousedu. Součet pravděpodobnosti pro takovou skupinu přechodu musí byt vždycky roven 1.
 
@@ -394,7 +389,7 @@ Tato sekvence vytvoří následující zobrazení - \ref{prob-transition}.
   \label{prob-transition}
 \end{figure}
 
-\subsubsection{Plugin \texttt{prior\_pl}}
+\subsection{Plugin \texttt{prior\_pl}}
 \label{subsec:prior_pl}
 Tento plugin je určeny pro přidaní prioritních pochodů do Petriho sítě. Podle nastavené priority se během simulace bude rozhodovat, který přechod se vyhodnotí a provede jako první. Priority můžou byt v rozsahu 0 -- 100, a radí se sestupné. Pro nastaveni priority element \texttt{Transition} má dodatečný a nepovinný parametr \texttt{prior} -- \ref{code:prior-transition-example}.
 \begin{python}
@@ -410,7 +405,7 @@ Tento plugin je určeny pro přidaní prioritních pochodů do Petriho sítě. P
 \end{figure}
 
 \subsection{Plugin \texttt{sim\_pl}}
-\label{sec:aplikace-mqtt}
+\label{subsec:aplikace-mqtt}
 Na implementací tohoto pluginu je založená práce ostatních pluginů ze skupiny \ref{sec:plug-impl}. Je ve své podstatě spojovacím prvkém mezi simulatorem, $MQTT$ klientem a seti Petri. Obsahuje přetěžovaní metod ze knihovny $SNAKES$ pro vykreslování prvků, které jsou rozšiřené pluginy. Taky přidavá zasadní metody pro nastavení Petriho sítě, umožnující použiti simulátoru a provádění spouštění sítě \ref{code:add_simulator}.
 \begin{python}
   sim=PNSim() (*\label{code:sim-add}*)
@@ -425,10 +420,44 @@ Stejně tak podporuje nastavení vzdálených portů pro předaní tokenů jiný
   n.add_remote_output(hen, "boiler-logic/Sensory_input") (*\label{code:remote_out}*)
 \end{python}
 
+\subsection{Návod pro import rozšíření}
+Vzhledem k odlišnému postupu pří přidání rozšíření do SNAKES, pro import simulačního nástroje a dalších rozšíření ze skupiny, uživatel musí dodrat správné pořadí pri importu knihoven. Konvence probíhá následujícím způsobem.
 
-\subsection{Planovac udalosti}
+\begin{python}
+  from snakes.nets import *   # Site, mista, prechody... (*\label{code:snakes-all}*) (*\label{code:plugin-setup}*)
+  from simul import PNSim     # Simulacni knihovna (*\label{code:pnsim}*)
+  snakes.plugins.load( (*\label{code:sim-plugins}*)
+    ["gv", "timed_pl", "sim_pl", "prob_pl", "prior_pl"],
+    "snakes.nets",
+    "plugins") # Seznam rozsireni pro import
+  from plugins import * # Redefinovane metody z rozsireni (*\label{code:pl-import}*)
+\end{python}
+
+\begin{enumerate}
+  \item Přidaní knihovny snakes a její prvků \ref{code:snakes-all}.
+  \item Import simulační knihovny, která poskytne základ pro rozšíření \ref{code:pnsim}.
+  \item Přidaní pluginů podle požadovaných vlastností sítě \ref{code:sim-plugins}. Ze skupiny doporučených pluginů stojí za zmínku plugin \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Jeho implementace používá nástroj \href{https://www.graphviz.org/}{\texttt{GraphViz}} pro vytvoření vizuální reprezentací Petriho sítě. Více o jeho použití v rámci simulátoru viz.\ref{subsec:mereni-teploty}. Zbytek je popsán v dalších sekcích \ref{subsec:timed_pl}.
+  \item Pro redefinici a přidání nových metod z rozšíření slouží řádek \ref{code:pl-import}. Od dané chvílí použití knihovny SNAKES je stejné jako v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu} a taky \todo{Muj navod}.
+\end{enumerate}
+
+
+\subsection{Plánovač události}
 \label{subsec:event-planner}
-Plánovač události je naimplementován jako prioritní fronta za využiti vestavěné knihovny \href{https://docs.python.org/3/library/heapq.html}{\texttt{heapq}} v Pythonu. Api naznačuje ze pro přidaní a vyberu prvku se používají metody \texttt{heappush} a \texttt{heappop}. Priorita v takové frontě se určuje číselnou hodnotou, která se vkládá do fronty. Tato hodnota muže byt prvním prvkem v seznamu elementu. Druhým parametrem pro určeni priority je poradí, ve kterém prvek byl vložen. Tato sada pravidel umožňuje vkládat záznamy, obsahující čas spuštěni jako první prvek, a podle toho se zařadí na přisluhující místo ve frontě. Metoda \texttt{heappop} vybere prvek ze seznamu s nejvyšší prioritou, což bude element s nejnižší hodnotou času.
+Plánovač události je naimplementován jako prioritní fronta za využiti vestavěné knihovny \href{https://docs.python.org/3/library/heapq.html}{\texttt{heapq}} v jazyce Python. Api naznačuje ze pro přidaní a vyberu prvku se používají metody \texttt{heappush} a \texttt{heappop}. Priorita v takové frontě se určuje číselnou hodnotou, která se vkládá do fronty. Tato hodnota muže byt prvním prvkem v seznamu elementu. Druhým parametrem pro určeni priority je poradí, ve kterém prvek byl vložen. Tato sada pravidel umožňuje vkládat záznamy, obsahující čas spuštěni jako první prvek, a podle toho se zařadí na přisluhující místo ve frontě. Metoda \texttt{heappop} vybere prvek ze seznamu s nejvyšší prioritou, což bude element s nejnižší hodnotou času.
+
+Pro účel plánování události se používají dvě funkce - \texttt{schedule\_at} \ref{code:schedule-at} a \texttt{schedule} \ref{code:schedule}. Jedna slouží pro vkládaní událostí na čas od začátku simulace, když ta druha pracuje se současným časem simulace. Funkce jsou určeny pro počáteční spouštění sítí po přidaní do simulátoru.
+
+Záznamy musejí mít odpovídat určitým zásadám, aby simulator byl schopny ten záznam zpracovat. Kazdy záznam obsahuje ve své struktuře referenci na volanou funkci, jako první element. Následující prvky seznamu jsou argumenty, které budou předaný této funkci ve chvíli její vyhodnocení.
+
+Ukázku takového záznamu můžete vidět na řádku \ref{code:event-struct}.
+
+\begin{python}
+  ev = [simul.execute_net, net.name] # Udalost a jeji argumenty (*\label{code:event-struct}*)
+  # Planovani udalosti na soucasny okamzik.
+  sim.schedule(event=ev, tm=PNSim.NOW, prior=0) (*\label{code:schedule}*)
+  # Planovani udalosti na cas 15s od zacatku simulace.
+  sim.schedule_at(event=ev, tm=15, prior=0) (*\label{code:schedule-at}*)
+\end{python}
 
 
 \chapter{Aplikace}
@@ -437,15 +466,35 @@ Plánovač události je naimplementován jako prioritní fronta za využiti vest
 \label{sec:tepelne-rizeni}
 Pro demonstraci prací simulátoru bylo rozhodnuto namodelovat distribuovaný system modelující chovaní topení, který pravděpodobně používáte u sebe doma. Takový system se sestavuje z několika častí. Základním prvkem je plynový spotřebič, nebo boiler. Ten ohřívá vodu a uvádí ji do pohybu po potrubích. Pak kazdy z pokojů ma na starosti tepelné čidlo a řízeni, které udržuje v pokoji nastavenou teplotu podle kalendáře teplot pro daný čas. Kazdou hodinu se z tabulky teplot vezme aktuální teplota pro současnou hodiny a tento pokoj, pak řízeni rozhodne jestli ma zapnout topení nebo ne. Pokud žádný z pokojů v současné době nemá zapnuté topení, tak karma se musí vypnout za účelem setřeni plynu. Toto řízeni provádí vestavěny system v boileru, protože je zcela mechanicky. Kazdy z tech prvku bude dale namodelován Petriho sítěmi. Pro pochopení struktury viz. \ref{boiler-net}.
 
+\section{Struktura aplikace}
+
+Navrch \ref{boiler-net} se sestavuje ze 5 častí:
+\begin{itemize}
+  \item Řízení
+  \item Sklep
+  \item Obývací pokoj
+  \item Kuchyně
+  \item Vnější prostředí
+\end{itemize}
+Kazda z častí navrchu je zvláštní instance simulátoru. Taková instance může byt spouštěna nebo pozastavena v různou dobu a zcela nezávislá na jiných instancích simulátoru, nebo jiných podmínkách.
+
+Takové rozdělení se vysvětluje snahou napodobovat skuteční rozložení pokojů. Ve sklepu se nachází boiler, což je reprezentováno Petriho sítí zvané \uv{\texttt{Boiler}}, a stav teploty toho pokoj se řídí svým vlastním mikropočítačem, a jeho reprezentací je síť \uv{\texttt{Sklep: simulace prostředí}}. Skutečnou siť pro boiler můžete vidět na obrázku \ref{boiler-logic-viz}, a její popis je v \todo{}.
+
+Pak každý z pokojů disponuje svou vlastní instancí simulátoru, která simuluje teplotní změny uvnitř pokoje.
+
+Poslední, ale přesto nejdůležitější častí navrchu \ref{boiler-net} je řízení pokojů. Ve reálných podmínkách, takové řízení se provádí na zvláštním serveru, což reprezentuje instance simulace, zvána \uv{\texttt{Řízení}}. Její součásti jsou Petriho sítě, simulující chovaní čidel a ventilu radiátoru v pokoji, jako \uv{\texttt{Kuchyně:
+řízení ventilu}}, a taky tabulky očekávaných teplot pro danou čas \uv{\texttt{Tabulka
+teplot}}.
+
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\textwidth]{obrazky-figures/boiler-net.pdf}
+  \includegraphics[width=0.85\textwidth]{obrazky-figures/boiler-net.pdf}
   \caption{Architektura aplikace}
   \label{boiler-net}
 \end{figure}
 
-Aby tento návrh co nejpřesněji odpovídal realitě, bylo rozhodnuto namodelovat chovaní teploty v pokoji.
-
+Aby tento návrh co nejpřesněji odpovídal realitě, bylo rozhodnuto namodelovat chovaní teploty v pokoji. Pro ten účel slouží například síť \uv{\texttt{Sklep: simulace prostředí}}.
+\todo{rozdel to nejak}
 Pro splnění tohoto úkolu, nejdříve musíme vědět jak výkonné je topení v pokoji. Běžné hodnoty pro tři druhy pokojů můžete vidět v následující tabulce \ref{tab:TepelneZtraty}. Dale nas zajímají tepelné ztráty a taky množství energii potřebné pro ohráti pokoje. Pro výpočet tohoto parametru použijeme následující vzoreček. Základní parametrem rozhodujícím o tepelné kapacitě pokoje je plocha vnitřního povrchu pokoje $V$, respektive celková plocha povrchu stopu, podlahy a sten. Pro ně je dolezte vědět koeficient ztrať tepla $K$. Zvlášť se počítají okna a dveře, vzhledem k jejich vetší vodivosti tepla. Pak zbývá jenom zjistit rozdíl současné teploty uvnitř pokoje a očekávané teploty pro tuto hodinu - $\Delta{T}$. To všechno dosadíme do vzorečku a zjistíme celkové množství energii potřebné pro jeho ohráti. \cite{tep_calc}
 \begin{center}
   $Q[kW/h] = \frac{V*\Delta{T}*K}{860}$
@@ -492,6 +541,21 @@ Vychází to zhruba následné:
 
 Cele chovaní systému odpovídá zákonu zachovaní energii, a tak můžeme odvodit rovnici pro výpočet potřebného její množství.
 
+\section{Simulace vnějšího prostředí}
+Tato cast aplikace je vyhrazena do zvláštní simulační instanci, vzhledem k tomu že není závislá na žádných jiných částech aplikace. Obsahuje jenom jednu síť ve svém zapouzdření -- Simulace počasí a času \ref{weather-viz}. Tá síť vytváří dvě podstatné věci pro tuto aplikaci, čas a teplotu pro tento čas. Podrobnější navrch a implementace je v \ref{subsec:mereni-teploty}.
+
+\section{Simulace pokojů}
+
+V rámci této simulace se popisuje chovaní řídicího systému senzoru a simuluje se chovaní teploty v každém z pokojů. Řízení -- \ref{sensor-viz}. Převod změn energii na teplotu \ref{room-temp-viz}, výměna energii se vnějším prostředím -- \ref{exchange-viz}, tabulka očekávaných teplot pro pokoj -- \ref{room-table-viz}, simulace ohřívaní pokoje -- \ref{heater-viz}. 
+
+\section{Řízení pokojů}
+
+Následující Petriho sítě provádějí obsluhu systému pokojů. K ním patří, například, řízení senzoru \ref{senzor-viz} a tabulka očekávaných teplot v pokoji \ref{room-table-viz}během dané hodiny.
+
+\section{Simulace boileru}
+
+Taky součásti simulace je popis chovaní boileru. Jeho cíli je sledovaní stavu ventilů v pokojích, a pokud nějaký z nich je otevřeny, tak začít pracovat na jeho topení \ref{boiler-logic-viz}.
+
 \subsubsection{Přesnost simulace}
 
 Stojí za to se zmínit, že účelem této aplikace není zcela přesná simulace chování topení, ale její zjednodušená kopie. Do úvahy se nebere například to, že rychlost výměny tepla ze vnějším prostředím není konstantní, jak je uvedená v tabulce \ref{tab:TepelneZtraty}, ale je závislá na spoustě parametru, jako teplota vnějšího prostředí, material a tloušťka stěn pokoje atd. To se nepočítá v současném navrchu, ale může být přidáno ve případě potřeby. Účelem této aplikace je vizualizace práce vytvořeného simulátoru.
@@ -504,7 +568,7 @@ Pravděpodobnostní přechody modeluji náhodné jevy jako oteplení nebo ochlaz
 
 Vizuální reprezentací celé site můžete vidět na obrázku \ref{thermometr-viz}.
 
-Obrázek \ref{thermometr-viz} byl vygenerován v průběhu práci simulátoru, díky použítí rozšíření \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Toto rozšíření, spolu s menšími vizuálními změny jiných rozšíření, zaměřených na jednotlivé prvky sítě, dokáže spolehlivě vygenerovat obrázek Petřino sítě, podobný \ref{thermometr-viz}, v jakýkoliv okamžik simulace. Táto síť je poměrně jednoduchá na pochopení, a zároveň názorně ukazuje použítí většiny neimplementovaných rozšíření.
+Obrázek \ref{thermometr-viz} byl vygenerován v průběhu práci simulátoru, díky použítí rozšíření \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/API/plugins/gv.html}{\uv{gv}}. Toto rozšíření, spolu s menšími vizuálními změny jiných rozšíření, zaměřených na jednotlivé prvky sítě, dokáže spolehlivě vygenerovat obrázek Petřino sítě, podobný \ref{thermometr-viz}, v jakýkoliv okamžik simulace. Táto síť je poměrně jednoduchá na pochopení, a zároveň názorně ukazuje použítí většiny naimplementovaných rozšíření.
 
 Pro vytvoření obrázku je specifikován jednoduchý příkaz \pyth{draw("file.png")}, a celý \hyperref[code:thermometr-draw]{postup} vypadá následně:
 
@@ -661,28 +725,28 @@ Pro vytvoření obrázku je specifikován jednoduchý příkaz \pyth{draw("file.
   \centering
   \includegraphics[width=\textwidth]{obrazky-figures/room-temp-upd.png}
   \caption{Převod energii na stupnici celsia.}
-  \label{thermometr-viz}
+  \label{room-temp-viz}
 \end{figure}
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.6\textwidth]{obrazky-figures/room-timetable.png}
   \caption{Tabulka teplot pro pokoj.}
-  \label{thermometr-viz}
+  \label{room-table-viz}
 \end{figure}
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{obrazky-figures/weather-sim.png}
   \caption{Simulace počasí a času.}
-  \label{thermometr-viz}
+  \label{weather-viz}
 \end{figure}
 
 \begin{figure}[httb]
   \centering
   \includegraphics[width=\textwidth]{obrazky-figures/boiler-logic.png}
   \caption{Simulace boileru.}
-  \label{thermometr-viz}
+  \label{boiler-logic-viz}
 \end{figure}
 
 \chapter{Závěr}
