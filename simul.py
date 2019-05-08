@@ -15,7 +15,7 @@ snakes.plugins.load(["gv", "let"], "snakes.nets", "plugins")
 from snakes.nets import *
 from plugins import *
 
-h = logging.FileHandler('out.log', 'w')
+h = logging.FileHandler('planner.log', 'w+')
 h.setLevel(logging.DEBUG)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(threadName)s - %(message)s', handlers=[h])
 

@@ -62,7 +62,7 @@ class Mqtt_client():
             if not net.has_place(message['target_place']):
                 self.control_publish(
                     f"F, {message['payload']} - " +
-                    f'Error: place "{message["target_place"]}" is not found in net "{net.name}"')
+                    f'Error: place "{message["target_place"]}" was not found in net "{net.name}"')
             try:
                 if message['action'] == 'set_input':
                     self.configure_internal_input_port(
@@ -228,9 +228,7 @@ class Mqtt_client():
         msg['payload'] = p
         msg['topic'] = message.topic
         if msg['topic'] == 'control':
-            # msg['target_place'] = msg['topic'].split('/'[-1])
             msg['type'], msg['content'] = p.split(', ', 1)
-            # print(self.net.name, 'received', p)
             if msg['type'] == 'R':
                 msg['action'], target_topic, msg['source_topic'] = msg['content'].split(', ')
                 msg['target_net'], msg['target_place'] = target_topic.split('/')
