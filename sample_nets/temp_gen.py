@@ -1,8 +1,6 @@
-#!/usr/bin/python3
+from .imports import *
 import inspect
-from template import *
 
-nets = []
 
 def temp_placement(Tmin, Tmax, k):
     """
@@ -205,29 +203,3 @@ def add_net_entry(n, en_prev=None, en_next=None, temp=None):
         tr.add_output(p_next, Variable('time_next'))
         tr.add_output(new_exp, Value(temp))
         n.add_transition(tr)
-
-
-def execute():
-    timetable = {
-        'kitchen': [
-            (23, 00, 19.0),
-            (6, 00, 22.0),
-            (10, 00, 20.0),
-            (19, 00, 21.0)
-        ],
-        'dining_room': [
-            (23, 00, 18.0),
-            (6, 30, 22.0),
-            (10, 00, 19.0),
-            (17, 00, 21.0)
-        ]
-    }
-    temp_gen = temp_generator(
-        'weather-generator', low=5, high=18, samples=100, speedup=100)
-    nets.append(temp_gen)
-    for room in timetable:
-        nets.append(room_timetable(room, timetable[room]))
-    execute_nets(nets, sim_id='Surroundings-simulation')
-
-if __name__ == '__main__':
-    execute()

@@ -1,7 +1,4 @@
-#!/usr/bin/python3.7
-
-from template import *
-
+from .imports import *
 
 def room_sens(room_name, exp_temp):
     name = f'{room_name}-sensors'
@@ -193,50 +190,3 @@ def room_heating(room_name, q_gps, heat_time):
     n.add_remote_input(vupd, f'{room_name}-sensors/Valve state')
 
     return n
-
-
-def execute(rooms=None):
-    nets = []
-
-    if rooms is None:
-        rooms = {
-            'kitchen': {
-                'qpc': 17.5,
-                'q_gps': 0.34,  # W/s
-                'q_lps': 0.2,  # W/s
-                'heat_time': 5,  # Timeout for heater output update
-                'exch_time': 30, # Timeout for temp loss/gain update
-                'exp_temp': 20.0,
-                'starting_temp': 18.0
-            },
-            'dining_room': {
-                'qpc': 24.0,
-                'q_gps': 0.5,  # W/s
-                'q_lps': 0.4,  # W/s
-                'heat_time': 5,  # Timeout for heater output update
-                'exch_time': 30,  # Timeout for temp loss/gain update
-                'exp_temp': 19.0,
-                'starting_temp': 18.0
-            },
-            'storeroom': {
-                'qpc': 24.0,
-                'q_gps': 0.5,  # W/s
-                'q_lps': 0.4,  # W/s
-                'heat_time': 5,  # Timeout for heater output update
-                'exch_time': 30,  # Timeout for temp loss/gain update
-                'exp_temp': 15.0,
-                'starting_temp': 5.0
-            }
-        }
-    for room in rooms:
-        args = rooms[room]
-        nets.append(room_heating(room, args['q_gps'], args['heat_time']))
-        nets.append(room_temp_update(room, args['qpc'], args['starting_temp']))
-        nets.append(room_outside_exchange(room, args['q_lps'], args['exch_time']))
-        nets.append(room_sens(room, args['exp_temp']))
-
-    execute_nets(nets, sim_id='room-simulation')
-
-
-if __name__ == "__main__":
-    execute()

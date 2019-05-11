@@ -1,5 +1,4 @@
-#!/usr/bin/python3.7
-from template import *
+from .imports import *
 
 
 def boiler_logic(name):
@@ -67,10 +66,3 @@ def boiler_logic(name):
     n.add_transition(disboil)
 
     return n
-
-def execute():
-    boiler_log = boiler_logic('boiler-logic')
-    execute_nets(boiler_log, sim_id='boiler-logic')
-
-if __name__ == "__main__":
-    execute()
