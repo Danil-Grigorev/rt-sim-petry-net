@@ -24,7 +24,6 @@ class Mqtt_client():
         self.setup_client()
 
     def on_message(self, client, userdata, message):
-        print('***', self.simul.id, message.topic, message.payload.decode('utf-8'))
         data = self.parse_msg(message)
         if data['topic'] == 'control':
             self.serve_control(data)
