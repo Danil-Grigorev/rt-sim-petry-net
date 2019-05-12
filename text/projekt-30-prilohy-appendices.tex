@@ -6,8 +6,10 @@
 %\chapter{Obsah přiloženého paměťového média}
 
 \chapter{Instalační manuál}
+\label{chap:instal-tutor}
 
-Pokud byste potřebovali odzkoušet simulační nástroj z této práci, tak bych doporučoval udělat této kroky instalace.
+\section{Instalace simulátoru}
+Pokud byste potřebovali odzkoušet simulační nástroj z této práci, tak bych doporučoval provést této kroky instalace.
 \begin{enumerate}
     \item Nainstalovat si balíčky \texttt{python3.6}, \texttt{graphviz}, \texttt{python3-pip}, \texttt{git}.
     \item Nainstalovat knihovnu SNAKES podle nějakého z postupu v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu}. \label{pip-snakes}
@@ -32,3 +34,26 @@ Pokud byste potřebovali odzkoušet simulační nástroj z této práci, tak byc
     \end{itemize}
 
 \end{enumerate}
+
+\section{MQTT broker}
+
+V mém \href{https://github.com/Danil-Grigorev/rt-sim-petry-net}{repositáři} se taky nachází konfigurační soubor pro případ, že byste neměli k dispozici MQTT broker. Je to soubor \href{https://github.com/Danil-Grigorev/rt-sim-petry-net/blob/master/hbmqtt.conf}{hbmqtt.conf}, a abyste takový server spustili na lokálním počítači, stačí k tomu příkaz \texttt{hbmqtt -c hbmqtt.conf}.
+
+Pro instalaci tohoto nástroje, stačí spustit příkaz \texttt{pip3 install hbmqtt}.
+
+\section{Šablona pro simulator}
+
+Běžný způsob použítí simulátoru předpokládá využití třídy \texttt{PNSim}, ale pro zjednodušení jsem se rozhodl vytvořit \href{https://github.com/Danil-Grigorev/rt-sim-petry-net/blob/master/template.py}{šablonu} pro spuštění simulátoru. Použítí je snadné: \ref{code:template-example}.
+
+\begin{python}
+    # Import metod ze sablony (*\label{code:template-example}*)
+    from template import *
+    nets = [] # Seznam Petriho siti pro simulaci
+    (*\ldots*) # Implementace Petriho siti a pridani instanci do seznamu
+    execute_nets(nets, sim_id='server') # Spusteni simulacni instance pod nazvem 'server'
+\end{python}
+
+\section{Ukázka externí aplikace}
+\label{sec:external-app-example}
+
+Postup pro vytvoření takové aplikace se nachází v kapitole \ref{subsec:external-app}, výsledný kód z komentáři je součástí \href{https://github.com/Danil-Grigorev/rt-sim-petry-net/blob/master/temperature_logger.py}{tohoto} souboru.
