@@ -28,7 +28,7 @@ def add_net(net, sim):
     sim.schedule_at([sim.execute_net, net.name], PNSim.NOW)
 
 
-def execute_nets(net_list, broker=None, sim_id=None, detached=True, debug=True):
+def execute_nets(net_list, broker="127.0.0.1", sim_id=None, detached=True, debug=True):
     signal.signal(signal.SIGTERM, terminate)
     signal.signal(signal.SIGINT, terminate)
     sim = PNSim(broker=broker, simul_id=sim_id, detached=detached, debug=debug)

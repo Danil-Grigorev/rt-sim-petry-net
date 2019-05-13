@@ -59,12 +59,18 @@ class PNSim(Thread):
         else:
             rand_id = predefined_id
         png_dir = os.path.dirname(__file__)
-        png_dir = os.path.join(png_dir, 'nets_png')
+        png_dir = os.path.join(png_dir, 'net-drawings')
         if not os.path.exists(png_dir):
             os.mkdir(png_dir)
-        png_dir = os.path.join(png_dir, rand_id)
-        if not os.path.exists(png_dir):
-            os.mkdir(png_dir)
+        sim_dir = os.path.join(png_dir, rand_id)
+        if not os.path.exists(sim_dir):
+            os.mkdir(sim_dir)
+        starting_dir = os.path.join(sim_dir, 'starting')
+        current_dir = os.path.join(sim_dir, 'current')
+        if not os.path.exists(starting_dir):
+            os.mkdir(starting_dir)
+        if not os.path.exists(current_dir):
+            os.mkdir(current_dir)
         return rand_id
 
     def setup(self, end_time=INF):
@@ -162,6 +168,15 @@ class PNSim(Thread):
                 PNSim.wake_event.wait(self.end_time - self.cur_time())
 
     def execute_net(self, net):
+        """
+        Main method for net execution, will execute all transition in deterministic
+        order, until none of transitions will be enabled, then finish the execution.
+
+        After finishing the execution will draw the current state into the 'current'
+        directory for the selected simulation, and send all tokens from output ports.
+
+        net -- Instance of Petri Net to execute
+        """
         net = self._nets[str(net)]
         print(f'{self.id}: Executing net {net.name}')
         logging.info(
@@ -174,7 +189,7 @@ class PNSim(Thread):
             finished_execution = self.execute_groups(presorted_tr)
         if self.debug:
             self.draw_net(net, act=True)
-        net.send_tokens()
+        net.send_tokens() # Sending tokens from output ports
         self.wake()
 
     def draw_net(self, net, act=False):
@@ -182,17 +197,17 @@ class PNSim(Thread):
         Simple function to draw net images for visualization.
 
         The structure is following:
-            <simulator path>/nets_png/<simulation name>/<net name>.png
+            <simulator path>/net-drawings/<simulation name>/starting|current/<net name>.png
 
         net -- Petri Net instance to be drawn.
-        act -- by default is false, allows to draw an instance with prefix:
-                    -current-state.png, for debugging purposes.
+        act -- by default is false, allows to draw an instance in 'current'
+               directory, for debugging purposes.
         """
         try:
             if act:
-                net.draw(f'nets_png/{self.id}/{net.name}-current-state.png')
+                net.draw(f'net-drawings/{self.id}/current/{net.name}.png')
             else:
-                net.draw(f'nets_png/{self.id}/{net.name}.png')
+                net.draw(f'net-drawings/{self.id}/starting/{net.name}.png')
         except:
             pass
 
