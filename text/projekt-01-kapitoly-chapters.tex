@@ -150,7 +150,7 @@ Distribuované systémy musejí používat decentralizované algoritmy, které p
 
 Z definice taky vyplývá, ze distribuovaný systém se obecně sestavuje z více se opakujících prvků, které fungují nezávisle na sobě a nemají přístup ke sdílené paměti, neboli každý prvek má svoji vlastni. Sdíleni stavu v případe distribuovaného systému se provádí pomoci zasílaní zprav.
 
-Tento koncept je velice dobře použitelný pro modelování. Prvky budou reprezentovány Petriho sítěmi, provázané komunikačními kanály. Jelikož každá Petriho síť je prvek nezávislý na vnějších podmínkách, ale jen na současném stavu mist a přechodu a taky jejich kombinaci, tak se to dá pojmenovat decentralizovaným algoritmem. Petriho síť si můžeme představit jako nezávislý blok, kdežto pro komunikaci mezi těmito bloky se dá použít protokol MQTT \ref{subsec:mqtt-proto}, který díky svým vlastnostem dokaže obsloužit neomezené množství klientů najednou. Případ implementace tepelného řízeni \ref{sec:tepelne-rizeni} názorně ukazuje použití dané myšlenky v praxi.
+Tento koncept je velice dobře použitelný pro modelování. Prvky budou reprezentovány Petriho sítěmi, provázané komunikačními kanály. Jelikož každá Petriho síť je prvek nezávislý na vnějších podmínkách, ale jen na současném stavu mist a přechodu a taky jejich kombinaci, tak se to dá pojmenovat decentralizovaným algoritmem. Petriho síť si můžeme představit jako nezávislý blok, kdežto pro komunikaci mezi těmito bloky se dá použít protokol MQTT \ref{subsec:mqtt-proto}, který díky svým vlastnostem dokaže obsloužit neomezené množství klientů najednou. Případ implementace řízeni topení \ref{sec:tepelne-rizeni} názorně ukazuje použití dané myšlenky v praxi.
 
 \subsection{Diskrétní simulace}
 \label{subsec:disc-sim}
@@ -202,11 +202,11 @@ Tento algoritmus nachází svoje použití v mnoha simulačních případech. B�
 
 Hardware-in-the-loop nebo HIL je technika používaná pro vývoj a testování řídících částí komplexních systémů, díky níž se fyzické části systému nahrazují jejích simulaci a umožňují plynulé testování ještě před nasazením do provozu \cite{hil}.
 
-Vezmeme si například řídící systém auta. Pokud se to auto zkonstruuje hned, co se dokončí navrh, tak je velká pravděpodobnost výskytu chyby, která může stát někoho život. Samozřejmě před nasazením do provozu se nový výrobek poradně testuje, ale často to objeví chybu, která je následkem jiné chyby. Pokud testujeme systém jako celek, přijít na takovou chybu je poměrně těžké, a časově a zdrojově náročné.
+Vezmeme si například řídící systém auta. Pokud se to auto zkonstruuje hned, co se dokončí návrh, tak je velká pravděpodobnost výskytu chyby, která může stát někoho život. Samozřejmě před nasazením do provozu se nový výrobek poradně testuje, ale často to objeví chybu, která je následkem jiné chyby. Pokud testujeme systém jako celek, přijít na takovou chybu je poměrně těžké, a časově a zdrojově náročné.
 
 Pro takový případ není špatné si rozdělit celý systém na části a testovat každou zvlášť. Ale je těžké představit si auto, které má karosérii oddělenou zvlášť od kol, ale přesto jezdí. HWIL simulace takový problém vyrušuje tak, že kolo \uv{si myslí} že jede jako součást celého auta, tím že všechny jeho vztahy s ostatními částmi auta modelují simulaci.
 
-Simulátor tepelného řízení \ref{sec:tepelne-rizeni} není sice věc, která by v případě běžné poruchy stála někoho život, ale pro demonstraci implikace HWIL stačí. V tomto případě navíc jde o druh simulace, zvané \uv{Reality-in-the-loop} nebo RIL. Realita je v tom případě součástí takových simulovaných prvků jako \ref{sec:mereni-teploty}.
+Simulátor řízení topení \ref{sec:tepelne-rizeni} není sice věc, která by v případě běžné poruchy stála někoho život, ale pro demonstraci implikace HWIL stačí. V tomto případě navíc jde o druh simulace, zvané \uv{Reality-in-the-loop} nebo RIL. Realita je v tom případě součástí takových simulovaných prvků jako \ref{sec:mereni-teploty}.
 
 \subsection{MQTT protokol}
 \label{subsec:mqtt-proto}
@@ -236,7 +236,7 @@ Příklad: \= \\
 \> \texttt{net2/portX} -- přijímá zprávy jenom na téma \texttt{net2/portX}. \\
 \end{tabbing}
 
-Příklady aplikace tohoto pojmu můžete vidět na příkladě \ref{code:remote-in-out}, nebo jiných aplikací \todo{}.
+Příklady aplikace tohoto prvku můžete vidět na příkladě \ref{code:remote-in-out}, nebo jiných aplikací \
 
 \paragraph{Zpráva}
 \label{par:message}
@@ -610,12 +610,12 @@ Pro účely vývoje simulátor vypisuje logy z plánovače události do souboru 
 \chapter{Aplikace -- návrh}
 \label{chap:app-arch}
 
-V této kapitole je popsán návrh a implementace zvolené aplikace simulátoru -- chovaní tepelného řízení.
+V této kapitole je popsán návrh a implementace zvolené aplikace simulátoru -- chovaní řízení topení.
 
-\section{Tepelné řízeni}
+\section{Řízeni topení}
 \label{sec:tepelne-rizeni}
 
-Pro demonstraci práce simulátoru bylo rozhodnuto namodelovat distribuovaný systém modelující chování topení, který pravděpodobně používáte u sebe doma. Takový systém se sestavuje z několika částí. Základním prvkem je plynový spotřebič nebo boiler. Ten ohřívá vodu a uvádí ji do pohybu po potrubích. Pak každý z pokojů ma na starosti tepelné čidlo a řízení, které udržuje v pokoji nastavenou teplotu podle kalendáře teplot pro daný čas. Kazdou hodinu se z tabulky teplot vezme aktuální teplota pro současnou hodinu a tento pokoj, pak řízení rozhodne jestli má zapnout topení nebo ne. Pokud žádný z pokojů v současné době nemá zapnuté topení, tak se karma musí vypnout za účelem šetření plynu. Toto řízení provádí vestavěný systém v boileru, protože je zcela mechanický. Každý z těch prvků bude dále namodelován Petriho sítěmi. Pro pochopení struktury viz. \ref{boiler-net}.
+Pro demonstraci práce simulátoru bylo rozhodnuto namodelovat distribuovaný systém modelující chování topení, který pravděpodobně používáte u sebe doma. Takový systém se sestavuje z několika částí. Základním prvkem je plynový spotřebič nebo boiler. Ten ohřívá vodu a uvádí ji do pohybu po potrubích. Pak každý z pokojů ma na starosti tepelné čidlo a řízení, které udržuje v pokoji nastavenou teplotu podle kalendáře teplot pro daný čas. Kazdou hodinu se z tabulky teplot vezme aktuální teplota pro současnou hodinu a tento pokoj, pak řízení rozhodne jestli má zapnout topení nebo ne. Pokud žádný z pokojů v současné době nemá zapnuté topení, tak se karma musí vypnout za účelem šetření plynu. Toto řízení provádí vestavěný systém v bojleru, protože je zcela mechanický. Každý z těch prvků bude dále namodelován Petriho sítěmi. Pro pochopení struktury viz. \ref{boiler-net}.
 
 \section{Struktura aplikace}
 
@@ -694,7 +694,7 @@ Celé chování systému odpovídá zákonu zachování energie, a tak můžeme 
 \chapter{Aplikace -- implementační detaily}
 \label{chap:app-implementation}
 
-V této kapitole jsou detajlně popsany obrázky Petriho sítí, vygenerované během simulace, které umožnují simulaci senzorů tepelného řízení pokojů \ref{sec:server-details}, ohřívaní pokoje a převod energii na teplotu pokoje -- \ref{sec:room-sim-details}, a jiné.
+V této kapitole jsou detailně popsaný obrázky Petriho sítí, vygenerované během simulace, které umožňují simulaci senzorů teplotního řízení pokojů \ref{sec:server-details}, ohřívaní pokoje a převod energii na teplotu pokoje -- \ref{sec:room-sim-details}, a jiné.
 
 \section{Simulace vnějšího prostředí}
 Tato část aplikace je vyhrazena do zvláštních simulačních instanci, vzhledem k tomu že není závislá na žádných jiných částech aplikace. Obsahuje jenom jednu síť ve svém zapouzdření -- Simulace počasí a času \ref{weather-viz}. Tato síť vytváří dvě podstatné věci pro tuto aplikaci, čas a teplotu pro tento čas. Podrobnější návrh a implementace je v \ref{sec:mereni-teploty}.
@@ -713,7 +713,11 @@ V rámci této simulace se popisuje chování řídícího systému senzoru a si
 
 \subsection{Výměna energii se vnějším prostředím}
 
-Obrázek -- \ref{exchange-viz}
+Tato Petriho síť je jednou ze součásti simulace pokoje, a může být vyměněna za podrobnější a rozsáhlejší její variantu ve případě že přesnost simulace je bodem srázu. Její cílem je modelovat chování změny teploty v pokoji během výměny teploty se vnějším prostředím. Pro tento účel slouží srovnání současné hodnoty teploty venku a vevnitř pokoje. První hodnota je uložena pro lokální využití v místě s názvem \uv{\texttt{Temperature outside}}. O její aktualizaci se stará vstupní port \uv{\texttt{Outside update}}. Pro aktualizaci vnitřní teploty je vstupní port \uv{\texttt{Inside temp update}} a lokální hodnota se nachází v \uv{\texttt{Temperature inside}}.
+
+Výměna teploty se vnějším prostředím se provádí na základě pollingu každých $30$ vteřin, což se řídí časovanými přechody \uv{\texttt{Temperature gain}} a \uv{\texttt{Temperature loss}}. Výsledek provádění takového přechodu je vzorec, který spočítá kolík [W] energii bylo ztráceno nebo získáno během těch $30$ vteřin -- $q\_lps*exch\_time$. Hodnota $q\_lps$ je definovaná jako globální proměna v prostředí Petriho sítě. Kód této sítě se nachází v \href{https://github.com/Danil-Grigorev/rt-sim-petry-net/blob/master/sample_nets/temp_sensor.py}{souboru} \texttt{temp\_sensor.py}.
+
+Výsledek můžete vidět na obrázku \ref{exchange-viz}.
 
 \subsection{Převod změn energii na teplotu}
 
@@ -748,15 +752,19 @@ Obrázek -- \ref{heater-viz}.
 \section{Řízení pokojů}
 \label{sec:server-details}
 
-Následující Petriho sítě provádějí obsluhu systému pokojů. K nim patří, například řízení senzoru \ref{sensor-viz} a tabulka očekávaných teplot v pokoji \ref{room-table-viz} během dané hodiny.
+Následující Petriho sítě provádějí obsluhu systému pokojů. K nim patří, například řízení senzoru \ref{subsec:room-control} a tabulka očekávaných teplot v pokoji \ref{subsec:room-table} během dané hodiny.
 
 \subsection{Řízení}
+\label{subsec:room-control}
 
-Obrázek můžete vidět v \ref{sensor-viz}
+Řízení pokojů je vizualizované na obrázku \ref{sensor-viz}. Funkce senzoru je velice jednoduchá, a spočívá v oznámení bojleru že pokoj potřebuje zapnout ohřívaní. To se provádí odesíláním dvojici \uv{\texttt{("jméno pokoje", "ventil je otevřen")}} z portu \uv{\texttt{Valve state}}. Pro splnění tohoto úkolu, síť potřebuje porovnat hodnoty očekávané teploty pro daný pokoj na tento čas, a současné teploty v pokoji. Informací o poslední přichází do portu \uv{\texttt{Temperature inside}}. Takové srovnání se musí provádět jen tehdy, kdy se stane nějaká změna v současné teplotě pokoje.  Pro oznámení změn teploty uvnitř, slouží port \uv{\texttt{Temperature update}}. Současný stav očekávané teploty se ukládá do místa \uv{\texttt{Expected temperature}}.
 
 \subsection{Tabulka očekávaných teplot}
+\label{subsec:room-table}
 
-Obrázek můžete vidět v \ref{room-table-viz}
+Účelem této Petrího sítí je dynamická změna očekávané teploty v pokoji podle příchozí hodnoty času. Tu, Petriho síť na obrázku \ref{room-table-viz} obdrží ze vstupního portu pod názvem \uv{\texttt{Time update}}. Následující obsah tabulky je vytvořen dynamicky. Jsou to místa pod názvem Time-HH:MM, obsahující číselný token, reprezentující  počet vteřin z počátku dne. Té hodnoty se použijí pro zjišťování, do kterého časového rozmezí spadá nová hodnota času. Podle něj určí teplota v pokoji por danou dobu, která se vezme z výstupní šipky přechodu s názvy \uv{\texttt{Enable: HH:MM--HH:MM}}. Výsledek bude uložen do místa \uv{\texttt{Expected update}}.
+
+Pokud nová hodnota očekávané teploty se liší od předchozí, která je uložena v místě \uv{\texttt{Expected temperature}}, tak ta změna bude předaná pro odesílaní výstupnímu portu \uv{\texttt{Temperature update}}.
 
 \begin{figure}[htb]
  \centering
@@ -773,15 +781,19 @@ Obrázek můžete vidět v \ref{room-table-viz}
 \end{figure}
 
 
-\section{Simulace boileru}
+\section{Simulace bojleru}
 \label{sec:boiler-net-details}
 
-Součásti simulace je taky popis chování boileru. Jeho cílem je sledování stavu ventilů v pokojích a pokud je nějaký z nich otevřený, tak začít pracovat na jeho topení \ref{boiler-logic-viz}.
+Součásti simulace je taky popis chování bojleru. Jeho cílem je sledování stavu ventilů v pokojích. Sémantika je jednoduchá -- pokud je nějaký z pokojů má otevřený ventil, on to oznámí vstupnímu portu \uv{\texttt{Sensory input}} dvojicí tokenů \texttt{("name", "enabled")}. Když alespoň jeden pokoj má otevřený ventil, tak boiler musí začít pracovat na jeho ohřáti.
+
+Celá síť obsahuje dvá základní řídící místa -- \uv{\texttt{Table}} a \uv{\texttt{Active Table}}. První je tabulka registrace pokojů. Tam se ukládá aktuální stav ventilu pokoje, dokud nebyla změna jeho stavu zpracovaná aktivní tabulkou. V aktivní tabulce se nacházejí pokoje, které v danou chvílí požadují zapnuté topení. Pokud je v ní alespoň jeden takový pokoj, tak boiler se přepne do zapnutého stavu. Současný stav bojleru je uložen v místě \uv{\texttt{Boiler Enabled}}, a změny jeho stavu se oznamují na výstupní port \uv{\texttt{Boiler state}}.
+
+Výsledná síť je na na obrázku \ref{boiler-logic-viz}.
 
 \begin{figure}[httb]
  \centering
  \includegraphics[width=\textwidth]{obrazky-figures/boiler-logic.png}
- \caption{Simulace boileru.}
+ \caption{Simulace bojleru.}
  \label{boiler-logic-viz}
 \end{figure}
 
@@ -789,10 +801,10 @@ Součásti simulace je taky popis chování boileru. Jeho cílem je sledování 
 
 Stojí za to se zmínit, že účelem této aplikace není zcela přesná simulace chování topení, ale její zjednodušená kopie. Do úvahy se nebere například to, že rychlost výměny tepla s vnějším prostředím není konstantní, jak je uvedeno v tabulce \ref{tab:tepelne-ztraty}, ale je závislá na spoustě parametrů, jako teplota vnějšího prostředí, materiál a tloušťka stěn pokoje atd. To se nepočítá v současném návrhu, ale může být přidáno ve případě potřeby. Účelem této aplikace je vizualizace práce vytvořeného simulátoru a demonstrace využití v distribuovaných systémech.
 
-\chapter{Postup pro vytvoření ukázkové Petriho sítě}
+\chapter{Detailní popis implementace Petriho sítě v rámci simulátoru.}
 \label{chap:postup}
 
-V této kapitole je detailní popis pro vytvoření zjednodušené varianty Petriho sítě, simulující chování počasí během dne \ref{weather-viz}.
+V této kapitole je detailní popis vytvoření Petriho sítě, simulující chování počasí během dne \ref{weather-viz}.
 
 \section{Měření teploty venku}
 \label{sec:mereni-teploty}
@@ -812,7 +824,7 @@ Tato síť je poměrně jednoduchá na pochopení, a zároveň názorně ukazuje
 
 \paragraph{Krok 1:}
 
-Je důležité si nejdříve naimportovat pluginy a knihovnu SNAKES podle \ref{code:plugin-setup}. Každá síť si vytváří klauzuli \pyth{PetriNet('nazev site')}. Dále se do sítě musí přidat místa, přechody, a případně vstupní a výstupní porty, při použití simulátoru podle \ref{subsec:sim_pl}.
+Je důležité si nejdříve naimportovat rozšíření a knihovnu SNAKES podle \ref{code:plugin-setup}. Každá síť si vytváří klauzuli \pyth{PetriNet('nazev site')}. Dále se do sítě musí přidat místa, přechody, a případně vstupní a výstupní porty, při použití simulátoru podle \ref{subsec:sim_pl}.
 
 V případě potřeby se dá vytvořená síť vykreslit pomocí příkazu \pyth{draw(net_name+'.png')}
 
@@ -826,7 +838,7 @@ V případě potřeby se dá vytvořená síť vykreslit pomocí příkazu \pyth
 
 \paragraph{Krok 2:}
 
-Dále, abychom si namodelovali chování teploty během dne, musíme vytvořit generátor, který rozdělí den časti. V případě této implementace je to $48$ -- \ref{code:poll-freq}. Tedy každých $1800s$ se vytvoří nová teplota -- \ref{code:timed-temp-example}, což je použití pluginu \texttt{timed\_pl} z \ref{subsec:timed_pl}. Výsledek je na obrázku \ref{therm-gen-viz}.
+Dále, abychom si namodelovali chování teploty během dne, musíme vytvořit generátor, který rozdělí den častí. V případě této implementace je to $48$ -- \ref{code:poll-freq}. Tedy každých $1800s$ se vytvoří nová teplota -- \ref{code:timed-temp-example}, což je použití rozšíření \texttt{timed\_pl} z \ref{subsec:timed_pl}. Výsledek je na obrázku \ref{therm-gen-viz}.
 
 \begin{python}
  # Sit (*\ref{therm-gen-viz}*) (*\label{code:gen-therm-draw}*)
@@ -963,7 +975,7 @@ Další kapitola vyjasnila struktura simulatoru, využívající MQTT protokol. 
 
 Stejně jako bez rozšíření, simulator Petriho sítí v reálném čase by nebyl možný bez implementace plánovače událostí, informace o kterém byla popsana v dalsi sekci.
 
-Následující kapitola měla za úkol vyjasnit navrh aplikaci, demonstrující využití simulátoru pro modelování a simulaci distribuovaných systémů na příkladě chování tepelného řízení. Spolu s kapitolou \ref{chap:app-implementation} se zcela podrobně popsala prace navrzene aplikace.
+Následující kapitola měla za úkol vyjasnit navrh aplikaci, demonstrující využití simulátoru pro modelování a simulaci distribuovaných systémů na příkladě chování řízení topení. Spolu s kapitolou \ref{chap:app-implementation} se zcela podrobně popsala prace navrzene aplikace.
 
 Poslední kapitolou této práci byla ukázka implementaci jedné z Petriho sítí patřící do aplikace, která demonstrovala využití všech navrzenych rozšíření, a měla za účel naučit uživatele správně zacházet z knihovnou SNAKES, a tedy implementovat svoje vlastní nápady. Pro tento účel slouží appendix \ref{chap:instal-tutor}, který obsahuje instalační manuál a popisuje nástroje, usnadňující nastavení simulatru do 2 řádku kódu.
 
