@@ -1,6 +1,13 @@
 \chapter{Úvod}
 \label{chap:uvod}
 
+Formalizmus Petriho sítí v současné době nemá tolik uznání, kolík si tento modelovací prostředek zaslouží. Cílem této bakalářské práce je ukázat čtenářovi, kde všude se dá uplatnit matematický model Petriho sítí, a jaké výhody to přináší. Tato práce je zaměřena na docela populární téma distribuovaných systému, o kterých byste se po přečtení mohli dozvědět více.
+
+Ve výsledku byste pochopili princip práci simulátoru v reálném čase, založeném na využití modelovacích technik Petriho sítí za použití knihovny SNAKES, který má předpoklady pro využití v distribuovaných systémech. Vzhledem k tomu, že takový systém je hodně závislý na komunikací s svými vzdálenými prvky, tak se v průběhu vysvětlí principy protokolu MQTT, který se stal základem implementaci simulátoru a jeho komunikačních kanálů. Nakonec byste byli schopné odzkoušet simulator v praxi, a podívat se podrobně na Petriho sítě, navržené pro ukázkovou aplikaci. Tato aplikace bude vytvořena pro demonstrační účely a založena na teorii distribuovaných systémů.
+
+Výsledný simulační nástroj bude vytvořený tak, abyste mohli snadno získat představu o současném stavu implementací nebo běhu simulace, za využití uživatelsky zaměřeného vizualizačního modulu knihovny SNAKES. Generované obrázky tohoto modulu sestaví nemalou část obsahu této práci. Díky naimplementovaným rozšířením, čtenář bude schopny snadno vytvořit sadu pro svůj model.
+
+Vzhledem k existenci hotového nástroje pro modelování a simulaci, cast této prací bude věnovaná návodu na vytvoření svých vlastních modelů, za účelem usnadnění procesu modelování a seznámení čtenáře s hotovým produktem a postupem pro jeho nastavení.
 
 \chapter{Přehled teorie}
 \label{chapp:prehled}
@@ -415,8 +422,8 @@ Přijetí, odesílající stranou potvrzovací zprávy Success, znamená že nas
 
 \begin{tabbing}
  Příklad: \= \\
- \> \texttt{'F, R, set\_output, net1/port1, net2/port2, }\\
- \> \texttt{Error: place "port1"\space was not found in net "net1"'} \\
+ \> \texttt{F, R, set\_output, net1/port1, net2/port2, }\\
+ \> \texttt{Error: place "port1"\space was not found in net "net1"} \\
 \end{tabbing}
 
 Běžně se takové chyby vyskytují jenom ve fází vývoje aplikace, když uživatel zkouší přidávat nové Petriho sítě, takže nehrozí, že výsledná aplikace, nasazená do provozu, najednou spadne s podobným chybovým hlášením.
@@ -472,7 +479,7 @@ Takový přechod se definuje ve dvou krocích. Nejdříve se vytvoří prvek \te
  pr2=Transition("Prob-trans-2", prob=0.4)
 \end{python}
 
-Dále stačí spojit pravděpodobnosti přechodu do jedné skupín pomocí klauzule \\ \texttt{add\_neighbour\_transition}. Viz. řádek \ref{code:prob-neghb-example} nebo řádek \ref{code:prob-temp-neghb-example-1} z kompletního \hyperref[code:prob-ev-draw]{příkladu}.
+Dále stačí spojit pravděpodobnosti přechodu do jedné skupin pomocí klauzule \\ \texttt{add\_neighbour\_transition}. Viz. řádek \ref{code:prob-neghb-example} nebo řádek \ref{code:prob-temp-neghb-example-1} z kompletního \hyperref[code:prob-ev-draw]{příkladu}.
 \begin{python}
  # Krok 2: Vytvoreni prechodu s parametrem prob
  pr1.add_neighbour_transition(pr2) (*\label{code:prob-neghb-example}*)
@@ -518,13 +525,45 @@ Stejně tak podporuje nastavení vzdálených portů pro předání tokenů jin�
  n.add_remote_output(hen, "boiler-logic/Sensory_input") (*\label{code:remote_out}*)
 \end{python}
 
+\subsubsection{Princip práci}
+
 Simulace funguje na základě opakování dvou simulačních cyklu, jak je to popsané v algoritmu \ref{real-time-alg}. První čeká na příchod nové události od plánovače, když ten druhý čeká na čas spouštění nejdřívější události ze seznamu plánovače. To čekání se provádí za použití metody \texttt{sleep}. Plánovač událostí se využívá pro plánovaní spouštění sítě do budoucna. Pro tento účel slouží metoda \texttt{execute\_net}.
 
 Jsou tří případy pro vložení takové události do plánovače. Může to být uživatelská akce, příchod tokenu do nějakého ze vstupních portů sítě, nebo událost od rozšíření \texttt{timed\_pl}.
 
-Provádění Petriho sítě metodou \texttt{execute\_net} je ukončené odesláním shromážděných tokenů z výstupních portů podle popísu v \ref{par:token-format}.
+Provádění Petriho sítě metodou \texttt{execute\_net} je ukončené odesláním shromážděných tokenů z výstupních portů podle popisu v \ref{par:token-format}.
 
-Původní navrch simulátoru předpokládal že simulace bude běžet nějakou omezenou časovou dobu, ale to se ukázalo byt nepoužitelné pro případ využití v teorii distribuovaných systémů. Takže současný stav simulátoru očekává ukončení simulaci příjetím signálu \texttt{SIGINT} nebo \texttt{SIGTERM} od užívatele.
+Původní navrch simulátoru předpokládal že simulace bude běžet nějakou omezenou časovou dobu, ale to se ukázalo byt nepoužitelné pro případ využití v teorii distribuovaných systémů. Takže současný stav simulátoru očekává ukončení simulaci příjetím signálu \texttt{SIGINT} nebo \texttt{SIGTERM} od uživatele.
+
+\subsubsection{Vykreslování stávu simulace}
+
+Každá instance simulátoru dokáže vykreslit svůj původní a aktuální stav Petriho sítí podle následující struktury -- \ref{fig:draw-stucture}.
+
+Původní stav: \uv{\texttt{net-drawings/<název simulace>/starting/<net-name>.png}}
+
+Současný stav: \uv{\texttt{net-drawings/<název simulace>/current/<net-name>.png}}.
+
+\begin{figure}
+  \centering
+  \framebox[\textwidth]{%
+  \begin{minipage}{0.9\textwidth}
+    \dirtree{%
+    .1 simulation-root.
+      .2 net-drawings.
+        .3 all-in-one.
+          .4 starting.
+            .5 net1.png.
+          .4 current.
+            .5 net1.png.
+        .3 server.
+          .4 starting.
+          .4 current.
+    }
+  \end{minipage}
+  }
+  \caption{Struktura uložení zobrazení Petriho sítí.}
+  \label{fig:draw-stucture}
+\end{figure}
 
 \subsection{Návod pro import rozšíření}
 Vzhledem k odlišnému postupu pří přidání rozšíření do SNAKES, pro import simulačního nástroje a dalších rozšíření ze skupiny, uživatel musí dodržovat správné pořadí při importu knihoven. Konvence probíhá následujícím způsobem.
@@ -580,7 +619,7 @@ Pro demonstraci práce simulátoru bylo rozhodnuto namodelovat distribuovaný sy
 
 \section{Struktura aplikace}
 
-Navrch \ref{boiler-net} se sestavuje ze 5 částí:
+Navrch \ref{boiler-net} se sestavuje z 5 částí:
 \begin{itemize}
  \item Řízení
  \item Sklep
@@ -670,7 +709,19 @@ Tato část aplikace je vyhrazena do zvláštních simulačních instanci, vzhle
 \section{Simulace pokojů}
 \label{sec:room-sim-details}
 
-V rámci této simulace se popisuje chování řídícího systému senzoru a simuluje se chování teploty v každém z pokojů. Řízení -- \ref{sensor-viz}. Převod změn energii na teplotu \ref{room-temp-viz}, výměna energii se vnějším prostředím -- \ref{exchange-viz}, simulace ohřívání pokoje -- \ref{heater-viz}.
+V rámci této simulace se popisuje chování řídícího systému senzoru a simuluje se chování teploty pro každý z pokojů.
+
+\subsection{Výměna energii se vnějším prostředím}
+
+Obrázek -- \ref{exchange-viz}
+
+\subsection{Převod změn energii na teplotu}
+
+Obrázek můžete vidět v \ref{room-temp-viz}
+
+\subsection{Simulace ohřívání pokoje}
+
+Obrázek -- \ref{heater-viz}.
 
 \begin{figure}[htb]
  \centering
@@ -698,6 +749,14 @@ V rámci této simulace se popisuje chování řídícího systému senzoru a si
 \label{sec:server-details}
 
 Následující Petriho sítě provádějí obsluhu systému pokojů. K nim patří, například řízení senzoru \ref{sensor-viz} a tabulka očekávaných teplot v pokoji \ref{room-table-viz} během dané hodiny.
+
+\subsection{Řízení}
+
+Obrázek můžete vidět v \ref{sensor-viz}
+
+\subsection{Tabulka očekávaných teplot}
+
+Obrázek můžete vidět v \ref{room-table-viz}
 
 \begin{figure}[htb]
  \centering
@@ -728,7 +787,7 @@ Součásti simulace je taky popis chování boileru. Jeho cílem je sledování 
 
 \section{Přesnost simulace}
 
-Stojí za to se zmínit, že účelem této aplikace není zcela přesná simulace chování topení, ale její zjednodušená kopie. Do úvahy se nebere například to, že rychlost výměny tepla s vnějším prostředím není konstantní, jak je uvedeno v tabulce \ref{tab:tepelne-ztraty}, ale je závislá na spoustě parametrů, jako teplota vnějšího prostředí, materiál a tloušťka stěn pokoje atd. To se nepočítá v současném návrhu, ale může být přidáno ve případě potřeby. Účelem této aplikace je vizualizace práce vytvořeného simulátoru.
+Stojí za to se zmínit, že účelem této aplikace není zcela přesná simulace chování topení, ale její zjednodušená kopie. Do úvahy se nebere například to, že rychlost výměny tepla s vnějším prostředím není konstantní, jak je uvedeno v tabulce \ref{tab:tepelne-ztraty}, ale je závislá na spoustě parametrů, jako teplota vnějšího prostředí, materiál a tloušťka stěn pokoje atd. To se nepočítá v současném návrhu, ale může být přidáno ve případě potřeby. Účelem této aplikace je vizualizace práce vytvořeného simulátoru a demonstrace využití v distribuovaných systémech.
 
 \chapter{Postup pro vytvoření ukázkové Petriho sítě}
 \label{chap:postup}
@@ -896,19 +955,20 @@ Síť vypadá následovně: \ref{prob-ev-viz}.
 \chapter{Závěr}
 \label{chap:zaver}
 
-Během čtení této bakalářské práci, čtenářovi byla nabidnuta možnost pochopit teoretické základy Petriho sítí, zjistit rozdíl mezí značkovanou a vysokoúrovňovou Petriho sětmi, a nahlednout do případů, kde se tento modelovací prostředek úspěšně používá nebo má předpoklády pro uplatnění. Byly taky ukázany teoretické základy Grafů Vysokoúrovňových Petriho sítí, které našli využití v dalších kapitolách, spojených s vizualizací navržené aplikace simulatoru.
+Během čtení této bakalářské práci, čtenářovi byla nabídnuta možnost pochopit teoretické základy Petriho sítí, zjistit rozdíl mezí značkovanou a vysokoúrovňovou Petriho sětmi, a nahlednout do případů, kde se tento modelovací prostředek úspěšně používá nebo má předpoklady pro uplatnění. Byly taky ukázaný teoretické základy Grafů Vysokoúrovňových Petriho sítí, kterchap:é našli využití v dalších kapitolách, spojených s vizualizací navržené aplikace simulatoru.
 
-Byla vyjasnena problematika Distribuovaných sýtemů, a taky kde a proč se takové sýstemy používají. Byl vysvetlen pojem Diskretní simulace, a simulace v reálném čase, včetně její běžných případů vyžítí v praxi. V sekci spojené z teoretickymi základy simulatoru, bylo taky řečeno o jeho využití v HWIL. Ve stejné sekci byl podrobně popsan MQTT protokol komunikace, který našel svoje využítí ve mnoha místech, včetně implementací simulatoru.
+Byla vyjasněna problematika Distribuovaných systémů, a taky kde a proč se takové systémy používají. Byl vysvětlen pojem Diskrétní simulace, a Simulace v Reálném Čase, včetně její běžných případů využití v praxi. V sekci spojené s teoretickými základy simulatoru, bylo taky řečeno o jeho využití v HWIL. Ve stejné sekci byl podrobně popsán MQTT protokol komunikace, který našel svoje využití ve mnoha místech, včetně implementací simulatoru.
 
-Další kapítola vyjasnila struktura simulatoru, využívající MQTT protokol. Značná čast této kapítoly byla zaměřená na vysvětlení prácí vlastního protokolu pro nastavení simulatoru, využítí kterého se dá uplatnít pro napsaní externích aplikaci pro výsledný simulator. Stejně tak se velice podrobně popsala implementace několíka rozšíření pro knihovnu SNAKES, bez kterých využití simulačního nástroje se nezdá byt možné. Z toho důvodu byl zdůraznen postup pro import téchto rozsíreni do knihovny SNAKES.
+Další kapitola vyjasnila struktura simulatoru, využívající MQTT protokol. Značná část této kapitoly byla zaměřená na vysvětlení prací vlastního protokolu pro nastavení simulatoru, využití kterého se dá uplatnit pro napsaní externích aplikaci pro výsledný simulator. Stejně tak se velice podrobně popsala implementace několika rozšíření pro knihovnu SNAKES, bez kterých využití simulačního nástroje se nezdá být možné. Z toho důvodu byl zdůrazněn postup pro import těchto rozšíření do knihovny SNAKES.
 
-Stejně jako bez rozsíření, simulator Petriho sítí v realném čase by nebyl možný bez planovače udalosti, informace o implementaci kterého byla popsana v dalsi sekci.
+Stejně jako bez rozšíření, simulator Petriho sítí v reálném čase by nebyl možný bez implementace plánovače událostí, informace o kterém byla popsana v dalsi sekci.
 
-Nasledující kapitola měla za ukol vyjasnit navrch aplikaci, demonstrujici vyuziti simulatoru pro modelovaní a simulaci distribuovaných systemů na příkladě chovaní tepelného řízení. Spolu s kapitolou \ref{chap:app-implementation} se zcela podrobně popsala prace navrzene aplikace.
+Následující kapitola měla za úkol vyjasnit navrh aplikaci, demonstrující využití simulátoru pro modelování a simulaci distribuovaných systémů na příkladě chování tepelného řízení. Spolu s kapitolou \ref{chap:app-implementation} se zcela podrobně popsala prace navrzene aplikace.
 
-Poslední kapitolou této praci byla ukazka implementaci jedné z Petriho sítí patřící do aplikace, která demonstrovala využítí všech navrzenych rozšíření, a měla za účel naučít uživatele správně zacházet z knihovnou SNAKES, a tedy implementovat svoje vlastní nápady. Pro ténto účel slouží appendix \ref{chap:instal-tutor}, který obsahuje instalační manual a popisuje nástroje, usnadňující nastavení simulatru do 2 řádku kódu.
+Poslední kapitolou této práci byla ukázka implementaci jedné z Petriho sítí patřící do aplikace, která demonstrovala využití všech navrzenych rozšíření, a měla za účel naučit uživatele správně zacházet z knihovnou SNAKES, a tedy implementovat svoje vlastní nápady. Pro tento účel slouží appendix \ref{chap:instal-tutor}, který obsahuje instalační manuál a popisuje nástroje, usnadňující nastavení simulatru do 2 řádku kódu.
 
-Svoji práci tímž ukončuji, a považuji za zcela hotovou. Byly splněny všechny body zadání, naimplementované a otesované všechny nastroje a dodrženy všechná pravidla struktorování textu, patřící technícké zprávě, podle standardů VUT.
+Svoji práci týmž ukončuji, a považuji za zcela hotovou. Byly splněny všechny body zadání, naimplementované a otestované všechny nástroje a dodrženy všechny pravidla strukturování textu, patřící technické zprávě, podle standardů VUT.
+
 
 
 
