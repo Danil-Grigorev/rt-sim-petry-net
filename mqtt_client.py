@@ -306,7 +306,6 @@ class Mqtt_client():
             self.publish(topic, '&'.join(tokens), 2)
         else: # Net is not yet registered
             self.update_remote_requests(net, '&'.join(tokens), topic)
-        # self.simul.schedule([self.topic_publish, topic], self.simul.INF)
 
     def configure(self):
         self.client.user_data_set(self.nets.keys())
