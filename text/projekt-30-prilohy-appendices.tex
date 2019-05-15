@@ -8,10 +8,10 @@ Pokud byste potřebovali odzkoušet simulační nástroj z této práci, tak byc
     \item Nainstalovat knihovnu SNAKES podle nějakého z postupu v \href{https://www.ibisc.univ-evry.fr/~fpommereau/SNAKES/first-steps-with-snakes.html}{návodu}. \label{pip-snakes}
     Doporučený postup, nainstalovat to přes pip:
 
-    \texttt{pip3 install git+git://github.com/fpom/snakes \-\-user}.
-    \item Nainstalovat této knihovny přes \texttt{pip3 install xxx \-\-user} pro podporu MQTT, kde \texttt{xxx} je:
+    \texttt{pip3 install git+git://github.com/fpom/snakes ----user}.
+    \item Nainstalovat této knihovny přes \texttt{pip3 install xxx ----user} pro podporu MQTT, kde \texttt{xxx} je:
     \begin{itemize}
-        \item \texttt{pahomqtt}
+        \item \texttt{paho--mqtt}
         \item \texttt{hbmqtt}
     \end{itemize}
     \item Naklonovat git repositář simulační knihovny do libovolného místa na disku:
@@ -28,6 +28,7 @@ Pokud byste potřebovali odzkoušet simulační nástroj z této práci, tak byc
 
 \end{enumerate}
 
+Alternativní postup je nainstalovat si závislosti z \texttt{pip3} pomoci pyth{setuptools}. Stačí spustit příkaz \pyth{python3 -m pip install -r requirements.txt --user}. Pří použítí \texttt{python3-venv}, nemusíte uvádět \texttt{----user} po každém z příkazů.
 \section{MQTT broker}
 
 V mém \href{https://github.com/Danil-Grigorev/rt-sim-petry-net}{repositáři} se taky nachází konfigurační soubor pro případ, že byste neměli k dispozici MQTT broker. Je to soubor \href{https://github.com/Danil-Grigorev/rt-sim-petry-net/blob/master/hbmqtt.conf}{hbmqtt.conf}, a abyste takový server spustili na lokálním počítači, stačí k tomu příkaz \texttt{hbmqtt -c hbmqtt.conf}.

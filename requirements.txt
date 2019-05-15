@@ -1,0 +1,3 @@
+paho-mqtt==1.4.0
+hbmqtt==0.9.5
+SNAKES==0.9.26
