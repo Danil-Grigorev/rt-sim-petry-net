@@ -1,10 +1,3 @@
-% Tento soubor nahraďte vlastním souborem s přílohami (nadpisy níže jsou pouze pro příklad)
-% This file should be replaced with your file with an appendices (headings below are examples only)
-
-% Umístění obsahu paměťového média do příloh je vhodné konzultovat s vedoucím
-% Placing of table of contents of the memory media here should be consulted with a supervisor
-%\chapter{Obsah přiloženého paměťového média}
-
 \chapter{Instalační manuál}
 \label{chap:instal-tutor}
 
@@ -57,3 +50,11 @@ Běžný způsob použítí simulátoru předpokládá využití třídy \texttt
 \label{sec:external-app-example}
 
 Postup pro vytvoření takové aplikace se nachází v kapitole \ref{subsec:external-app}, výsledný kód z komentáři je součástí \href{https://github.com/Danil-Grigorev/rt-sim-petry-net/blob/master/temperature_logger.py}{tohoto} souboru.
+
+\section{Zdrojové kódy pro aplikaci}
+
+V kapitole \ref{chap:app-arch} a \ref{chap:app-implementation} je detailní popis navržené aplikace. Zdrojové kódy se nacházejí ve \href{https://github.com/Danil-Grigorev/rt-sim-petry-net/tree/master/sample_nets}{složce} \uv{\texttt{sample\_nets}}.
+
+Pro import a následující použítí stačí provést příkaz \pyth{from sample_nets import *}.
+
+Jsou dvě možností pro spouštění aplikace -- buď distribuovaně podle návrhu z \ref{boiler-net}, kdě aplikace je rozdělena na častí v do souborů \texttt{dining-room.py}, \texttt{storeroom.py}, \texttt{surroundings.py}, \texttt{kitchen.py} a \texttt{server.py}, nebo pro demonstrační účely slouží varianta \texttt{all-in-one.py}.

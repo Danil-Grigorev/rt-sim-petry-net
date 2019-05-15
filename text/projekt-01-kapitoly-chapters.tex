@@ -361,6 +361,8 @@ Na obrázku je 6 vstupních portů a 5 výstupních. Vstupní porty jsou označe
 
 Na příkladě vstupního portu \texttt{log} můžete vidět, že není povinné, aby port byl zapojený. V~případě simulátoru se chování vstupního portu s~takovým nastavením  neliší od už připojeného -- pokračuje v~naslouchání na svoje \uv{téma}. Pokud ale nějaký z~výstupních portů nebude mít žádnou registrovanou dvojicí, \uv{\texttt{NET/TOPIC}}, tak jenom zahazuje tokeny namísto odesílání. Víc o~použítí takového nastavení viz. \ref{subsec:external-app}.
 
+Ve případě že vzdálené porty jsou součástí Petriho sítě, nacházející se uvnitř stejné instanci, tak přenos zpráv se provádí lokálně, bez použítí protokolu MQTT.
+
 Více se o~nastavení portů viz \ref{subsec:sim_pl} a \ref{subsec:remote-ports-setup}.
 
 \subsection{Nastavení vstupních a výstupních portů}
@@ -372,7 +374,7 @@ Je předem definované, že každá simulační instance odebírá zprávy z~té
 
 \paragraph{Nastavení vstupního portu}
 
-Běžná činnost pro vstupní port -- naslouchání na téma uvedené v~vizualizací portu. Seznam takových témat se nachází pod navěštím \texttt{Listening to}. Vstupní port se označuje zeleně. Výsledek je na obrázku \ref{port-in}.
+Vstupní porty se označují zelenou barvou. Běžná činnost pro vstupní port -- naslouchání na téma uvedené v~vizualizací portu. Seznam takových témat se nachází pod navěštím \texttt{Listening to}, poslední název z toho seznamu patří místu. Výsledek je na obrázku \ref{port-in}.
 
 \begin{python}
   # Vytvoreni site, mista a pridani ho do site
@@ -416,7 +418,11 @@ Běžná činnost pro vstupní port -- naslouchání na téma uvedené v~vizuali
 \end{figure}
 
 
-Implementace zevnitř vypadá podobně reprezentací samotných portů. Síť, pří volání metody \texttt{add\_remote\_input} nastaví typ místa na vstupní, pak pošle zprávu na téma \texttt{control} obsahující dvojicí \texttt{[jméno sítě, jméno místa]} a uloží zprávu do čekací fronty. Pak, když se k~brokeru přípojí nějaká simulační instance s~požadovanou dvojicí síť--místo, zpráva se přepošle všem simulačním instancím. To se zase provede zasíláním zprávy na téma \texttt{control}. Hned po přijetí takové zprávy, port se nastaví a začne vykonávat svou činnost.
+Implementace zevnitř vypadá podobně reprezentací samotných portů. Síť, pří volání metody \texttt{add\_remote\_input} nastaví typ místa na vstupní, pak pošle zprávu na téma \texttt{control} obsahující dvojicí \texttt{[jméno sítě, jméno místa]} a uloží zprávu do čekací fronty. Pak, když se k~brokeru přípojí nějaká simulační instance s~požadovanou dvojicí síť--místo, zpráva se přepošle všem simulačním instancím. To se zase provede zasíláním zprávy na téma \texttt{control}. Hned po přijetí takové zprávy, port cílové sítě se nastaví na výstupní a začne vykonávat svou činnost.
+
+Nastavení portů je tedy oboustranní, a může se opakovat. Platí jenom, že vstupní a výstupní porty se navzájem vylučují.
+
+Přeposílání zpráv se provádí buď lokálně, když příjemce se nachází v rámci jedné simulace, nebo za použítí MQTT protokolu.
 
 \subsection{Vlastní protokol komunikace}
 \label{subsec:comm-proto}
