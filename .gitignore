@@ -371,3 +371,6 @@ TSWLatexianTemp*
 *.pdf
 *czechiso*
 .vscode*
+*.code-workspace
+projekt.pdf
+requirements.txt
